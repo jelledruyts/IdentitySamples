@@ -1,0 +1,20 @@
+﻿@{
+    ViewBag.Title = "Account";
+}
+<h1>@ViewBag.Title</h1>
+<h2>Claims</h2>
+<table class="table table-bordered table-hover table-responsive table-striped">
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>Value</th>
+        </tr>
+    </thead>
+    @foreach (var claim in ((System.Security.Claims.ClaimsIdentity)User.Identity).Claims)
+    {
+        <tr>
+            <td>@claim.Type</td>
+            <td>@claim.Value</td>
+        </tr>
+    }
+</table>

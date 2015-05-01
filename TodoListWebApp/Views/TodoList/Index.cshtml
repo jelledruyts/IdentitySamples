@@ -1,0 +1,23 @@
+﻿@model List<TodoListWebApp.Models.TodoItem>
+@{
+    ViewBag.Title = "To Do List";
+}
+<h1>@ViewBag.Title</h1>
+<h3>New To Do Item</h3>
+@using (Html.BeginForm("Index", "TodoList", FormMethod.Post, new { @class = "form-inline" }))
+{
+    <div class="form-group">
+        <input type="text" class="form-control" id="title" name="title" placeholder="Enter title">
+    </div>
+    <button type="submit" class="btn btn-default">Submit</button>
+}
+@if (Model.Any())
+{
+    <h3>@Model.Count To Do Item(s)</h3>
+    <ul class="list-group">
+        @foreach (var item in Model)
+        {
+            <li class="list-group-item">@item.Title</li>
+        }
+    </ul>
+}
