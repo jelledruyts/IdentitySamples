@@ -29,11 +29,14 @@ namespace TodoListWebApp.Controllers
         [HttpPost]
         public async Task<ActionResult> Index(TodoItem model)
         {
-            var client = await GetTodoListClient();
-            var request = new HttpRequestMessage(HttpMethod.Post, SiteConfiguration.WebApiRootUrl + "api/todolist");
-            request.Content = new JsonContent(model);
-            var response = await client.SendAsync(request);
-            response.EnsureSuccessStatusCode();
+            if (ModelState.IsValid)
+            {
+                var client = await GetTodoListClient();
+                var request = new HttpRequestMessage(HttpMethod.Post, SiteConfiguration.WebApiRootUrl + "api/todolist");
+                request.Content = new JsonContent(model);
+                var response = await client.SendAsync(request);
+                response.EnsureSuccessStatusCode();
+            }
             return RedirectToAction("Index");
         }
 

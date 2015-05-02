@@ -1,4 +1,5 @@
 ﻿using Common;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,7 @@ namespace TodoListWebApi.Controllers
         public IEnumerable<TodoItem> Get()
         {
             var userId = ClaimsPrincipal.Current.GetUniqueIdentifier();
-            return database.Where(t => t.UserId == userId);
+            return database.Where(t => t.UserId == userId).OrderBy(t => t.CreatedTime);
         }
 
         public IHttpActionResult Post(TodoItem value)
@@ -25,7 +26,7 @@ namespace TodoListWebApi.Controllers
                 return BadRequest("Title is required");
             }
             var userId = ClaimsPrincipal.Current.GetUniqueIdentifier();
-            database.Add(new TodoItem { Title = value.Title, UserId = userId });
+            database.Add(new TodoItem { Title = value.Title, UserId = userId, CreatedTime = DateTimeOffset.UtcNow });
             return Ok();
         }
     }
