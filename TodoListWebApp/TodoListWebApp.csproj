@@ -150,7 +150,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
+    <Compile Include="Models\Category.cs" />
     <Compile Include="Models\TodoItem.cs" />
+    <Compile Include="Models\TodoListIndexViewModel.cs" />
     <Compile Include="SiteConfiguration.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
@@ -214,9 +216,7 @@
     <Content Include="Views\Account\Index.cshtml" />
     <Content Include="Views\TodoList\Index.cshtml" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="App_Data\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Content Include="packages.config" />
   </ItemGroup>

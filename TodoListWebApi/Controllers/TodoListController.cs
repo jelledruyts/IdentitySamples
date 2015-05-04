@@ -9,14 +9,37 @@ using TodoListWebApi.Models;
 
 namespace TodoListWebApi.Controllers
 {
+    [Authorize]
     public class TodoListController : ApiController
     {
-        private static ConcurrentBag<TodoItem> database = new ConcurrentBag<TodoItem>();
+        #region In-Memory Database
+
+        private static ConcurrentBag<TodoItemData> database = new ConcurrentBag<TodoItemData>();
+
+        private class TodoItemData
+        {
+            public string Id { get; set; }
+            public DateTimeOffset CreatedTime { get; set; }
+            public string Title { get; set; }
+            public string CategoryId { get; set; }
+            public string UserId { get; set; }
+
+            public TodoItemData(string title, string categoryId, string userId)
+            {
+                this.Id = Guid.NewGuid().ToString();
+                this.CreatedTime = DateTimeOffset.UtcNow;
+                this.Title = title;
+                this.CategoryId = categoryId;
+                this.UserId = userId;
+            }
+        }
+
+        #endregion
 
         public IEnumerable<TodoItem> Get()
         {
             var userId = ClaimsPrincipal.Current.GetUniqueIdentifier();
-            return database.Where(t => t.UserId == userId).OrderBy(t => t.CreatedTime);
+            return database.Where(t => t.UserId == userId).OrderBy(t => t.CreatedTime).Select(t => new TodoItem { Id = t.Id, Title = t.Title, CategoryId = t.CategoryId });
         }
 
         public IHttpActionResult Post(TodoItem value)
@@ -25,9 +48,15 @@ namespace TodoListWebApi.Controllers
             {
                 return BadRequest("Title is required");
             }
+            if (value == null || string.IsNullOrWhiteSpace(value.CategoryId))
+            {
+                return BadRequest("CategoryId is required");
+            }
             var userId = ClaimsPrincipal.Current.GetUniqueIdentifier();
-            database.Add(new TodoItem { Title = value.Title, UserId = userId, CreatedTime = DateTimeOffset.UtcNow });
-            return Ok();
+            var data = new TodoItemData(value.Title, value.CategoryId, userId);
+            database.Add(data);
+            value.Id = data.Id;
+            return Ok(value);
         }
     }
 }

@@ -1,9 +1,8 @@
 ﻿using Microsoft.Owin.Security.ActiveDirectory;
 using Owin;
-using System.Configuration;
 using System.IdentityModel.Tokens;
 
-namespace TodoListWebApi
+namespace TaxonomyWebApi
 {
     public partial class Startup
     {
@@ -13,8 +12,7 @@ namespace TodoListWebApi
                 {
                     TokenValidationParameters = new TokenValidationParameters
                     {
-                        ValidAudience = SiteConfiguration.TodoListWebApiResourceId,
-                        SaveSigninToken = true // This places the original token on the ClaimsIdentity.BootstrapContext.
+                        ValidAudience = SiteConfiguration.TaxonomyWebApiResourceId
                     },
                     Tenant = SiteConfiguration.AadTenant
                 });

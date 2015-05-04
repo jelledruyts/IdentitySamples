@@ -1,23 +1,56 @@
-﻿@model List<TodoListWebApp.Models.TodoItem>
+﻿@model TodoListWebApp.Models.TodoListIndexViewModel
 @{
     ViewBag.Title = "To Do List";
 }
 <h1>@ViewBag.Title</h1>
+
 <h3>New To Do Item</h3>
-@using (Html.BeginForm("Index", "TodoList", FormMethod.Post, new { @class = "form-inline" }))
+<div class="well">
+    @using (Html.BeginForm("Index", "TodoList", FormMethod.Post))
+    {
+        <div class="form-group">
+            <label for="title">Title</label>
+            <input type="text" class="form-control" id="title" name="title" placeholder="Enter a title">
+        </div>
+        <div class="form-group">
+            <label for="categoryId">Category</label>
+            <select id="categoryId" name="categoryId" class="form-control">
+                @foreach (var category in Model.Categories)
+                {
+                    <option value="@category.Id">@(category.Name + (category.IsPrivate ? " [Private]" : ""))</option>
+                }
+            </select>
+        </div>
+        <div class="form-group form-inline">
+            <label for="">Or new:</label>
+            <input type="text" class="form-control" id="newCategoryName" name="newCategoryName" placeholder="Enter a new category" />
+            <div class="checkbox">
+                <label for="newCategoryIsPrivate" title="Make the new category only visible to yourself">
+                    <input type="checkbox" id="newCategoryIsPrivate" name="newCategoryIsPrivate" value="true"> Private
+                </label>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-default btn-primary">Submit</button>
+    }
+</div>
+
+@if (Model.TodoItems.Any())
 {
-    <div class="form-group">
-        <input type="text" class="form-control" id="title" name="title" placeholder="Enter title">
-    </div>
-    <button type="submit" class="btn btn-default">Submit</button>
-}
-@if (Model.Any())
-{
-    <h3>@Model.Count To Do Item(s)</h3>
+    <h3>@Model.TodoItems.Count To Do Item@(Model.TodoItems.Count != 1 ? "s" : "")</h3>
     <ul class="list-group">
-        @foreach (var item in Model)
+        @foreach (var item in Model.TodoItems)
         {
-            <li class="list-group-item">@item.Title</li>
+            var category = Model.Categories.FirstOrDefault(c => c.Id == item.CategoryId);
+            <li class="list-group-item">
+                @if (category != null)
+                {
+                    <span class="badge" title="@(category.IsPrivate ? "Private" : "Public") category">
+                        @category.Name
+                        <span class="glyphicon glyphicon-@(category.IsPrivate ? "sunglasses" : "eye-open")"></span>
+                    </span>
+                }
+                @item.Title
+            </li>
         }
     </ul>
 }

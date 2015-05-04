@@ -16,7 +16,7 @@ namespace TodoListWebApp
         public void ConfigureAuth(IAppBuilder app)
         {
             var urlHelper = new UrlHelper(HttpContext.Current.Request.RequestContext);
-            var postLogoutRedirectUri = new Uri(new Uri(SiteConfiguration.WebAppRootUrl), urlHelper.Action("SignedOut", "Account")).ToString();
+            var postLogoutRedirectUri = new Uri(new Uri(SiteConfiguration.TodoListWebAppRootUrl), urlHelper.Action("SignedOut", "Account")).ToString();
 
             app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
 
@@ -25,7 +25,7 @@ namespace TodoListWebApp
             app.UseOpenIdConnectAuthentication(
                 new OpenIdConnectAuthenticationOptions
                 {
-                    ClientId = SiteConfiguration.WebAppClientId,
+                    ClientId = SiteConfiguration.TodoListWebAppClientId,
                     Authority = SiteConfiguration.AadAuthority,
                     PostLogoutRedirectUri = postLogoutRedirectUri,
 
@@ -37,9 +37,9 @@ namespace TodoListWebApp
                             // and store those away in the cache.
                             // Note that typically this is a "Multiple Resource Refresh Token" which means the refresh token can be used not only against
                             // the requested "resource" but also against any other resource defined in the same directory tenant the user has access to.
-                            var credential = new ClientCredential(SiteConfiguration.WebAppClientId, SiteConfiguration.WebAppClientSecret);
+                            var credential = new ClientCredential(SiteConfiguration.TodoListWebAppClientId, SiteConfiguration.TodoListWebAppClientSecret);
                             var authContext = new AuthenticationContext(SiteConfiguration.AadAuthority, TokenCacheFactory.Instance);
-                            var result = await authContext.AcquireTokenByAuthorizationCodeAsync(context.Code, new Uri(HttpContext.Current.Request.Url.GetLeftPart(UriPartial.Path)), credential, SiteConfiguration.WebApiResourceId);
+                            var result = await authContext.AcquireTokenByAuthorizationCodeAsync(context.Code, new Uri(HttpContext.Current.Request.Url.GetLeftPart(UriPartial.Path)), credential, SiteConfiguration.TodoListWebApiResourceId);
                         },
                         AuthenticationFailed = context =>
                         {

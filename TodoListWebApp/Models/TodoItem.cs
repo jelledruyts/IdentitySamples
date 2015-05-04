@@ -4,7 +4,7 @@ namespace TodoListWebApp.Models
 {
     public class TodoItem
     {
-        [Required]
         public string Title { get; set; }
+        public string CategoryId { get; set; }
     }
 }
