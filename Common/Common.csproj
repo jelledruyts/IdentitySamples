@@ -44,7 +44,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClaimInfo.cs" />
     <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="IdentityInfo.cs" />
     <Compile Include="JsonContent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

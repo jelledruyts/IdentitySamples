@@ -150,6 +150,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
+    <Compile Include="Models\AccountIndexViewModel.cs" />
     <Compile Include="Models\Category.cs" />
     <Compile Include="Models\TodoItem.cs" />
     <Compile Include="Models\TodoListIndexViewModel.cs" />

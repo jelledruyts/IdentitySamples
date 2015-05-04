@@ -65,7 +65,7 @@ namespace TodoListWebApp.Controllers
             return RedirectToAction("Index");
         }
 
-        private async Task<HttpClient> GetTodoListClient()
+        public static async Task<HttpClient> GetTodoListClient()
         {
             // Get a token to authenticate against the Web API.
             var authContext = new AuthenticationContext(SiteConfiguration.AadAuthority, TokenCacheFactory.Instance);

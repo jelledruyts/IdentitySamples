@@ -38,7 +38,7 @@ namespace TodoListWebApi.Controllers
             return Ok(newCategory);
         }
 
-        private async Task<HttpClient> GetTaxonomyClient()
+        public static async Task<HttpClient> GetTaxonomyClient()
         {
             // Get an On-Behalf-Of token to authenticate against the Taxonomy Web API.
             var authContext = new AuthenticationContext(SiteConfiguration.AadAuthority, TokenCacheFactory.Instance);

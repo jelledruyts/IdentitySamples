@@ -1,20 +1,91 @@
-﻿@{
+﻿@model TodoListWebApp.Models.AccountIndexViewModel
+@{
     ViewBag.Title = "Account";
 }
 <h1>@ViewBag.Title</h1>
-<h2>Claims</h2>
-<table class="table table-bordered table-hover table-responsive table-striped">
-    <thead>
-        <tr>
-            <th>Type</th>
-            <th>Value</th>
-        </tr>
-    </thead>
-    @foreach (var claim in ((System.Security.Claims.ClaimsIdentity)User.Identity).Claims)
-    {
-        <tr>
-            <td>@claim.Type</td>
-            <td>@claim.Value</td>
-        </tr>
-    }
-</table>
+@ShowIdentity(Model.IdentityInfo)
+
+@helper ShowIdentity(Common.IdentityInfo identity)
+{
+    var identityInfoPanelId = Guid.NewGuid().ToString();
+
+    <div class="panel-group">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" href="#@identityInfoPanelId">Identity</a>
+                </h4>
+            </div>
+            <div id="@identityInfoPanelId" class="panel-collapse collapse in">
+                <div class="panel-body">
+                    <dl class="dl-horizontal">
+                        <dt>Is Authenticated</dt>
+                        <dd>@identity.IsAuthenticated.ToString().ToLowerInvariant()</dd>
+                        <dt>Authentication Type</dt>
+                        <dd>@identity.AuthenticationType</dd>
+                        <dt>Name</dt>
+                        <dd>@identity.Name</dd>
+                        @if (identity.RelatedApplicationIdentities != null && identity.RelatedApplicationIdentities.Any())
+                        {
+                            <dt>Related Application Identities</dt>
+                            <dd>
+                                @foreach (var relatedApplicationIdentity in identity.RelatedApplicationIdentities)
+                                {
+                                    var actorPanelId = Guid.NewGuid().ToString();
+
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">
+                                                <a data-toggle="collapse" href="#@actorPanelId">@relatedApplicationIdentity.Application</a>
+                                            </h4>
+                                        </div>
+                                        <div id="@actorPanelId" class="panel-collapse collapse">
+                                            <div class="panel-body">
+                                                @ShowIdentity(relatedApplicationIdentity)
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </dd>
+                        }
+                    </dl>
+                </div>
+            </div>
+        </div>
+        @foreach (var claimsByIssuer in identity.Claims.GroupBy(c => c.Issuer))
+        {
+            var claimsPanelId = Guid.NewGuid().ToString();
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" href="#@claimsPanelId">
+                            @claimsByIssuer.Count() claims issued by <code>@claimsByIssuer.Key</code>
+                        </a>
+                    </h4>
+                </div>
+                <div id="@claimsPanelId" class="panel-collapse collapse in">
+                    <div class="panel-body">
+                        <table class="table table-bordered table-striped table-responsive">
+                            <thead>
+                                <tr>
+                                    <th>Claim Type</th>
+                                    <th>Claim Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var claim in claimsByIssuer)
+                                {
+                                    <tr>
+                                        <td>@claim.Type</td>
+                                        <td><abbr title="@claim.Remark">@claim.Value</abbr></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

@@ -2,20 +2,35 @@
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.OpenIdConnect;
+using Newtonsoft.Json;
 using System.Linq;
+using System.Net.Http;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using TodoListWebApp.Infrastructure;
+using TodoListWebApp.Models;
 
 namespace TodoListWebApp.Controllers
 {
     [Authorize]
     public class AccountController : Controller
     {
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            return View();
+            // Get identity information from the Todo List Web API.
+            var todoListWebApiClient = await TodoListController.GetTodoListClient();
+            var todoListWebApiIdentityInfoRequest = new HttpRequestMessage(HttpMethod.Get, SiteConfiguration.TodoListWebApiRootUrl + "api/identity");
+            var todoListWebApiIdentityInfoResponse = await todoListWebApiClient.SendAsync(todoListWebApiIdentityInfoRequest);
+            todoListWebApiIdentityInfoResponse.EnsureSuccessStatusCode();
+            var todoListWebApiIdentityInfoResponseString = await todoListWebApiIdentityInfoResponse.Content.ReadAsStringAsync();
+            var todoListWebApiIdentityInfo = JsonConvert.DeserializeObject<IdentityInfo>(todoListWebApiIdentityInfoResponseString);
+
+            // Gather identity information from the current application and aggregate it with the identity information from the Web API.
+            var identityInfo = IdentityInfo.FromCurrent("Todo List Web Application", new IdentityInfo[] { todoListWebApiIdentityInfo });
+
+            return View(new AccountIndexViewModel(identityInfo));
         }
 
         public ActionResult SignIn()
@@ -44,8 +59,6 @@ namespace TodoListWebApp.Controllers
             {
                 tokenCache.DeleteItem(userToken);
             }
-
-            Session.Abandon();
         }
 
         [AllowAnonymous]
