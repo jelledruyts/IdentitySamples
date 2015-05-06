@@ -3,13 +3,10 @@ using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.OpenIdConnect;
 using Newtonsoft.Json;
-using System.Linq;
 using System.Net.Http;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
-using TodoListWebApp.Infrastructure;
 using TodoListWebApp.Models;
 
 namespace TodoListWebApp.Controllers
@@ -50,15 +47,9 @@ namespace TodoListWebApp.Controllers
 
         public void SignOut()
         {
-            // Remove all cache entries for this user and send an OpenID Connect sign-out request.
+            // Remove the token cache for this user and send an OpenID Connect sign-out request.
+            TokenCacheFactory.DeleteTokenCacheForCurrentPrincipal();
             HttpContext.GetOwinContext().Authentication.SignOut(OpenIdConnectAuthenticationDefaults.AuthenticationType, CookieAuthenticationDefaults.AuthenticationType);
-
-            var userId = ClaimsPrincipal.Current.GetUniqueIdentifier();
-            var tokenCache = TokenCacheFactory.Instance;
-            foreach (var userToken in tokenCache.ReadItems().Where(t => t.UniqueId == userId))
-            {
-                tokenCache.DeleteItem(userToken);
-            }
         }
 
         [AllowAnonymous]

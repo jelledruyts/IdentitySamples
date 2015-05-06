@@ -7,7 +7,6 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using TodoListWebApp.Infrastructure;
 using TodoListWebApp.Models;
 
 namespace TodoListWebApp.Controllers
@@ -68,7 +67,7 @@ namespace TodoListWebApp.Controllers
         public static async Task<HttpClient> GetTodoListClient()
         {
             // Get a token to authenticate against the Web API.
-            var authContext = new AuthenticationContext(SiteConfiguration.AadAuthority, TokenCacheFactory.Instance);
+            var authContext = new AuthenticationContext(SiteConfiguration.AadAuthority, TokenCacheFactory.GetTokenCacheForCurrentPrincipal());
             var credential = new ClientCredential(SiteConfiguration.TodoListWebAppClientId, SiteConfiguration.TodoListWebAppClientSecret);
             var userIdentifier = new UserIdentifier(ClaimsPrincipal.Current.GetUniqueIdentifier(), UserIdentifierType.UniqueId);
 
