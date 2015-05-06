@@ -1,0 +1,30 @@
+﻿<h1>To Do List</h1>
+
+<h3>New To Do Item</h3>
+<div class="well" ng-init="populate()">
+    <div ng-hide="!error" class="alert alert-danger">{{error}}</div>
+    <div class="form-group">
+        <div class="form-group">
+            <label for="title">Title</label>
+            <input type="text" class="form-control" id="title" ng-model="title" placeholder="Enter a title">
+        </div>
+        <div class="form-group">
+            <label for="categoryId">Category</label>
+            <select id="categoryId" ng-model="categoryId" ng-options="category.Id as (category.Name + (category.IsPrivate ? ' [Private]' : '')) for category in categories" class="form-control"></select>
+        </div>
+        <button ng-click="add();" class="btn btn-default btn-primary">Submit</button>
+    </div>
+</div>
+
+<div ng-hide="!loadingMessage" class="alert alert-info">{{loadingMessage}}</div>
+<div ng-hide="!todoList">
+    <h3>{{todoList.length}} To Do Item{{todoList.length != 1 ? 's' : ''}}</h3>
+    <ul class="list-group">
+        <li ng-repeat="item in todoList" class="list-group-item">
+            <span class="pull-right label" ng-class="item.Category.IsPrivate ? 'label-warning' : 'label-success'" title="{{item.Category.IsPrivate ? 'Private' : 'Public'}} category">
+                {{item.Category.Name}}
+            </span>
+            {{item.Title}}
+        </li>
+    </ul>
+</div>

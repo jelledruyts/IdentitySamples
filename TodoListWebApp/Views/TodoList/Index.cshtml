@@ -22,7 +22,7 @@
             </select>
         </div>
         <div class="form-group form-inline">
-            <label for="">Or new:</label>
+            <label for="newCategoryName">Or new:</label>
             <input type="text" class="form-control" id="newCategoryName" name="newCategoryName" placeholder="Enter a new category" />
             <div class="checkbox">
                 <label for="newCategoryIsPrivate" title="Make the new category only visible to yourself">
@@ -44,9 +44,8 @@
             <li class="list-group-item">
                 @if (category != null)
                 {
-                    <span class="badge" title="@(category.IsPrivate ? "Private" : "Public") category">
+                    <span class="pull-right label label-@(category.IsPrivate ? "warning" : "success")" title="@(category.IsPrivate ? "Private" : "Public") category">
                         @category.Name
-                        <span class="glyphicon glyphicon-@(category.IsPrivate ? "sunglasses" : "eye-open")"></span>
                     </span>
                 }
                 @item.Title

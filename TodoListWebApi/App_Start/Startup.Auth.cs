@@ -1,6 +1,6 @@
-﻿using Microsoft.Owin.Security.ActiveDirectory;
+﻿using Microsoft.Owin.Cors;
+using Microsoft.Owin.Security.ActiveDirectory;
 using Owin;
-using System.Configuration;
 using System.IdentityModel.Tokens;
 
 namespace TodoListWebApi
@@ -9,6 +9,10 @@ namespace TodoListWebApi
     {
         public void ConfigureAuth(IAppBuilder app)
         {
+            // Allow Cross-Origin Resource Sharing (CORS) from a Javascript client (SPA web application).
+            app.UseCors(CorsOptions.AllowAll);
+
+            // Use bearer authentication with tokens coming from Azure Active Directory.
             app.UseWindowsAzureActiveDirectoryBearerAuthentication(new WindowsAzureActiveDirectoryBearerAuthenticationOptions
                 {
                     TokenValidationParameters = new TokenValidationParameters

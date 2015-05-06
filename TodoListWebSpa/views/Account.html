@@ -1,0 +1,45 @@
+﻿<h1>Account</h1>
+<div class="panel-group">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-target="#identity-info-panel">Identity</a>
+            </h4>
+        </div>
+        <div id="identity-info-panel" class="panel-collapse collapse in">
+            <div class="panel-body">
+                <dl class="dl-horizontal">
+                    <dt>Is Authenticated</dt>
+                    <dd>{{userInfo.isAuthenticated}}</dd>
+                    <dt>Name</dt>
+                    <dd>{{userInfo.userName}}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-target="#claims-info-panel">Claims</a>
+            </h4>
+        </div>
+        <div id="claims-info-panel" class="panel-collapse collapse in">
+            <div class="panel-body">
+                <table class="table table-bordered table-striped table-responsive">
+                    <thead>
+                        <tr>
+                            <th>Claim Type</th>
+                            <th>Claim Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="(key,value) in userInfo.profile">
+                            <td>{{key}}</td>
+                            <td>{{value}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

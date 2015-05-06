@@ -5,6 +5,11 @@ namespace Common
 {
     public static class ExtensionMethods
     {
+        /// <summary>
+        /// Gets a unique identifier for the specified principal.
+        /// </summary>
+        /// <param name="principal">The principal.</param>
+        /// <returns>A unique identifier for the specified principal.</returns>
         public static string GetUniqueIdentifier(this ClaimsPrincipal principal)
         {
             if (principal == null)
@@ -12,7 +17,7 @@ namespace Common
                 throw new ArgumentNullException("principal");
             }
 
-            // The "Object Identifier" is ensured to be unique, non-changeable and non-reusable across multiple identities.
+            // [NOTE] The "Object Identifier" claim is ensured to be unique, non-changeable and non-reusable across multiple identities.
             var objectIdentifierClaim = principal.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier");
             if (objectIdentifierClaim == null || string.IsNullOrWhiteSpace(objectIdentifierClaim.Value))
             {

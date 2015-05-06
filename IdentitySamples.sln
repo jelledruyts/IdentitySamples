@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoListWebApp", "TodoListW
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoListWebApi", "TodoListWebApi\TodoListWebApi.csproj", "{11A10D48-8D21-47D1-B3DA-6CBA82C66789}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C7A4F408-7F06-46C7-8A74-A5C430894CD4}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "00 - Solution Items", "00 - Solution Items", "{C7A4F408-7F06-46C7-8A74-A5C430894CD4}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
 		LICENSE = LICENSE
@@ -17,6 +17,34 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{5608E35F-173B-48FA-B892-91F4D7259B2E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaxonomyWebApi", "TaxonomyWebApi\TaxonomyWebApi.csproj", "{A950E6FC-6902-4BA3-9F25-F45B62DAD294}"
+EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "TodoListWebSpa", "http://localhost:62920", "{6A6F8B90-45C0-4927-9842-A28D7AAEDDDB}"
+	ProjectSection(WebsiteProperties) = preProject
+		UseIISExpress = "true"
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5.1"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_62920"
+		Debug.AspNetCompiler.PhysicalPath = "TodoListWebSpa\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_62920\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_62920"
+		Release.AspNetCompiler.PhysicalPath = "TodoListWebSpa\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_62920\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		SlnRelativePath = "TodoListWebSpa\"
+		DefaultWebSiteLanguage = "Visual C#"
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "03 - Clients", "03 - Clients", "{079BF8E4-4430-4423-B65A-FEF5676C470B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02 - WebAPIs", "02 - WebAPIs", "{5CF11F85-59C5-497C-AF7E-19FA22B9C91A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01 - Common", "01 - Common", "{7F4559E7-1102-427E-9A0C-06AB57831794}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -40,8 +68,19 @@ Global
 		{A950E6FC-6902-4BA3-9F25-F45B62DAD294}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A950E6FC-6902-4BA3-9F25-F45B62DAD294}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A950E6FC-6902-4BA3-9F25-F45B62DAD294}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A6F8B90-45C0-4927-9842-A28D7AAEDDDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A6F8B90-45C0-4927-9842-A28D7AAEDDDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A6F8B90-45C0-4927-9842-A28D7AAEDDDB}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A6F8B90-45C0-4927-9842-A28D7AAEDDDB}.Release|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5FAB39E1-07CF-414C-9290-2A70E2B36F53} = {079BF8E4-4430-4423-B65A-FEF5676C470B}
+		{11A10D48-8D21-47D1-B3DA-6CBA82C66789} = {5CF11F85-59C5-497C-AF7E-19FA22B9C91A}
+		{5608E35F-173B-48FA-B892-91F4D7259B2E} = {7F4559E7-1102-427E-9A0C-06AB57831794}
+		{A950E6FC-6902-4BA3-9F25-F45B62DAD294} = {5CF11F85-59C5-497C-AF7E-19FA22B9C91A}
+		{6A6F8B90-45C0-4927-9842-A28D7AAEDDDB} = {079BF8E4-4430-4423-B65A-FEF5676C470B}
 	EndGlobalSection
 EndGlobal
