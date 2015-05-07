@@ -18,7 +18,7 @@ namespace TodoListWebApp.Controllers
         {
             var client = await GetTodoListClient();
 
-            // Get the to do list.
+            // Get the todo list.
             var todoListRequest = new HttpRequestMessage(HttpMethod.Get, SiteConfiguration.TodoListWebApiRootUrl + "api/todolist");
             var todoListResponse = await client.SendAsync(todoListRequest);
             todoListResponse.EnsureSuccessStatusCode();
@@ -55,7 +55,7 @@ namespace TodoListWebApp.Controllers
                     model.CategoryId = category.Id;
                 }
 
-                // Create the new to do item.
+                // Create the new todo item.
                 var newTodoItemRequest = new HttpRequestMessage(HttpMethod.Post, SiteConfiguration.TodoListWebApiRootUrl + "api/todolist");
                 newTodoItemRequest.Content = new JsonContent(model);
                 var newTodoItemResponse = await client.SendAsync(newTodoItemRequest);
@@ -75,7 +75,6 @@ namespace TodoListWebApp.Controllers
             // for an access token and stored it in the token cache.
             var result = await authContext.AcquireTokenSilentAsync(SiteConfiguration.TodoListWebApiResourceId, credential, userIdentifier);
 
-            // Retrieve the user's To Do List.
             var client = new HttpClient();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
             return client;

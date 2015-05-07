@@ -1,6 +1,7 @@
 ﻿'use strict';
 angular.module('todoApp')
-.controller('homeCtrl', ['$scope', 'adalAuthenticationService', '$location', function ($scope, adalService, $location) {
+.controller('homeCtrl', ['$scope', 'config', 'adalAuthenticationService', '$location', function ($scope, config, adalService, $location) {
+    $scope.applicationName = config.applicationName;
     $scope.signin = function () {
         adalService.login(); // [NOTE] This explicitly triggers a sign-in.
     };

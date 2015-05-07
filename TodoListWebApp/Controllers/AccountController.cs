@@ -25,7 +25,7 @@ namespace TodoListWebApp.Controllers
             var todoListWebApiIdentityInfo = JsonConvert.DeserializeObject<IdentityInfo>(todoListWebApiIdentityInfoResponseString);
 
             // Gather identity information from the current application and aggregate it with the identity information from the Web API.
-            var identityInfo = IdentityInfo.FromCurrent("Todo List Web Application", new IdentityInfo[] { todoListWebApiIdentityInfo });
+            var identityInfo = IdentityInfo.FromCurrent(SiteConfiguration.ApplicationName, new IdentityInfo[] { todoListWebApiIdentityInfo });
 
             return View(new AccountIndexViewModel(identityInfo));
         }

@@ -1,10 +1,10 @@
 ﻿@model TodoListWebApp.Models.TodoListIndexViewModel
 @{
-    ViewBag.Title = "To Do List";
+    ViewBag.Title = "Todo List";
 }
 <h1>@ViewBag.Title</h1>
 
-<h3>New To Do Item</h3>
+<h3>New Todo Item</h3>
 <div class="well">
     @using (Html.BeginForm("Index", "TodoList", FormMethod.Post))
     {
@@ -36,7 +36,7 @@
 
 @if (Model.TodoItems.Any())
 {
-    <h3>@Model.TodoItems.Count To Do Item@(Model.TodoItems.Count != 1 ? "s" : "")</h3>
+    <h3>@Model.TodoItems.Count Todo Item@(Model.TodoItems.Count != 1 ? "s" : "")</h3>
     <ul class="list-group">
         @foreach (var item in Model.TodoItems)
         {

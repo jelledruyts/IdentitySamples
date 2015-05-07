@@ -19,7 +19,7 @@ angular.module('todoApp')
                 $scope.categoryId = $scope.categories[0].Id;
             }
 
-            // Refresh all to do items.
+            // Refresh all todo items.
             $scope.refresh();
         }).error(function (err) {
             $scope.error = err;
@@ -28,11 +28,11 @@ angular.module('todoApp')
     };
 
     $scope.refresh = function () {
-        // Refresh all to do items.
+        // Refresh all todo items.
         todoListSvc.getItems().success(function (results) {
             $scope.error = '';
             $scope.loadingMessage = '';
-            // Assign the category for each to do item.
+            // Assign the category for each todo item.
             for (var i = 0; i < results.length; i++) {
                 for (var c = 0; c < $scope.categories.length; c++) {
                     if ($scope.categories[c].Id === results[i].CategoryId) {
@@ -48,7 +48,7 @@ angular.module('todoApp')
     };
 
     $scope.add = function () {
-        // Add a new to do item.
+        // Add a new todo item.
         todoListSvc.postItem({
             'Title': $scope.title,
             'CategoryId': $scope.categoryId

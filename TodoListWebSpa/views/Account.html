@@ -1,45 +1,84 @@
 ﻿<h1>Account</h1>
-<div class="panel-group">
-    <div class="panel panel-default">
+
+<h2>Identity Information</h2>
+<div ng-init="populate()" ng-model="identityInfo" ng-include="'identityInfoTree'"></div>
+
+<script type="text/ng-template" id="identityInfoTree">
+    <div class="panel panel-primary">
         <div class="panel-heading">
             <h4 class="panel-title">
-                <a data-toggle="collapse" data-target="#identity-info-panel">Identity</a>
+                <a data-toggle="collapse" data-target="#application-panel-{{getHashCode(identityInfo.Application)}}">{{identityInfo.Application}}</a>
             </h4>
         </div>
-        <div id="identity-info-panel" class="panel-collapse collapse in">
+        <div id="application-panel-{{getHashCode(identityInfo.Application)}}" class="panel-collapse collapse in">
             <div class="panel-body">
-                <dl class="dl-horizontal">
-                    <dt>Is Authenticated</dt>
-                    <dd>{{userInfo.isAuthenticated}}</dd>
-                    <dt>Name</dt>
-                    <dd>{{userInfo.userName}}</dd>
-                </dl>
+                <div class="panel-group">
+                    <!-- Identity Information -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-target="#identity-panel-{{getHashCode(identityInfo.Application)}}">Identity</a>
+                            </h4>
+                        </div>
+                        <div id="identity-panel-{{getHashCode(identityInfo.Application)}}" class="panel-collapse collapse in">
+                            <div class="panel-body">
+                                <dl class="dl-horizontal">
+                                    <dt>Is Authenticated</dt>
+                                    <dd>{{identityInfo.IsAuthenticated}}</dd>
+                                    <dt>Name</dt>
+                                    <dd>{{identityInfo.Name}}</dd>
+                                    <dt>Authentication Type</dt>
+                                    <dd>{{identityInfo.AuthenticationType}}</dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Claims Information -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-target="#claims-panel-{{getHashCode(identityInfo.Application)}}">
+                                    Claims
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="claims-panel-{{getHashCode(identityInfo.Application)}}" class="panel-collapse collapse in">
+                            <div class="panel-body">
+                                <table class="table table-bordered table-striped table-responsive">
+                                    <thead>
+                                        <tr>
+                                            <th>Claim Type</th>
+                                            <th>Claim Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="claim in identityInfo.Claims">
+                                            <td>{{claim.Type}}</td>
+                                            <td><abbr ng-attr-title="{{claim.Remark || undefined}}">{{claim.Value}}</abbr></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Related Application Identities Information -->
+                    <div class="panel panel-default" ng-if="identityInfo.RelatedApplicationIdentities.length > 0">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-target="#related-panel-{{getHashCode(identityInfo.Application)}}">
+                                    Related Application Identities
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="related-panel-{{getHashCode(identityInfo.Application)}}" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <div ng-repeat="identityInfo in identityInfo.RelatedApplicationIdentities" ng-include="'identityInfoTree'">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h4 class="panel-title">
-                <a data-toggle="collapse" data-target="#claims-info-panel">Claims</a>
-            </h4>
-        </div>
-        <div id="claims-info-panel" class="panel-collapse collapse in">
-            <div class="panel-body">
-                <table class="table table-bordered table-striped table-responsive">
-                    <thead>
-                        <tr>
-                            <th>Claim Type</th>
-                            <th>Claim Value</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr ng-repeat="(key,value) in userInfo.profile">
-                            <td>{{key}}</td>
-                            <td>{{value}}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
+</script>

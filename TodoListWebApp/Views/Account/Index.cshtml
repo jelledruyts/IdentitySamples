@@ -3,89 +3,95 @@
     ViewBag.Title = "Account";
 }
 <h1>@ViewBag.Title</h1>
+
+<h2>Identity Information</h2>
 @ShowIdentity(Model.IdentityInfo)
 
 @helper ShowIdentity(Common.IdentityInfo identity)
 {
-    var identityInfoPanelId = Guid.NewGuid().ToString();
-
-    <div class="panel-group">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h4 class="panel-title">
-                    <a data-toggle="collapse" href="#@identityInfoPanelId">Identity</a>
-                </h4>
-            </div>
-            <div id="@identityInfoPanelId" class="panel-collapse collapse in">
-                <div class="panel-body">
-                    <dl class="dl-horizontal">
-                        <dt>Is Authenticated</dt>
-                        <dd>@identity.IsAuthenticated.ToString().ToLowerInvariant()</dd>
-                        <dt>Authentication Type</dt>
-                        <dd>@identity.AuthenticationType</dd>
-                        <dt>Name</dt>
-                        <dd>@identity.Name</dd>
-                        @if (identity.RelatedApplicationIdentities != null && identity.RelatedApplicationIdentities.Any())
-                        {
-                            <dt>Related Application Identities</dt>
-                            <dd>
-                                @foreach (var relatedApplicationIdentity in identity.RelatedApplicationIdentities)
-                                {
-                                    var actorPanelId = Guid.NewGuid().ToString();
-
-                                    <div class="panel panel-default">
-                                        <div class="panel-heading">
-                                            <h4 class="panel-title">
-                                                <a data-toggle="collapse" href="#@actorPanelId">@relatedApplicationIdentity.Application</a>
-                                            </h4>
-                                        </div>
-                                        <div id="@actorPanelId" class="panel-collapse collapse">
-                                            <div class="panel-body">
-                                                @ShowIdentity(relatedApplicationIdentity)
-                                            </div>
-                                        </div>
-                                    </div>
-                                }
-                            </dd>
-                        }
-                    </dl>
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" href="#application-panel-@identity.Application.GetHashCode()">@identity.Application</a>
+            </h4>
+        </div>
+        <div id="application-panel-@identity.Application.GetHashCode()" class="panel-collapse collapse in">
+            <div class="panel-body">
+                <div class="panel-group">
+                    <!-- Identity Information -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" href="#identity-panel-@identity.Application.GetHashCode()">Identity</a>
+                            </h4>
+                        </div>
+                        <div id="identity-panel-@identity.Application.GetHashCode()" class="panel-collapse collapse in">
+                            <div class="panel-body">
+                                <dl class="dl-horizontal">
+                                    <dt>Is Authenticated</dt>
+                                    <dd>@identity.IsAuthenticated.ToString().ToLowerInvariant()</dd>
+                                    <dt>Name</dt>
+                                    <dd>@identity.Name</dd>
+                                    <dt>Authentication Type</dt>
+                                    <dd>@identity.AuthenticationType</dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Claims Information -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" href="#claims-panel-@identity.Application.GetHashCode()">
+                                    Claims
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="claims-panel-@identity.Application.GetHashCode()" class="panel-collapse collapse in">
+                            <div class="panel-body">
+                                <table class="table table-bordered table-striped table-responsive">
+                                    <thead>
+                                        <tr>
+                                            <th>Claim Type</th>
+                                            <th>Claim Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var claim in identity.Claims)
+                                        {
+                                            <tr>
+                                                <td>@claim.Type</td>
+                                                <td><abbr title="@claim.Remark">@claim.Value</abbr></td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Related Application Identities Information -->
+                    @if (identity.RelatedApplicationIdentities != null && identity.RelatedApplicationIdentities.Any())
+                    {
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <a data-toggle="collapse" href="#related-panel-@identity.Application.GetHashCode()">
+                                        Related Application Identities
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="related-panel-@identity.Application.GetHashCode()" class="panel-collapse collapse">
+                                <div class="panel-body">
+                                    @foreach (var relatedApplicationIdentity in identity.RelatedApplicationIdentities)
+                                    {
+                                        @ShowIdentity(relatedApplicationIdentity)
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
                 </div>
             </div>
         </div>
-        @foreach (var claimsByIssuer in identity.Claims.GroupBy(c => c.Issuer))
-        {
-            var claimsPanelId = Guid.NewGuid().ToString();
-
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h4 class="panel-title">
-                        <a data-toggle="collapse" href="#@claimsPanelId">
-                            @claimsByIssuer.Count() claims issued by <code>@claimsByIssuer.Key</code>
-                        </a>
-                    </h4>
-                </div>
-                <div id="@claimsPanelId" class="panel-collapse collapse in">
-                    <div class="panel-body">
-                        <table class="table table-bordered table-striped table-responsive">
-                            <thead>
-                                <tr>
-                                    <th>Claim Type</th>
-                                    <th>Claim Value</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var claim in claimsByIssuer)
-                                {
-                                    <tr>
-                                        <td>@claim.Type</td>
-                                        <td><abbr title="@claim.Remark">@claim.Value</abbr></td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        }
     </div>
 }

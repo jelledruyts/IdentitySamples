@@ -47,7 +47,6 @@ namespace TodoListWebApi.Controllers
             var userAssertion = new UserAssertion(bootstrapContext.Token);
             var result = await authContext.AcquireTokenAsync(SiteConfiguration.TaxonomyWebApiResourceId, credential, userAssertion);
 
-            // Retrieve the user's To Do List.
             var client = new HttpClient();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
             return client;

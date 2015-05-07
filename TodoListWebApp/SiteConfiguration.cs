@@ -4,7 +4,7 @@ namespace TodoListWebApp
 {
     public static class SiteConfiguration
     {
-        public const string ApplicationName = "To Do List (ASP.NET MVC)";
+        public const string ApplicationName = "Todo List (ASP.NET MVC)";
 
         public static readonly string TodoListWebAppRootUrl = ConfigurationManager.AppSettings["TodoListWebAppRootUrl"];
         public static readonly string TodoListWebAppClientId = ConfigurationManager.AppSettings["TodoListWebAppClientId"];
