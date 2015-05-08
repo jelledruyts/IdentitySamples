@@ -18,7 +18,8 @@ namespace TodoListWebApi.Controllers
             var taxonomyWebApiIdentityInfoResponseString = await taxonomyWebApiIdentityInfoResponse.Content.ReadAsStringAsync();
             var taxonomyWebApiIdentityInfo = JsonConvert.DeserializeObject<IdentityInfo>(taxonomyWebApiIdentityInfoResponseString);
 
-            return IdentityInfo.FromCurrent("Todo List Web API", new IdentityInfo[] { taxonomyWebApiIdentityInfo });
+            var graphClient = new AadGraphClient(SiteConfiguration.AadTenant, SiteConfiguration.TodoListWebApiClientId, SiteConfiguration.TodoListWebApiClientSecret);
+            return await IdentityInfo.FromCurrent("Todo List Web API", new IdentityInfo[] { taxonomyWebApiIdentityInfo }, graphClient);
         }
     }
 }

@@ -22,7 +22,7 @@ angular.module('todoApp', ['ngRoute', 'AdalAngular', 'configuration'])
     // Initialize ADAL.
     adalProvider.init(
         {
-            instance: 'https://login.microsoftonline.com/',
+            instance: config.aadEndpoint,
             tenant: config.aadTenant,
             clientId: config.todoListWebSpaClientId,
             endpoints: config.webApiEndpoints,

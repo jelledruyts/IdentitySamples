@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿using Common;
+using System.Configuration;
 
 namespace TodoListWebApp
 {
@@ -14,6 +15,6 @@ namespace TodoListWebApp
         public static readonly string TodoListWebApiResourceId = ConfigurationManager.AppSettings["TodoListWebApiResourceId"];
         
         public static readonly string AadTenant = ConfigurationManager.AppSettings["AadTenant"];
-        public static readonly string AadAuthority = "https://login.microsoftonline.com/" + AadTenant;
+        public static readonly string AadAuthority = Constants.AadEndpoint + AadTenant;
     }
 }

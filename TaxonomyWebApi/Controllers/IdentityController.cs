@@ -1,4 +1,5 @@
 ﻿using Common;
+using System.Threading.Tasks;
 using System.Web.Http;
 
 namespace TaxonomyWebApi.Controllers
@@ -6,9 +7,10 @@ namespace TaxonomyWebApi.Controllers
     [Authorize]
     public class IdentityController : ApiController
     {
-        public IdentityInfo Get()
+        public async Task<IdentityInfo> Get()
         {
-            return IdentityInfo.FromCurrent("Taxonomy Web API", null);
+            var graphClient = new AadGraphClient(SiteConfiguration.AadTenant, SiteConfiguration.TaxonomyWebApiClientId, SiteConfiguration.TaxonomyWebApiClientSecret);
+            return await IdentityInfo.FromCurrent("Taxonomy Web API", null, graphClient);
         }
     }
 }

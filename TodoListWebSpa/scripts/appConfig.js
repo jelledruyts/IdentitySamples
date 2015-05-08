@@ -3,6 +3,7 @@ angular.module('configuration', [])
 .constant('config',
     {
         applicationName: 'Todo List (SPA)',
+        aadEndpoint: 'https://login.microsoftonline.com/',
         aadTenant: 'identitysamples.onmicrosoft.com',
         todoListWebSpaClientId: '31580c09-e971-431a-8ab7-86a7b244720e',
         todoListWebApiRootUrl: 'https://localhost:44307/',

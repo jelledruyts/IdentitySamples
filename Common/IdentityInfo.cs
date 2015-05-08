@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Microsoft.Azure.ActiveDirectory.GraphClient;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace Common
 {
@@ -14,6 +16,8 @@ namespace Common
         #region Constants
 
         private static readonly string[] ClaimTypesToSkip = { "nonce", "at_hash", "c_hash" };
+        private static readonly string[] GroupClaimTypes = { "groups", "http://schemas.microsoft.com/ws/2008/06/identity/claims/groups" };
+        private static readonly DateTimeOffset UnixTimestampEpoch = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
         #endregion
 
@@ -69,9 +73,9 @@ namespace Common
         /// <param name="application">The application from which the identity is observed.</param>
         /// <param name="relatedApplicationIdentities">The identities as seen from other applications related to the current application.</param>
         /// <returns>Identity information about the current principal's identity</returns>
-        public static IdentityInfo FromCurrent(string application, IList<IdentityInfo> relatedApplicationIdentities)
+        public static async Task<IdentityInfo> FromCurrent(string application, IList<IdentityInfo> relatedApplicationIdentities, AadGraphClient graphClient)
         {
-            return FromIdentity((ClaimsIdentity)ClaimsPrincipal.Current.Identity, application, relatedApplicationIdentities);
+            return await FromIdentity((ClaimsIdentity)ClaimsPrincipal.Current.Identity, application, relatedApplicationIdentities, graphClient);
         }
 
         /// <summary>
@@ -80,9 +84,21 @@ namespace Common
         /// <param name="identity">The identity.</param>
         /// <param name="application">The application from which the identity is observed.</param>
         /// <param name="relatedApplicationIdentities">The identities as seen from other applications related to the current application.</param>
+        /// <param name="graphClient">The graph client used to look up group claim details.</param>
         /// <returns>Identity information about the specified identity.</returns>
-        public static IdentityInfo FromIdentity(ClaimsIdentity identity, string application, IList<IdentityInfo> relatedApplicationIdentities)
+        public static async Task<IdentityInfo> FromIdentity(ClaimsIdentity identity, string application, IList<IdentityInfo> relatedApplicationIdentities, AadGraphClient graphClient)
         {
+            var groups = default(IList<IGroup>);
+            if (graphClient != null)
+            {
+                // Look up all the Azure AD groups for which there are group claims.
+                // [NOTE] To get group claims in the token, ensure to update the Azure AD application manifest.
+                // Change "groupMembershipClaims" from null to "SecurityGroup" (or "All" to include distribution groups).
+                // See http://www.dushyantgill.com/blog/2014/12/10/authorization-cloud-applications-using-ad-groups/ for more information.
+                var groupIds = identity.Claims.Where(claim => GroupClaimTypes.Any(groupClaimType => string.Equals(claim.Type, groupClaimType, StringComparison.OrdinalIgnoreCase))).Select(claim => claim.Value).ToArray();
+                groups = await graphClient.GetGroups(groupIds);
+            }
+
             // [NOTE] Inspect the identity and its claims.
             return new IdentityInfo
             {
@@ -90,12 +106,12 @@ namespace Common
                 IsAuthenticated = identity.IsAuthenticated,
                 Name = identity.Name,
                 AuthenticationType = identity.AuthenticationType,
-                Claims = identity.Claims.Where(c => !ClaimTypesToSkip.Any(s => string.Equals(s, c.Type, StringComparison.OrdinalIgnoreCase))).Select(c => new ClaimInfo { Issuer = c.Issuer, Type = c.Type, Value = c.Value, Remark = GetRemark(c) }).ToArray(),
+                Claims = identity.Claims.Where(claim => !ClaimTypesToSkip.Any(claimTypeToSkip => string.Equals(claimTypeToSkip, claim.Type, StringComparison.OrdinalIgnoreCase))).Select(claim => new ClaimInfo { Issuer = claim.Issuer, Type = claim.Type, Value = claim.Value, Remark = GetRemark(claim, groups) }).ToArray(),
                 RelatedApplicationIdentities = relatedApplicationIdentities ?? new IdentityInfo[0]
             };
         }
 
-        private static string GetRemark(Claim claim)
+        private static string GetRemark(Claim claim, IList<IGroup> groups)
         {
             // [NOTE] Certain claims can be interpreted to more meaningful information.
             switch (claim.Type.ToLowerInvariant())
@@ -115,10 +131,17 @@ namespace Common
                 case "pwd_exp":
                     return GetTimestampDescription("Password expires", claim.Value, false);
             }
+            if (groups != null && GroupClaimTypes.Any(groupClaimType => string.Equals(claim.Type, groupClaimType, StringComparison.OrdinalIgnoreCase)))
+            {
+                // This is a group claim, look up the group details.
+                var group = groups.FirstOrDefault(g => string.Equals(g.ObjectId, claim.Value, StringComparison.OrdinalIgnoreCase));
+                if (group != null)
+                {
+                    return "Active Directory Group: " + group.DisplayName;
+                }
+            }
             return null;
         }
-
-        private static readonly DateTimeOffset UnixTimestampEpoch = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
         private static string GetTimestampDescription(string prefix, string timestamp, bool secondsSinceEpoch)
         {
