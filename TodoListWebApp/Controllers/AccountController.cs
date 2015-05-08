@@ -31,6 +31,21 @@ namespace TodoListWebApp.Controllers
             return View(new AccountIndexViewModel(identityInfo));
         }
 
+        [HttpPost]
+        public async Task<ActionResult> Index(IdentityUpdate model)
+        {
+            if (model != null && !string.IsNullOrWhiteSpace(model.DisplayName))
+            {
+                // Update identity information through the Todo List Web API.
+                var todoListWebApiClient = await TodoListController.GetTodoListClient();
+                var identityUpdateRequest = new HttpRequestMessage(HttpMethod.Post, SiteConfiguration.TodoListWebApiRootUrl + "api/identity");
+                identityUpdateRequest.Content = new JsonContent(model);
+                var todoListWebApiIdentityInfoResponse = await todoListWebApiClient.SendAsync(identityUpdateRequest);
+                todoListWebApiIdentityInfoResponse.EnsureSuccessStatusCode();
+            }
+            return RedirectToAction("Index");
+        }
+
         public ActionResult SignIn()
         {
             if (!Request.IsAuthenticated)

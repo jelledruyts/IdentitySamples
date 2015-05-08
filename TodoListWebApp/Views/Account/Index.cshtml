@@ -4,6 +4,18 @@
 }
 <h1>@ViewBag.Title</h1>
 
+<h2>Update</h2>
+<div class="well">
+    @using (Html.BeginForm("Index", "Account", FormMethod.Post))
+    {
+        <div class="form-group">
+            <label for="displayName">Display Name</label>
+            <input type="text" class="form-control" id="displayName" name="displayName" placeholder="Enter a new display name">
+        </div>
+        <button type="submit" class="btn btn-default btn-primary">Submit</button>
+    }
+</div>
+
 <h2>Identity Information</h2>
 @ShowIdentity(Model.IdentityInfo)
 

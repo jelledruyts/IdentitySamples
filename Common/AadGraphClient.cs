@@ -2,6 +2,7 @@
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -49,7 +50,7 @@ namespace Common
         /// </summary>
         /// <param name="groupIds">The Group ID's for which to retrieve the groups.</param>
         /// <returns>The requested groups.</returns>
-        public async Task<IList<IGroup>> GetGroups(IList<string> groupIds)
+        public async Task<IList<IGroup>> GetGroupsAsync(IList<string> groupIds)
         {
             var groups = new List<IGroup>();
             if (groupIds != null && groupIds.Any())
@@ -77,6 +78,26 @@ namespace Common
                 }
             }
             return groups;
+        }
+
+        #endregion
+
+        #region UpdateUser
+
+        /// <summary>
+        /// Updates user information.
+        /// </summary>
+        /// <param name="userObjectId">The Object ID of the user to update.</param>
+        /// <param name="displayName">The new display name for the user.</param>
+        public async Task UpdateUserAsync(string userObjectId, string displayName)
+        {
+            var user = await this.client.Users.GetByObjectId(userObjectId).ExecuteAsync();
+            if (user == null)
+            {
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "The user with Object ID \"{0}\" was not found in the directory.", userObjectId));
+            }
+            user.DisplayName = displayName;
+            await user.UpdateAsync();
         }
 
         #endregion

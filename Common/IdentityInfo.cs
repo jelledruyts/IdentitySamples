@@ -96,7 +96,7 @@ namespace Common
                 // Change "groupMembershipClaims" from null to "SecurityGroup" (or "All" to include distribution groups).
                 // See http://www.dushyantgill.com/blog/2014/12/10/authorization-cloud-applications-using-ad-groups/ for more information.
                 var groupIds = identity.Claims.Where(claim => GroupClaimTypes.Any(groupClaimType => string.Equals(claim.Type, groupClaimType, StringComparison.OrdinalIgnoreCase))).Select(claim => claim.Value).ToArray();
-                groups = await graphClient.GetGroups(groupIds);
+                groups = await graphClient.GetGroupsAsync(groupIds);
             }
 
             // [NOTE] Inspect the identity and its claims.
