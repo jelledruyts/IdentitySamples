@@ -5,5 +5,8 @@ angular.module('todoApp')
         getItem: function () {
             return $http.get(config.todoListWebApiRootUrl + 'api/identity');
         },
+        postItem: function (item) {
+            return $http.post(config.todoListWebApiRootUrl + 'api/identity', item);
+        }
     };
 }]);

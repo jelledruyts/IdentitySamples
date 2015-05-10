@@ -3,7 +3,21 @@ angular.module('todoApp')
 .controller('accountCtrl', ['$scope', 'config', 'identitySvc', 'adalAuthenticationService', function ($scope, config, identitySvc, adalService) {
     $scope.loadingMessage = 'Loading...';
     $scope.error = '';
+    $scope.infoMessage = '';
+    $scope.displayName = '';
     $scope.identityInfo = null;
+
+    $scope.update = function () {
+        // Update the identity information.
+        identitySvc.postItem({
+            'DisplayName': $scope.displayName,
+        }).success(function (results) {
+            $scope.error = '';
+            $scope.infoMessage = 'Your changes were saved.';
+        }).error(function (err) {
+            $scope.error = err;
+        })
+    };
 
     $scope.getHashCode = function (value) {
         var hash = 0;
@@ -11,7 +25,7 @@ angular.module('todoApp')
         for (var i = 0; i < value.length; i++) {
             var char = value.charCodeAt(i);
             hash = ((hash << 5) - hash) + char;
-            hash = hash & hash; // Convert to 32bit integer 
+            hash = hash & hash;
         }
         return hash;
     };

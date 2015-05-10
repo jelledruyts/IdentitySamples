@@ -1,8 +1,8 @@
 ﻿<h1>Todo List</h1>
+<div ng-hide="!error" class="alert alert-danger">{{error}}</div>
 
 <h3>New Todo Item</h3>
 <div class="well" ng-init="populate()">
-    <div ng-hide="!error" class="alert alert-danger">{{error}}</div>
     <div class="form-group">
         <div class="form-group">
             <label for="title">Title</label>

@@ -1,7 +1,19 @@
 ﻿<h1>Account</h1>
+<div ng-hide="!infoMessage" class="alert alert-success">{{infoMessage}}</div>
+<div ng-hide="!error" class="alert alert-danger">{{error}}</div>
+
+<h2>Update</h2>
+<div class="well">
+    <div class="form-group">
+        <label for="displayName">Display Name</label>
+        <input type="text" class="form-control" id="displayName" ng-model="displayName" placeholder="Enter a new display name">
+    </div>
+    <button ng-click="update();" class="btn btn-default btn-primary">Submit</button>
+</div>
 
 <h2>Identity Information</h2>
-<div ng-init="populate()" ng-model="identityInfo" ng-include="'identityInfoTree'"></div>
+<div ng-hide="!loadingMessage" class="alert alert-info">{{loadingMessage}}</div>
+<div ng-init="populate()" ng-hide="!identityInfo" ng-model="identityInfo" ng-include="'identityInfoTree'"></div>
 
 <script type="text/ng-template" id="identityInfoTree">
     <div class="panel panel-primary">
