@@ -12,6 +12,15 @@
             <label for="categoryId">Category</label>
             <select id="categoryId" ng-model="categoryId" ng-options="category.Id as (category.Name + (category.IsPrivate ? ' [Private]' : '')) for category in categories" class="form-control"></select>
         </div>
+        <div class="form-group form-inline">
+            <label for="newCategoryName">Or new:</label>
+            <input type="text" class="form-control" id="newCategoryName" ng-model="newCategoryName" placeholder="Enter a new category" />
+            <div class="checkbox">
+                <label for="newCategoryIsPrivate" title="Make the new category only visible to yourself">
+                    <input type="checkbox" id="newCategoryIsPrivate" ng-model="newCategoryIsPrivate" value="true"> Private
+                </label>
+            </div>
+        </div>
         <button ng-click="add();" class="btn btn-default btn-primary">Submit</button>
     </div>
 </div>

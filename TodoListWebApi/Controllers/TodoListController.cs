@@ -1,9 +1,12 @@
 ﻿using Common;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using System.Web.Http;
 using TodoListWebApi.Models;
 
@@ -42,7 +45,7 @@ namespace TodoListWebApi.Controllers
             return database.Where(t => t.UserId == userId).OrderBy(t => t.CreatedTime).Select(t => new TodoItem { Id = t.Id, Title = t.Title, CategoryId = t.CategoryId });
         }
 
-        public IHttpActionResult Post(TodoItem value)
+        public async Task<IHttpActionResult> Post(TodoItemCreate value)
         {
             if (value == null || string.IsNullOrWhiteSpace(value.Title))
             {
@@ -52,11 +55,25 @@ namespace TodoListWebApi.Controllers
             {
                 return BadRequest("CategoryId is required");
             }
+
+            // Create a new category if requested.
+            if (!string.IsNullOrWhiteSpace(value.NewCategoryName))
+            {
+                var client = await CategoryController.GetTaxonomyClient();
+                var newCategory = new Category { Name = value.NewCategoryName, IsPrivate = value.NewCategoryIsPrivate };
+                var newCategoryRequest = new HttpRequestMessage(HttpMethod.Post, SiteConfiguration.TaxonomyWebApiRootUrl + "api/category");
+                newCategoryRequest.Content = new JsonContent(newCategory);
+                var newCategoryResponse = await client.SendAsync(newCategoryRequest);
+                newCategoryResponse.EnsureSuccessStatusCode();
+                var newCategoryResponseString = await newCategoryResponse.Content.ReadAsStringAsync();
+                var category = JsonConvert.DeserializeObject<Category>(newCategoryResponseString);
+                value.CategoryId = category.Id;
+            }
+
             var userId = ClaimsPrincipal.Current.GetUniqueIdentifier();
             var data = new TodoItemData(value.Title, value.CategoryId, userId);
             database.Add(data);
-            value.Id = data.Id;
-            return Ok(value);
+            return Ok();
         }
     }
 }

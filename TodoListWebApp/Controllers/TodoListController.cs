@@ -36,26 +36,11 @@ namespace TodoListWebApp.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Index(TodoItem model, string newCategoryName, bool? newCategoryIsPrivate)
+        public async Task<ActionResult> Index(TodoItemCreate model)
         {
             if (!string.IsNullOrWhiteSpace(model.Title) && !string.IsNullOrWhiteSpace(model.CategoryId))
             {
                 var client = await GetTodoListClient();
-
-                // Create a new category if requested.
-                if (!string.IsNullOrWhiteSpace(newCategoryName))
-                {
-                    var newCategory = new Category { Name = newCategoryName, IsPrivate = (newCategoryIsPrivate == true) };
-                    var newCategoryRequest = new HttpRequestMessage(HttpMethod.Post, SiteConfiguration.TodoListWebApiRootUrl + "api/category");
-                    newCategoryRequest.Content = new JsonContent(newCategory);
-                    var newCategoryResponse = await client.SendAsync(newCategoryRequest);
-                    newCategoryResponse.EnsureSuccessStatusCode();
-                    var newCategoryResponseString = await newCategoryResponse.Content.ReadAsStringAsync();
-                    var category = JsonConvert.DeserializeObject<Category>(newCategoryResponseString);
-                    model.CategoryId = category.Id;
-                }
-
-                // Create the new todo item.
                 var newTodoItemRequest = new HttpRequestMessage(HttpMethod.Post, SiteConfiguration.TodoListWebApiRootUrl + "api/todolist");
                 newTodoItemRequest.Content = new JsonContent(model);
                 var newTodoItemResponse = await client.SendAsync(newTodoItemRequest);

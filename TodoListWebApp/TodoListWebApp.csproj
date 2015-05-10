@@ -154,6 +154,7 @@
     <Compile Include="Models\Category.cs" />
     <Compile Include="Models\IdentityUpdate.cs" />
     <Compile Include="Models\TodoItem.cs" />
+    <Compile Include="Models\TodoItemCreate.cs" />
     <Compile Include="Models\TodoListIndexViewModel.cs" />
     <Compile Include="SiteConfiguration.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
