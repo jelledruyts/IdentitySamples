@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Newtonsoft.Json.Serialization;
 using System.Linq;
+using System.Net.Http.Formatting;
 using System.Web.Http;
 
 namespace TaxonomyWebApi
@@ -9,11 +9,15 @@ namespace TaxonomyWebApi
     {
         public static void Register(HttpConfiguration config)
         {
-            // Web API configuration and services
+            // Output JSON data with camel case property names to follow JavaScript conventions.
+            var jsonFormatter = config.Formatters.OfType<JsonMediaTypeFormatter>().FirstOrDefault();
+            if (jsonFormatter != null)
+            {
+                jsonFormatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            }
 
             // Web API routes
             config.MapHttpAttributeRoutes();
-
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",
                 routeTemplate: "api/{controller}/{id}",

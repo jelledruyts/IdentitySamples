@@ -4,14 +4,12 @@ angular.module('todoApp')
     $scope.loadingMessage = 'Loading...';
     $scope.error = '';
     $scope.infoMessage = '';
-    $scope.displayName = '';
+    $scope.identityUpdate = { displayName: '' };
     $scope.identityInfo = null;
 
     $scope.update = function () {
         // Update the identity information.
-        identitySvc.postItem({
-            'DisplayName': $scope.displayName,
-        }).success(function (results) {
+        identitySvc.postItem($scope.identityUpdate).success(function (results) {
             $scope.error = '';
             $scope.infoMessage = 'Your changes were saved.';
         }).error(function (err) {
@@ -40,7 +38,7 @@ angular.module('todoApp')
             for (var claimType in $scope.userInfo.profile) {
                 if ($scope.userInfo.profile.hasOwnProperty(claimType)) {
                     userClaims.push({
-                        Issuer: '', Type: claimType, Value: $scope.userInfo.profile[claimType], Remark: ''
+                        issuer: '', type: claimType, value: $scope.userInfo.profile[claimType], remark: ''
                     });
                 }
             }
@@ -48,12 +46,12 @@ angular.module('todoApp')
             // Create a root identity info object for the current application, and embed the
             // retrieved Web API identity info into it.
             $scope.identityInfo = {
-                Application: config.applicationName,
-                IsAuthenticated: $scope.userInfo.isAuthenticated,
-                AuthenticationType: 'JWT',
-                Name: $scope.userInfo.userName,
-                Claims: userClaims,
-                RelatedApplicationIdentities: [results]
+                application: config.applicationName,
+                isAuthenticated: $scope.userInfo.isAuthenticated,
+                authenticationType: 'JWT',
+                name: $scope.userInfo.userName,
+                claims: userClaims,
+                relatedApplicationIdentities: [results]
             };
         }).error(function (err) {
             $scope.error = err;

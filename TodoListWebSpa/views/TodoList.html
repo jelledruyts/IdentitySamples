@@ -6,18 +6,18 @@
     <div class="form-group">
         <div class="form-group">
             <label for="title">Title</label>
-            <input type="text" class="form-control" id="title" ng-model="title" placeholder="Enter a title">
+            <input type="text" class="form-control" id="title" ng-model="todoItemCreate.title" placeholder="Enter a title">
         </div>
         <div class="form-group">
             <label for="categoryId">Category</label>
-            <select id="categoryId" ng-model="categoryId" ng-options="category.Id as (category.Name + (category.IsPrivate ? ' [Private]' : '')) for category in categories" class="form-control"></select>
+            <select id="categoryId" ng-model="todoItemCreate.categoryId" ng-options="category.id as (category.name + (category.isPrivate ? ' [Private]' : '')) for category in categories" class="form-control"></select>
         </div>
         <div class="form-group form-inline">
             <label for="newCategoryName">Or new:</label>
-            <input type="text" class="form-control" id="newCategoryName" ng-model="newCategoryName" placeholder="Enter a new category" />
+            <input type="text" class="form-control" id="newCategoryName" ng-model="todoItemCreate.newCategoryName" placeholder="Enter a new category" />
             <div class="checkbox">
                 <label for="newCategoryIsPrivate" title="Make the new category only visible to yourself">
-                    <input type="checkbox" id="newCategoryIsPrivate" ng-model="newCategoryIsPrivate" value="true"> Private
+                    <input type="checkbox" id="newCategoryIsPrivate" ng-model="todoItemCreate.newCategoryIsPrivate" value="true"> Private
                 </label>
             </div>
         </div>
@@ -30,10 +30,10 @@
     <h3>{{todoList.length}} Todo Item{{todoList.length != 1 ? 's' : ''}}</h3>
     <ul class="list-group">
         <li ng-repeat="item in todoList" class="list-group-item">
-            <span class="pull-right label" ng-class="item.Category.IsPrivate ? 'label-warning' : 'label-success'" title="{{item.Category.IsPrivate ? 'Private' : 'Public'}} category">
-                {{item.Category.Name}}
+            <span class="pull-right label" ng-class="item.category.isPrivate ? 'label-warning' : 'label-success'" title="{{item.category.isPrivate ? 'Private' : 'Public'}} category">
+                {{item.category.name}}
             </span>
-            {{item.Title}}
+            {{item.title}}
         </li>
     </ul>
 </div>

@@ -6,7 +6,7 @@
 <div class="well">
     <div class="form-group">
         <label for="displayName">Display Name</label>
-        <input type="text" class="form-control" id="displayName" ng-model="displayName" placeholder="Enter a new display name">
+        <input type="text" class="form-control" id="displayName" ng-model="identityUpdate.displayName" placeholder="Enter a new display name">
     </div>
     <button ng-click="update();" class="btn btn-default btn-primary">Submit</button>
 </div>
@@ -19,28 +19,28 @@
     <div class="panel panel-primary">
         <div class="panel-heading">
             <h4 class="panel-title">
-                <a data-toggle="collapse" data-target="#application-panel-{{getHashCode(identityInfo.Application)}}">{{identityInfo.Application}}</a>
+                <a data-toggle="collapse" data-target="#application-panel-{{getHashCode(identityInfo.application)}}">{{identityInfo.application}}</a>
             </h4>
         </div>
-        <div id="application-panel-{{getHashCode(identityInfo.Application)}}" class="panel-collapse collapse in">
+        <div id="application-panel-{{getHashCode(identityInfo.application)}}" class="panel-collapse collapse in">
             <div class="panel-body">
                 <div class="panel-group">
                     <!-- Identity Information -->
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <a data-toggle="collapse" data-target="#identity-panel-{{getHashCode(identityInfo.Application)}}">Identity</a>
+                                <a data-toggle="collapse" data-target="#identity-panel-{{getHashCode(identityInfo.application)}}">Identity</a>
                             </h4>
                         </div>
-                        <div id="identity-panel-{{getHashCode(identityInfo.Application)}}" class="panel-collapse collapse in">
+                        <div id="identity-panel-{{getHashCode(identityInfo.application)}}" class="panel-collapse collapse in">
                             <div class="panel-body">
                                 <dl class="dl-horizontal">
                                     <dt>Is Authenticated</dt>
-                                    <dd>{{identityInfo.IsAuthenticated}}</dd>
+                                    <dd>{{identityInfo.isAuthenticated}}</dd>
                                     <dt>Name</dt>
-                                    <dd>{{identityInfo.Name}}</dd>
+                                    <dd>{{identityInfo.name}}</dd>
                                     <dt>Authentication Type</dt>
-                                    <dd>{{identityInfo.AuthenticationType}}</dd>
+                                    <dd>{{identityInfo.authenticationType}}</dd>
                                 </dl>
                             </div>
                         </div>
@@ -49,12 +49,12 @@
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <a data-toggle="collapse" data-target="#claims-panel-{{getHashCode(identityInfo.Application)}}">
+                                <a data-toggle="collapse" data-target="#claims-panel-{{getHashCode(identityInfo.application)}}">
                                     Claims
                                 </a>
                             </h4>
                         </div>
-                        <div id="claims-panel-{{getHashCode(identityInfo.Application)}}" class="panel-collapse collapse in">
+                        <div id="claims-panel-{{getHashCode(identityInfo.application)}}" class="panel-collapse collapse in">
                             <div class="panel-body">
                                 <table class="table table-bordered table-striped table-responsive">
                                     <thead>
@@ -64,9 +64,9 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr ng-repeat="claim in identityInfo.Claims">
-                                            <td>{{claim.Type}}</td>
-                                            <td><abbr ng-attr-title="{{claim.Remark || undefined}}">{{claim.Value}}</abbr></td>
+                                        <tr ng-repeat="claim in identityInfo.claims">
+                                            <td>{{claim.type}}</td>
+                                            <td><abbr ng-attr-title="{{claim.remark || undefined}}">{{claim.value}}</abbr></td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -74,17 +74,17 @@
                         </div>
                     </div>
                     <!-- Related Application Identities Information -->
-                    <div class="panel panel-default" ng-if="identityInfo.RelatedApplicationIdentities.length > 0">
+                    <div class="panel panel-default" ng-if="identityInfo.relatedApplicationIdentities.length > 0">
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <a data-toggle="collapse" data-target="#related-panel-{{getHashCode(identityInfo.Application)}}">
+                                <a data-toggle="collapse" data-target="#related-panel-{{getHashCode(identityInfo.application)}}">
                                     Related Application Identities
                                 </a>
                             </h4>
                         </div>
-                        <div id="related-panel-{{getHashCode(identityInfo.Application)}}" class="panel-collapse collapse">
+                        <div id="related-panel-{{getHashCode(identityInfo.application)}}" class="panel-collapse collapse">
                             <div class="panel-body">
-                                <div ng-repeat="identityInfo in identityInfo.RelatedApplicationIdentities" ng-include="'identityInfoTree'">
+                                <div ng-repeat="identityInfo in identityInfo.relatedApplicationIdentities" ng-include="'identityInfoTree'">
                                 </div>
                             </div>
                         </div>
