@@ -18,7 +18,9 @@ namespace TodoListWebApi
                     TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidAudience = SiteConfiguration.TodoListWebApiResourceId,
-                        SaveSigninToken = true // This places the original token on the ClaimsIdentity.BootstrapContext.
+                        SaveSigninToken = true, // [NOTE] This places the original token on the ClaimsIdentity.BootstrapContext
+                        NameClaimType = "name", // [NOTE] This indicates that the user's display name is defined in the "name" claim
+                        RoleClaimType = "roles" // [NOTE] This indicates that the user's roles are defined in the "roles" claim
                     },
                     Tenant = SiteConfiguration.AadTenant
                 });

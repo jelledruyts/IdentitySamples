@@ -41,6 +41,10 @@
                                     <dd>{{identityInfo.name}}</dd>
                                     <dt>Authentication Type</dt>
                                     <dd>{{identityInfo.authenticationType}}</dd>
+                                    <dt ng-if="identityInfo.roleNames.length > 0">Application Roles</dt>
+                                    <dd ng-if="identityInfo.roleNames.length > 0">{{identityInfo.roleNames.join(', ')}}</dd>
+                                    <dt ng-if="identityInfo.groupNames.length > 0">Groups</dt>
+                                    <dd ng-if="identityInfo.groupNames.length > 0">{{identityInfo.groupNames.join(', ')}}</dd>
                                 </dl>
                             </div>
                         </div>

@@ -12,7 +12,9 @@ namespace TaxonomyWebApi
                 {
                     TokenValidationParameters = new TokenValidationParameters
                     {
-                        ValidAudience = SiteConfiguration.TaxonomyWebApiResourceId
+                        ValidAudience = SiteConfiguration.TaxonomyWebApiResourceId,
+                        NameClaimType = "name", // [NOTE] This indicates that the user's display name is defined in the "name" claim
+                        RoleClaimType = "roles" // [NOTE] This indicates that the user's roles are defined in the "roles" claim
                     },
                     Tenant = SiteConfiguration.AadTenant
                 });

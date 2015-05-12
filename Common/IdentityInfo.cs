@@ -17,6 +17,7 @@ namespace Common
 
         private static readonly string[] ClaimTypesToSkip = { "nonce", "at_hash", "c_hash" };
         private static readonly string[] GroupClaimTypes = { "groups", "http://schemas.microsoft.com/ws/2008/06/identity/claims/groups" };
+        private static readonly string[] RoleClaimTypes = { "roles", "http://schemas.microsoft.com/ws/2008/06/identity/claims/role" };
         private static readonly DateTimeOffset UnixTimestampEpoch = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
         #endregion
@@ -42,6 +43,16 @@ namespace Common
         /// The identity name.
         /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// The names of the groups the user is a member of.
+        /// </summary>
+        public IList<string> GroupNames { get; set; }
+
+        /// <summary>
+        /// The names of the roles the user has.
+        /// </summary>
+        public IList<string> RoleNames { get; set; }
 
         /// <summary>
         /// The claims.
@@ -106,6 +117,8 @@ namespace Common
                 IsAuthenticated = identity.IsAuthenticated,
                 Name = identity.Name,
                 AuthenticationType = identity.AuthenticationType,
+                GroupNames = (groups == null ? new string[0] : groups.Select(g => g.DisplayName).ToArray()),
+                RoleNames = identity.Claims.Where(claim => RoleClaimTypes.Any(roleClaimType => string.Equals(claim.Type, roleClaimType, StringComparison.OrdinalIgnoreCase))).Select(claim => claim.Value).ToArray(),
                 Claims = identity.Claims.Where(claim => !ClaimTypesToSkip.Any(claimTypeToSkip => string.Equals(claimTypeToSkip, claim.Type, StringComparison.OrdinalIgnoreCase))).Select(claim => new ClaimInfo { Issuer = claim.Issuer, Type = claim.Type, Value = claim.Value, Remark = GetRemark(claim, groups) }).ToArray(),
                 RelatedApplicationIdentities = relatedApplicationIdentities ?? new IdentityInfo[0]
             };
@@ -137,7 +150,7 @@ namespace Common
                 var group = groups.FirstOrDefault(g => string.Equals(g.ObjectId, claim.Value, StringComparison.OrdinalIgnoreCase));
                 if (group != null)
                 {
-                    return "Active Directory Group: " + group.DisplayName;
+                    return "Group: " + group.DisplayName;
                 }
             }
             return null;

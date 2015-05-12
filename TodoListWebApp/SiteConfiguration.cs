@@ -8,6 +8,7 @@ namespace TodoListWebApp
         public const string ApplicationName = "Todo List (ASP.NET MVC)";
 
         public static readonly string TodoListWebAppRootUrl = ConfigurationManager.AppSettings["TodoListWebAppRootUrl"];
+        public static readonly string TodoListWebAppResourceId = ConfigurationManager.AppSettings["TodoListWebAppResourceId"];
         public static readonly string TodoListWebAppClientId = ConfigurationManager.AppSettings["TodoListWebAppClientId"];
         public static readonly string TodoListWebAppClientSecret = ConfigurationManager.AppSettings["TodoListWebAppClientSecret"];
 

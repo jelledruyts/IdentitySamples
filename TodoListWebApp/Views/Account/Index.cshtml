@@ -46,6 +46,16 @@
                                     <dd>@identity.Name</dd>
                                     <dt>Authentication Type</dt>
                                     <dd>@identity.AuthenticationType</dd>
+                                    @if (identity.RoleNames != null && identity.RoleNames.Any())
+                                    {
+                                        <dt>Application Roles</dt>
+                                        <dd>@string.Join(", ", identity.RoleNames)</dd>
+                                    }
+                                    @if (identity.GroupNames != null && identity.GroupNames.Any())
+                                    {
+                                        <dt>Groups</dt>
+                                        <dd>@string.Join(", ", identity.GroupNames)</dd>
+                                    }
                                 </dl>
                             </div>
                         </div>

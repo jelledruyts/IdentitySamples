@@ -29,6 +29,12 @@ namespace TodoListWebApp
                     Authority = SiteConfiguration.AadAuthority,
                     PostLogoutRedirectUri = postLogoutRedirectUri,
 
+                    TokenValidationParameters = new System.IdentityModel.Tokens.TokenValidationParameters
+                    {
+                        NameClaimType = "name", // [NOTE] This indicates that the user's display name is defined in the "name" claim
+                        RoleClaimType = "roles" // [NOTE] This indicates that the user's roles are defined in the "roles" claim
+                    },
+
                     Notifications = new OpenIdConnectAuthenticationNotifications()
                     {
                         AuthorizationCodeReceived = async (context) =>
