@@ -52,29 +52,32 @@ namespace Common
         /// <returns>The requested groups.</returns>
         public async Task<IList<IGroup>> GetGroupsAsync(IList<string> groupIds)
         {
+            // There is currently no API to retrieve a filtered list of groups based on their ID's.
+            // Alternatives:
+            // - Construct the OData query string manually to "OR" together all the requested Group ID's
+            // - Retrieve ALL groups and then retain only the requested ones
+            // - Retrieve the requested ones individually (via the GetByObjectId method)
+            // Here we use the second option to show the client library and how to page through results.
             var groups = new List<IGroup>();
             if (groupIds != null && groupIds.Any())
             {
-                // There is currently no API to retrieve a filtered list of groups based on their ID's.
-                // Alternatives:
-                // - Construct the OData query string manually to include all the requested Group ID's
-                // - Retrieve all groups and then retain only the requested ones
-                // - Retrieve the requested ones individually (via the GetByObjectId method)
-                // Here we use the second option to show the client library and how to page through results.
-                var complete = false;
-                while (!complete)
+                // Retrieve the first page of results.
+                var groupsResult = await this.client.Groups.ExecuteAsync();
+                while (groupsResult != null)
                 {
-                    // Retrieve a page of results.
-                    var groupsResult = await this.client.Groups.ExecuteAsync();
-                    if (groupsResult != null)
-                    {
-                        // See if any of the requested groups were returned in the current page.
-                        var matchingRequestedGroups = groupsResult.CurrentPage.Where(g => groupIds.Any(groupId => string.Equals(groupId, g.ObjectId, StringComparison.OrdinalIgnoreCase)));
-                        groups.AddRange(matchingRequestedGroups);
-                    }
+                    // See if any of the requested groups were returned in the current page.
+                    var matchingRequestedGroups = groupsResult.CurrentPage.Where(g => groupIds.Any(groupId => string.Equals(groupId, g.ObjectId, StringComparison.OrdinalIgnoreCase)));
+                    groups.AddRange(matchingRequestedGroups);
 
-                    // Keep going while there are more pages.
-                    complete = groupsResult == null || !groupsResult.MorePagesAvailable;
+                    if (groupsResult.MorePagesAvailable)
+                    {
+                        // Keep going while there are more pages.
+                        groupsResult = await groupsResult.GetNextPageAsync();
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
             }
             return groups;
