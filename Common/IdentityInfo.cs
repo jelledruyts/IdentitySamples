@@ -150,7 +150,7 @@ namespace Common
                 var group = groups.FirstOrDefault(g => string.Equals(g.ObjectId, claim.Value, StringComparison.OrdinalIgnoreCase));
                 if (group != null)
                 {
-                    return "Group: " + group.DisplayName;
+                    return group.DisplayName;
                 }
             }
             return null;
