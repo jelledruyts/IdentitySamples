@@ -13,6 +13,12 @@ namespace Common
     /// </summary>
     public class AadGraphClient
     {
+        #region Constants
+
+        private const string AadGraphApiEndpoint = "https://graph.windows.net/";
+
+        #endregion
+
         #region Fields
 
         private ActiveDirectoryClient client;
@@ -29,14 +35,14 @@ namespace Common
         /// <param name="clientSecret">The Client Secret of the client application calling the Azure AD Graph API.</param>
         public AadGraphClient(string tenant, string clientId, string clientSecret)
         {
-            var aadGraphApiTenant = Constants.AadGraphApiEndpoint + tenant;
+            var aadGraphApiTenant = AadGraphApiEndpoint + tenant;
             var aadAuthority = Constants.AadEndpoint + tenant;
             this.client = new ActiveDirectoryClient(new Uri(aadGraphApiTenant), async () =>
             {
                 // [NOTE] This uses the OAuth 2.0 Client Credentials flow to authenticate as the client application itself (not as a user).
                 var authenticationContext = new AuthenticationContext(aadAuthority, false);
                 var credential = new ClientCredential(clientId, clientSecret);
-                var authenticationResult = await authenticationContext.AcquireTokenAsync(Constants.AadGraphApiEndpoint, credential);
+                var authenticationResult = await authenticationContext.AcquireTokenAsync(AadGraphApiEndpoint, credential);
                 return authenticationResult.AccessToken;
             });
         }

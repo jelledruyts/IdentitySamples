@@ -1,5 +1,5 @@
 ﻿
-namespace TodoListWebApp.Models
+namespace TodoListWpf.Models
 {
     public class TodoItem
     {

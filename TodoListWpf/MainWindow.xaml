@@ -1,0 +1,191 @@
+﻿<Window x:Class="TodoListWpf.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:c="clr-namespace:Common;assembly=Common"
+        xmlns:local="clr-namespace:TodoListWpf"
+        Title="{Binding Path=ApplicationName, Mode=OneWay}"
+        Height="600" Width="800" WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <local:StringListConverter x:Key="StringListConverter" />
+        <DataTemplate DataType="{x:Type c:IdentityInfo}">
+            <Expander Header="{Binding Path=Application}" IsExpanded="True" Margin="5" BorderBrush="Blue" BorderThickness="1">
+                <Grid Margin="20,0,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Expander Grid.Row="0" Header="Identity" IsExpanded="True" Margin="5" BorderBrush="Gray" BorderThickness="1">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Label Grid.Row="0" Grid.Column="0" Content="Is Authenticated" FontWeight="Bold" HorizontalContentAlignment="Right" VerticalAlignment="Center" />
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Path=IsAuthenticated}" VerticalAlignment="Center" />
+
+                            <Label Grid.Row="1" Grid.Column="0" Content="Name" FontWeight="Bold" HorizontalContentAlignment="Right" VerticalAlignment="Center" />
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Path=Name}" VerticalAlignment="Center" />
+
+                            <Label Grid.Row="2" Grid.Column="0" Content="Authentication Type" FontWeight="Bold" HorizontalContentAlignment="Right" VerticalAlignment="Center" />
+                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Path=AuthenticationType}" VerticalAlignment="Center" />
+
+                            <Label Grid.Row="3" Grid.Column="0" Content="Application Roles" FontWeight="Bold" HorizontalContentAlignment="Right" VerticalAlignment="Center" />
+                            <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Path=RoleNames, Converter={StaticResource StringListConverter}}" VerticalAlignment="Center" />
+
+                            <Label Grid.Row="4" Grid.Column="0" Content="Groups" FontWeight="Bold" HorizontalContentAlignment="Right" VerticalAlignment="Center" />
+                            <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding Path=GroupNames, Converter={StaticResource StringListConverter}}" VerticalAlignment="Center" />
+                        </Grid>
+                    </Expander>
+
+                    <Expander Grid.Row="1" Header="Claims" IsExpanded="True" Margin="5" BorderBrush="Gray" BorderThickness="1">
+                        <DataGrid ItemsSource="{Binding Path=Claims}" IsReadOnly="True" AutoGenerateColumns="False">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Claim Type" Binding="{Binding Path=Type}" />
+                                <DataGridTextColumn Header="Claim Value" Binding="{Binding Path=Value}">
+                                    <DataGridTextColumn.CellStyle>
+                                        <Style TargetType="DataGridCell">
+                                            <Setter Property="ToolTip" Value="{Binding Path=Remark}" />
+                                        </Style>
+                                    </DataGridTextColumn.CellStyle>
+                                </DataGridTextColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Expander>
+
+                    <Expander Grid.Row="2" Header="Related Application Identities" IsExpanded="False" Margin="5" BorderBrush="Gray" BorderThickness="1">
+                        <Expander.Style>
+                            <Style TargetType="Expander">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Path=RelatedApplicationIdentities.Count}" Value="0">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Expander.Style>
+                        <ItemsControl ItemsSource="{Binding Path=RelatedApplicationIdentities}" Margin="20,0,0,0" />
+                    </Expander>
+                </Grid>
+            </Expander>
+        </DataTemplate>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid Margin="5">
+            <TextBlock Panel.ZIndex="1" HorizontalAlignment="Right">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Path=CurrentUser}" Value="{x:Null}">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+                <Hyperlink Command="{Binding Path=SignInCommand}">Sign In</Hyperlink>
+            </TextBlock>
+
+            <TabControl IsEnabled="{Binding Path=IsUserSignedIn}">
+                <TabItem Header="Account">
+                    <ScrollViewer HorizontalScrollBarVisibility="Auto">
+                        <ContentPresenter Content="{Binding Path=IdentityInfo}" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Header="Todo List">
+                    <Grid Margin="5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <GroupBox Header="New Todo Item" Grid.Row="0">
+                            <Grid Margin="5">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Title" VerticalAlignment="Center" />
+                                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=TodoItemCreate.Title, UpdateSourceTrigger=PropertyChanged}" />
+
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Category" VerticalAlignment="Center" Margin="0,5,0,0" />
+                                <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Path=Categories}" SelectedIndex="0" DisplayMemberPath="DisplayName" SelectedValuePath="Id" SelectedValue="{Binding Path=TodoItemCreate.CategoryId}" Margin="0,5,0,0" />
+
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Or new" VerticalAlignment="Center" Margin="0,5,0,0" />
+                                <Grid Grid.Row="2" Grid.Column="1" Margin="0,5,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Grid.Column="0" Text="{Binding Path=TodoItemCreate.NewCategoryName}" />
+                                    <CheckBox Grid.Column="1" IsChecked="{Binding Path=TodoItemCreate.NewCategoryIsPrivate}" Margin="5,0,0,0" Content="Private" VerticalAlignment="Center" />
+                                </Grid>
+
+                                <Button Grid.Row="3" Content="Submit" Command="{Binding Path=CreateTodoItemCommand}" Margin="0,5,0,0" Padding="5" />
+                            </Grid>
+                        </GroupBox>
+
+                        <GroupBox Header="Todo Items" Grid.Row="1" Margin="0,5,0,0">
+                            <Grid Margin="5">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <WrapPanel Grid.Row="0">
+                                    <Button Command="{Binding Path=RefreshTodoListCommand}" Content="Refresh" Padding="5" />
+                                </WrapPanel>
+
+                                <DataGrid Grid.Row="1" ItemsSource="{Binding Path=TodoList}" IsReadOnly="True" AutoGenerateColumns="False" Margin="0,5,0,0">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Title" Binding="{Binding Path=Title}" Width="*" />
+                                        <DataGridTextColumn Header="Category" Binding="{Binding Path=CategoryName}">
+                                            <DataGridTextColumn.CellStyle>
+                                                <Style TargetType="DataGridCell">
+                                                    <Setter Property="Foreground" Value="Green" />
+                                                    <Setter Property="ToolTip" Value="Public category" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Path=CategoryIsPrivate}" Value="True">
+                                                            <Setter Property="Foreground" Value="Orange" />
+                                                            <Setter Property="ToolTip" Value="Private category" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </DataGridTextColumn.CellStyle>
+                                        </DataGridTextColumn>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </Grid>
+                        </GroupBox>
+                    </Grid>
+
+                </TabItem>
+            </TabControl>
+        </Grid>
+
+        <StatusBar Grid.Row="1">
+            <StatusBarItem>
+                <TextBlock Text="{Binding Path=StatusText}"/>
+            </StatusBarItem>
+        </StatusBar>
+    </Grid>
+</Window>

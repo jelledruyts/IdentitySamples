@@ -34,10 +34,7 @@ namespace TodoListConsole
             var todoListWebApiIdentityInfoResponse = await todoListWebApiClient.SendAsync(todoListWebApiIdentityInfoRequest);
             todoListWebApiIdentityInfoResponse.EnsureSuccessStatusCode();
             var todoListWebApiIdentityInfoResponseString = await todoListWebApiIdentityInfoResponse.Content.ReadAsStringAsync();
-            var todoListWebApiIdentityInfo = JsonConvert.DeserializeObject<IdentityInfo>(todoListWebApiIdentityInfoResponseString);
-
-            // Gather identity information from the current application and aggregate it with the identity information from the Web API.
-            return await IdentityInfo.FromCurrent(AppConfiguration.ApplicationName, new IdentityInfo[] { todoListWebApiIdentityInfo }, null);
+            return JsonConvert.DeserializeObject<IdentityInfo>(todoListWebApiIdentityInfoResponseString);
         }
 
         private static HttpClient GetTodoListClient()

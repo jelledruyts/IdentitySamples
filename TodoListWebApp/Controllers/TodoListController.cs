@@ -38,7 +38,7 @@ namespace TodoListWebApp.Controllers
         [HttpPost]
         public async Task<ActionResult> Index(TodoItemCreate model)
         {
-            if (!string.IsNullOrWhiteSpace(model.Title) && !string.IsNullOrWhiteSpace(model.CategoryId))
+            if (!string.IsNullOrWhiteSpace(model.Title))
             {
                 var client = await GetTodoListClient();
                 var newTodoItemRequest = new HttpRequestMessage(HttpMethod.Post, SiteConfiguration.TodoListWebApiRootUrl + "api/todolist");
