@@ -127,10 +127,11 @@ namespace Common
         private static string GetRemark(Claim claim, IList<IGroup> groups)
         {
             // [NOTE] Certain claims can be interpreted to more meaningful information.
+            // See https://msdn.microsoft.com/en-us/library/azure/dn195587.aspx among others.
             switch (claim.Type.ToLowerInvariant())
             {
                 case "aud":
-                    return "Audience URI of the targeted application";
+                    return "Audience URI of the targeted application, i.e. the intended recipient of the token";
                 case "iss":
                     return "Issued by Security Token Service";
                 case "iat":
@@ -143,6 +144,10 @@ namespace Common
                     return "Version";
                 case "pwd_exp":
                     return GetTimestampDescription("Password expires", claim.Value, false);
+                case "appid":
+                    return "application that is using the token to access a resource";
+                case "appidacr":
+                    return "Application Authentication Context Class Reference" + (claim.Value == "0" ? ": Public Client" : (claim.Value == "1" ? ": Confidential Client" : null));
             }
             if (groups != null && GroupClaimTypes.Any(groupClaimType => string.Equals(claim.Type, groupClaimType, StringComparison.OrdinalIgnoreCase)))
             {
