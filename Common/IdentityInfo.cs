@@ -145,9 +145,9 @@ namespace Common
                 case "pwd_exp":
                     return GetTimestampDescription("Password expires", claim.Value, false);
                 case "appid":
-                    return "application that is using the token to access a resource";
+                    return "Application that is using the token to access a resource";
                 case "appidacr":
-                    return "Application Authentication Context Class Reference" + (claim.Value == "0" ? ": Public Client" : (claim.Value == "1" ? ": Confidential Client" : null));
+                    return "Application Authentication Context Class Reference" + (claim.Value == "0" ? ": Public Client" : (claim.Value == "1" ? ": Confidential Client (Client ID + Secret)" : (claim.Value == "2" ? ": Confidential Client (X509 Certificate)" : null)));
             }
             if (groups != null && GroupClaimTypes.Any(groupClaimType => string.Equals(claim.Type, groupClaimType, StringComparison.OrdinalIgnoreCase)))
             {
