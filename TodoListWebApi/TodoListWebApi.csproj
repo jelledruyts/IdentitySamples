@@ -125,7 +125,9 @@
     <Reference Include="System.Net.Http.WebRequest">
     </Reference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="AadManifest.json" />
+  </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />

@@ -4,6 +4,9 @@ using System.Windows.Input;
 
 namespace TodoListUniversal
 {
+    /// <summary>
+    /// A command implementation that delegates to methods on a view model.
+    /// </summary>
     public class AsyncRelayCommand : ICommand
     {
         #region Member Fields

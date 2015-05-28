@@ -20,7 +20,7 @@ namespace TodoListUniversal
 
         public async Task ContinueWebAuthenticationAsync(IWebAuthenticationBrokerContinuationEventArgs args)
         {
-            // A web authentication continuation was requested, delegate to the view model.
+            // [NOTE] A web authentication continuation was requested, delegate to the view model.
             await ((MainPageViewModel)this.DataContext).ContinueWebAuthenticationAsync(args);
         }
     }

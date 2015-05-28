@@ -1,0 +1,55 @@
+{
+  "appId": "67d3ed0e-325c-455c-b012-0fcf6409826c",
+  "appRoles": [],
+  "availableToOtherTenants": true,
+  "displayName": "TodoListWindows",
+  "errorUrl": null,
+  "groupMembershipClaims": null,
+  "homepage": null,
+  "identifierUris": [],
+  "keyCredentials": [],
+  "knownClientApplications": [],
+  "logoutUrl": null,
+  "oauth2AllowImplicitFlow": false,
+  "oauth2AllowUrlPathMatching": false,
+  "oauth2Permissions": [],
+  "oauth2RequirePostResponse": false,
+  "passwordCredentials": [],
+  "publicClient": true,
+  "replyUrls": [
+    "ms-app://s-1-15-2-1560001648-135754094-621000606-2169641607-3755769251-1805572070-2548304156/"
+  ],
+  "requiredResourceAccess": [
+    {
+      "resourceAppId": "93fc871a-3e18-4f2c-b7a5-dcc65efd6384",
+      "resourceAccess": [
+        {
+          "id": "bc9ce9d2-457c-4943-8484-8b96854ce963",
+          "type": "Scope"
+        }
+      ]
+    },
+    {
+      "resourceAppId": "00000002-0000-0000-c000-000000000000",
+      "resourceAccess": [
+        {
+          "id": "311a71cc-e848-46a1-bdf8-97ff7156d8e6",
+          "type": "Scope"
+        }
+      ]
+    }
+  ],
+  "samlMetadataUrl": null,
+  "extensionProperties": [],
+  "objectType": "Application",
+  "objectId": "6bc5f123-640b-492b-82f3-9d6aabbf44c1",
+  "deletionTimestamp": null,
+  "createdOnBehalfOf": null,
+  "createdObjects": [],
+  "manager": null,
+  "directReports": [],
+  "members": [],
+  "memberOf": [],
+  "owners": [],
+  "ownedObjects": []
+}

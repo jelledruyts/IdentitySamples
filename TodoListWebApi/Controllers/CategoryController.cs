@@ -14,6 +14,9 @@ namespace TodoListWebApi.Controllers
     [Authorize]
     public class CategoryController : ApiController
     {
+        /// <summary>
+        /// Gets all public categories as well as the current user's private categories.
+        /// </summary>
         public async Task<IEnumerable<Category>> Get()
         {
             var client = await GetTaxonomyClient();
@@ -25,6 +28,9 @@ namespace TodoListWebApi.Controllers
             return categoryList;
         }
 
+        /// <summary>
+        /// Creates a new category.
+        /// </summary>
         public async Task<IHttpActionResult> Post(Category value)
         {
             var client = await GetTaxonomyClient();
@@ -37,8 +43,9 @@ namespace TodoListWebApi.Controllers
             return Ok(newCategory);
         }
 
-        public static async Task<HttpClient> GetTaxonomyClient()
+        internal static async Task<HttpClient> GetTaxonomyClient()
         {
+            // [SCENARIO] OAuth 2.0 On-Behalf-Of Grant
             // Get an On-Behalf-Of token to authenticate against the Taxonomy Web API.
             var authContext = new AuthenticationContext(SiteConfiguration.AadAuthority, TokenCacheFactory.GetTokenCacheForCurrentPrincipal());
             var credential = new ClientCredential(SiteConfiguration.TodoListWebApiClientId, SiteConfiguration.TodoListWebApiClientSecret);

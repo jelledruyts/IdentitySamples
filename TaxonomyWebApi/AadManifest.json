@@ -1,0 +1,71 @@
+{
+  "appId": "f585dc24-7561-4dea-bce6-d26768643d42",
+  "appRoles": [],
+  "availableToOtherTenants": false,
+  "displayName": "TaxonomyWebApi",
+  "errorUrl": null,
+  "groupMembershipClaims": "SecurityGroup",
+  "homepage": "https://localhost:44308/",
+  "identifierUris": [
+    "http://identitysamples/taxonomywebapi"
+  ],
+  "keyCredentials": [],
+  "knownClientApplications": [],
+  "logoutUrl": null,
+  "oauth2AllowImplicitFlow": false,
+  "oauth2AllowUrlPathMatching": false,
+  "oauth2Permissions": [
+    {
+      "adminConsentDescription": "Allow the application to access TaxonomyWebApi on behalf of the signed-in user.",
+      "adminConsentDisplayName": "Access TaxonomyWebApi",
+      "id": "c5106d12-e187-4fea-939c-2f2fe59877e7",
+      "isEnabled": true,
+      "type": "User",
+      "userConsentDescription": "Allow the application to access TaxonomyWebApi on your behalf.",
+      "userConsentDisplayName": "Access TaxonomyWebApi",
+      "value": "user_impersonation"
+    }
+  ],
+  "oauth2RequirePostResponse": false,
+  "passwordCredentials": [
+    {
+      "customKeyIdentifier": null,
+      "endDate": "2017-05-08T08:23:31.4991516Z",
+      "keyId": "b52c3e5b-a679-47d1-ab30-064a684931e8",
+      "startDate": "2015-05-08T08:23:31.4991516Z",
+      "value": null
+    }
+  ],
+  "publicClient": null,
+  "replyUrls": [
+    "https://localhost:44308/"
+  ],
+  "requiredResourceAccess": [
+    {
+      "resourceAppId": "00000002-0000-0000-c000-000000000000",
+      "resourceAccess": [
+        {
+          "id": "5778995a-e1bf-45b8-affa-663a9f3f4d04",
+          "type": "Role"
+        },
+        {
+          "id": "311a71cc-e848-46a1-bdf8-97ff7156d8e6",
+          "type": "Scope"
+        }
+      ]
+    }
+  ],
+  "samlMetadataUrl": null,
+  "extensionProperties": [],
+  "objectType": "Application",
+  "objectId": "017be6a6-46b1-4e01-a0e6-2cb85ed75c4c",
+  "deletionTimestamp": null,
+  "createdOnBehalfOf": null,
+  "createdObjects": [],
+  "manager": null,
+  "directReports": [],
+  "members": [],
+  "memberOf": [],
+  "owners": [],
+  "ownedObjects": []
+}

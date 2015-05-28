@@ -34,12 +34,18 @@ namespace TaxonomyWebApi.Controllers
 
         #endregion
 
+        /// <summary>
+        /// Gets all public categories as well as the current user's private categories.
+        /// </summary>
         public IEnumerable<Category> Get()
         {
             var userId = ClaimsPrincipal.Current.GetUniqueIdentifier();
             return database.Where(c => c.UserId == null || c.UserId == userId).OrderBy(c => c.Name).Select(c => new Category { Id = c.Id, Name = c.Name, IsPrivate = c.UserId != null });
         }
 
+        /// <summary>
+        /// Creates a new category.
+        /// </summary>
         public IHttpActionResult Post(Category value)
         {
             if (value == null || string.IsNullOrWhiteSpace(value.Name))

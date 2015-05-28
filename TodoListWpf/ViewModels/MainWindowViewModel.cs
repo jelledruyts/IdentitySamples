@@ -203,6 +203,7 @@ namespace TodoListWpf.ViewModels
 
         private static HttpClient GetTodoListClient()
         {
+            // [SCENARIO] OAuth 2.0 Authorization Code Grant, Public Client
             // Get a token to authenticate against the Web API.
             var context = new AuthenticationContext(AppConfiguration.AadAuthority);
             var result = context.AcquireToken(AppConfiguration.TodoListWebApiResourceId, AppConfiguration.TodoListWpfClientId, new Uri(AppConfiguration.TodoListWpfRedirectUrl));

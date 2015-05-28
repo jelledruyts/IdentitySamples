@@ -10,7 +10,7 @@ namespace TodoListConsole
 {
     class Program
     {
-        // The STA threading model is necessary for the ADAL web browser popup that authenticates with the authority.
+        // [NOTE] The STA threading model is necessary for the ADAL web browser popup that authenticates with the authority.
         [STAThread]
         static void Main(string[] args)
         {
@@ -38,6 +38,7 @@ namespace TodoListConsole
 
         private static HttpClient GetTodoListClient()
         {
+            // [SCENARIO] OAuth 2.0 Authorization Code Grant, Public Client
             // Get a token to authenticate against the Web API.
             var context = new AuthenticationContext(AppConfiguration.AadAuthority);
             var result = context.AcquireToken(AppConfiguration.TodoListWebApiResourceId, AppConfiguration.TodoListConsoleClientId, new Uri(AppConfiguration.TodoListConsoleRedirectUrl));

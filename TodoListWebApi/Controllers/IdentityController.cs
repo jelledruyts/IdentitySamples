@@ -14,8 +14,12 @@ namespace TodoListWebApi.Controllers
     [Authorize]
     public class IdentityController : ApiController
     {
+        /// <summary>
+        /// Gets identity information about the currently authenticated user.
+        /// </summary>
         public async Task<IdentityInfo> Get()
         {
+            // Retrieve identity information from the downstream Taxonomy Web API.
             var relatedApplicationIdentities = new List<IdentityInfo>();
             try
             {
@@ -37,10 +41,14 @@ namespace TodoListWebApi.Controllers
                 Trace.WriteLine("Failed to retrieve related application identity information: " + exc.ToString());
             }
 
+            // Aggregate the current identity information with the downstream identities.
             var graphClient = new AadGraphClient(SiteConfiguration.AadTenant, SiteConfiguration.TodoListWebApiClientId, SiteConfiguration.TodoListWebApiClientSecret);
             return await IdentityInfo.FromCurrent("Todo List Web API", relatedApplicationIdentities, graphClient);
         }
 
+        /// <summary>
+        /// Updates information about a user in Azure Active Directory.
+        /// </summary>
         public async Task Post(IdentityUpdate identity)
         {
             if (identity != null && !string.IsNullOrWhiteSpace(identity.DisplayName))

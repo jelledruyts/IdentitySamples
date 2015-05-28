@@ -50,7 +50,7 @@ namespace TodoListWebApp.Controllers
         {
             if (!Request.IsAuthenticated)
             {
-                // Send an OpenID Connect sign-in request.
+                // [NOTE] Send an OpenID Connect sign-in request.
                 HttpContext.GetOwinContext().Authentication.Challenge(new AuthenticationProperties { RedirectUri = Url.Action("Index", "Home") }, OpenIdConnectAuthenticationDefaults.AuthenticationType);
                 return new EmptyResult(); // The challenge will take care of the response.
             }
@@ -63,7 +63,7 @@ namespace TodoListWebApp.Controllers
 
         public void SignOut()
         {
-            // Remove the token cache for this user and send an OpenID Connect sign-out request.
+            // [NOTE] Remove the token cache for this user and send an OpenID Connect sign-out request.
             TokenCacheFactory.DeleteTokenCacheForCurrentPrincipal();
             HttpContext.GetOwinContext().Authentication.SignOut(OpenIdConnectAuthenticationDefaults.AuthenticationType, CookieAuthenticationDefaults.AuthenticationType);
         }

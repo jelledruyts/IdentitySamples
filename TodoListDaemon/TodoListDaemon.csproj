@@ -62,6 +62,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="AadManifest.json" />
     <None Include="App.config" />
     <None Include="packages.config" />
     <None Include="Setup.ps1" />

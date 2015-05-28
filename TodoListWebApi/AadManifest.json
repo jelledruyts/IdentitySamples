@@ -1,0 +1,115 @@
+{
+  "appId": "93fc871a-3e18-4f2c-b7a5-dcc65efd6384",
+  "appRoles": [
+    {
+      "allowedMemberTypes": [
+        "User"
+      ],
+      "description": "Administrators can manage the application",
+      "displayName": "Administrator",
+      "id": "6f7a2ff9-5741-41f6-9476-39286dfbcf8d",
+      "isEnabled": true,
+      "value": "administrator"
+    },
+    {
+      "allowedMemberTypes": [
+        "User"
+      ],
+      "description": "Contributors can manage their own todo lists",
+      "displayName": "Contributor",
+      "id": "752176e1-9159-4df2-b065-f8a843b84575",
+      "isEnabled": true,
+      "value": "contributor"
+    }
+  ],
+  "availableToOtherTenants": false,
+  "displayName": "TodoListWebApi",
+  "errorUrl": null,
+  "groupMembershipClaims": "SecurityGroup",
+  "homepage": "https://localhost:44307/",
+  "identifierUris": [
+    "http://identitysamples/todolistwebapi"
+  ],
+  "keyCredentials": [],
+  "knownClientApplications": [],
+  "logoutUrl": null,
+  "oauth2AllowImplicitFlow": false,
+  "oauth2AllowUrlPathMatching": false,
+  "oauth2Permissions": [
+    {
+      "adminConsentDescription": "Allow the application to write todo's on behalf of the signed-in user.",
+      "adminConsentDisplayName": "Write TodoListWebApi",
+      "id": "5f54c597-8838-4eaf-853c-91cf5b487d1d",
+      "isEnabled": true,
+      "type": "User",
+      "userConsentDescription": "Allow the application to write todo's on your behalf.",
+      "userConsentDisplayName": "Write TodoListWebApi",
+      "value": "todo_write"
+    },
+    {
+      "adminConsentDescription": "Allow the application to access TodoListWebApi on behalf of the signed-in user.",
+      "adminConsentDisplayName": "Access TodoListWebApi",
+      "id": "bc9ce9d2-457c-4943-8484-8b96854ce963",
+      "isEnabled": true,
+      "type": "User",
+      "userConsentDescription": "Allow the application to access TodoListWebApi on your behalf.",
+      "userConsentDisplayName": "Access TodoListWebApi",
+      "value": "user_impersonation"
+    }
+  ],
+  "oauth2RequirePostResponse": false,
+  "passwordCredentials": [
+    {
+      "customKeyIdentifier": null,
+      "endDate": "2017-05-04T09:57:52.0343262Z",
+      "keyId": "4d49f7b8-660d-46b7-8aac-cbc2a1afd7ab",
+      "startDate": "2015-05-04T09:57:52.0343262Z",
+      "value": null
+    }
+  ],
+  "publicClient": null,
+  "replyUrls": [
+    "https://localhost:44307/"
+  ],
+  "requiredResourceAccess": [
+    {
+      "resourceAppId": "00000002-0000-0000-c000-000000000000",
+      "resourceAccess": [
+        {
+          "id": "5778995a-e1bf-45b8-affa-663a9f3f4d04",
+          "type": "Role"
+        },
+        {
+          "id": "78c8a3c8-a07e-4b9e-af1b-b5ccab50a175",
+          "type": "Role"
+        },
+        {
+          "id": "311a71cc-e848-46a1-bdf8-97ff7156d8e6",
+          "type": "Scope"
+        }
+      ]
+    },
+    {
+      "resourceAppId": "f585dc24-7561-4dea-bce6-d26768643d42",
+      "resourceAccess": [
+        {
+          "id": "c5106d12-e187-4fea-939c-2f2fe59877e7",
+          "type": "Scope"
+        }
+      ]
+    }
+  ],
+  "samlMetadataUrl": null,
+  "extensionProperties": [],
+  "objectType": "Application",
+  "objectId": "3af7eb41-a60e-403e-a95e-abedc18ed903",
+  "deletionTimestamp": null,
+  "createdOnBehalfOf": null,
+  "createdObjects": [],
+  "manager": null,
+  "directReports": [],
+  "members": [],
+  "memberOf": [],
+  "owners": [],
+  "ownedObjects": []
+}

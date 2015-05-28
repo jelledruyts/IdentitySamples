@@ -12,6 +12,9 @@ using TodoListWebApi.Models;
 
 namespace TodoListWebApi.Controllers
 {
+    // [NOTE] To ensure that the caller is authorized, just place the [Authorize] attribute.
+    // Optionally, include roles e.g. [Authorize(Roles = "Contributor")] which are
+    // checked against the role claims in the token.
     [Authorize]
     public class TodoListController : ApiController
     {
@@ -39,12 +42,23 @@ namespace TodoListWebApi.Controllers
 
         #endregion
 
+        /// <summary>
+        /// Gets the todo items of the current user.
+        /// </summary>
         public IEnumerable<TodoItem> Get()
         {
+            // [NOTE] The ClaimsPrincipal.Current is automatically populated
+            // by the Bearer Token middleware with the claims coming from the
+            // authorization token.
+            // When using application roles, these can be checked with the
+            // standard mechanisms, e.g. ClaimsPrincipal.Current.IsInRole("Contributor")
             var userId = ClaimsPrincipal.Current.GetUniqueIdentifier();
             return database.Where(t => t.UserId == userId).OrderBy(t => t.CreatedTime).Select(t => new TodoItem { Id = t.Id, Title = t.Title, CategoryId = t.CategoryId });
         }
 
+        /// <summary>
+        /// Creates a new todo item for the current user.
+        /// </summary>
         public async Task<IHttpActionResult> Post(TodoItemCreate value)
         {
             if (value == null || string.IsNullOrWhiteSpace(value.Title))
@@ -56,7 +70,7 @@ namespace TodoListWebApi.Controllers
                 return BadRequest("CategoryId is required");
             }
 
-            // Create a new category if requested.
+            // Create a new category via the Taxonomy Web API if requested.
             if (!string.IsNullOrWhiteSpace(value.NewCategoryName))
             {
                 var client = await CategoryController.GetTaxonomyClient();

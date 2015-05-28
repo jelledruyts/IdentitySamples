@@ -26,20 +26,6 @@ namespace TodoListDaemon
             }
         }
 
-        private static X509Certificate2 GetCertificate(string certificateName)
-        {
-            var store = new X509Store(StoreLocation.CurrentUser);
-            try
-            {
-                store.Open(OpenFlags.ReadOnly);
-                return store.Certificates.Find(X509FindType.FindBySubjectName, certificateName, false).Cast<X509Certificate2>().FirstOrDefault();
-            }
-            finally
-            {
-                store.Close();
-            }
-        }
-
         private static async Task<IdentityInfo> GetIdentityInfoFromWebApiAsync()
         {
             // Get identity information from the Todo List Web API.
@@ -53,19 +39,35 @@ namespace TodoListDaemon
 
         private static async Task<HttpClient> GetTodoListClient()
         {
+            // [SCENARIO] OAuth 2.0 Client Credential Grant with Client Certificate
             // Get a token to authenticate against the Web API.
             var context = new AuthenticationContext(AppConfiguration.AadAuthority);
             var certificate = GetCertificate(AppConfiguration.TodoListDaemonCertificateName);
-            if (certificate == null)
-            {
-                throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "The certificate with subject name \"{0}\" could not be found, please create it first.", AppConfiguration.TodoListDaemonCertificateName));
-            }
             var clientCertificate = new ClientAssertionCertificate(AppConfiguration.TodoListDaemonClientId, certificate);
             var result = await context.AcquireTokenAsync(AppConfiguration.TodoListWebApiResourceId, clientCertificate);
 
             var client = new HttpClient();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
             return client;
+        }
+
+        private static X509Certificate2 GetCertificate(string certificateName)
+        {
+            var store = new X509Store(StoreLocation.CurrentUser);
+            try
+            {
+                store.Open(OpenFlags.ReadOnly);
+                var certificate = store.Certificates.Find(X509FindType.FindBySubjectName, certificateName, false).Cast<X509Certificate2>().FirstOrDefault();
+                if (certificate == null)
+                {
+                    throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "The certificate with subject name \"{0}\" could not be found, please create it first.", AppConfiguration.TodoListDaemonCertificateName));
+                }
+                return certificate;
+            }
+            finally
+            {
+                store.Close();
+            }
         }
     }
 }

@@ -8,11 +8,12 @@ namespace TaxonomyWebApi
     {
         public void ConfigureAuth(IAppBuilder app)
         {
+            // [SCENARIO] OAuth 2.0 Bearer Token Authorization 
             app.UseWindowsAzureActiveDirectoryBearerAuthentication(new WindowsAzureActiveDirectoryBearerAuthenticationOptions
                 {
                     TokenValidationParameters = new TokenValidationParameters
                     {
-                        ValidAudience = SiteConfiguration.TaxonomyWebApiResourceId,
+                        ValidAudience = SiteConfiguration.TaxonomyWebApiResourceId, // [NOTE] This ensures the token is actually intended for the current application
                         NameClaimType = "name", // [NOTE] This indicates that the user's display name is defined in the "name" claim
                         RoleClaimType = "roles" // [NOTE] This indicates that the user's roles are defined in the "roles" claim
                     },

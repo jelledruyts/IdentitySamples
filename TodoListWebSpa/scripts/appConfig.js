@@ -8,6 +8,8 @@ angular.module('configuration', [])
         todoListWebSpaClientId: '31580c09-e971-431a-8ab7-86a7b244720e',
         todoListWebApiRootUrl: 'https://localhost:44307/',
         webApiEndpoints: {
+            // [NOTE] This is used by ADAL.JS to automatically attach tokens to these endpoints.
+            // Format: '<Endpoint URL>': '<AAD Resource ID>'
             'https://localhost:44307/api': 'http://identitysamples/todolistwebapi'
         }
     }

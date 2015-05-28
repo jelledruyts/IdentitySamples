@@ -15,6 +15,9 @@ namespace Common
     {
         #region Constants
 
+        /// <summary>
+        /// The root endpoint for accessing the Azure Active Directory Graph API.
+        /// </summary>
         private const string AadGraphApiEndpoint = "https://graph.windows.net/";
 
         #endregion
@@ -39,7 +42,8 @@ namespace Common
             var aadAuthority = Constants.AadEndpoint + tenant;
             this.client = new ActiveDirectoryClient(new Uri(aadGraphApiTenant), async () =>
             {
-                // [NOTE] This uses the OAuth 2.0 Client Credentials flow to authenticate as the client application itself (not as a user).
+                // [SCENARIO] OAuth 2.0 Client Credential Grant with Client Secret
+                // [NOTE] This uses the OAuth 2.0 Client Credentials Grant to authenticate as the client application itself (not as a user).
                 var authenticationContext = new AuthenticationContext(aadAuthority, false);
                 var credential = new ClientCredential(clientId, clientSecret);
                 var authenticationResult = await authenticationContext.AcquireTokenAsync(AadGraphApiEndpoint, credential);
@@ -58,6 +62,7 @@ namespace Common
         /// <returns>The requested groups.</returns>
         public async Task<IList<IGroup>> GetGroupsAsync(IList<string> groupIds)
         {
+            // [SCENARIO] Calling the Graph API (Read)
             // There is currently no API to retrieve a filtered list of groups based on their ID's.
             // Alternatives:
             // - Construct the OData query string manually to "OR" together all the requested Group ID's
@@ -100,6 +105,7 @@ namespace Common
         /// <param name="displayName">The new display name for the user.</param>
         public async Task UpdateUserAsync(string userObjectId, string displayName)
         {
+            // [SCENARIO] Calling the Graph API (Write)
             var user = await this.client.Users.GetByObjectId(userObjectId).ExecuteAsync();
             if (user == null)
             {

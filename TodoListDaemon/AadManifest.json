@@ -1,0 +1,68 @@
+{
+  "appId": "4707dd0f-52f8-4543-a2f0-d45099e54b3f",
+  "appRoles": [],
+  "availableToOtherTenants": false,
+  "displayName": "TodoListDaemon",
+  "errorUrl": null,
+  "groupMembershipClaims": null,
+  "homepage": "http://identitysamples/todolistdaemon",
+  "identifierUris": [
+    "http://identitysamples/todolistdaemon"
+  ],
+  "keyCredentials": [],
+  "knownClientApplications": [],
+  "logoutUrl": null,
+  "oauth2AllowImplicitFlow": false,
+  "oauth2AllowUrlPathMatching": false,
+  "oauth2Permissions": [
+    {
+      "adminConsentDescription": "Allow the application to access TodoListDaemon on behalf of the signed-in user.",
+      "adminConsentDisplayName": "Access TodoListDaemon",
+      "id": "979d786d-788f-4f25-b645-7dcf55772076",
+      "isEnabled": true,
+      "type": "User",
+      "userConsentDescription": "Allow the application to access TodoListDaemon on your behalf.",
+      "userConsentDisplayName": "Access TodoListDaemon",
+      "value": "user_impersonation"
+    }
+  ],
+  "oauth2RequirePostResponse": false,
+  "passwordCredentials": [],
+  "publicClient": null,
+  "replyUrls": [
+    "http://identitysamples/todolistdaemon"
+  ],
+  "requiredResourceAccess": [
+    {
+      "resourceAppId": "93fc871a-3e18-4f2c-b7a5-dcc65efd6384",
+      "resourceAccess": [
+        {
+          "id": "bc9ce9d2-457c-4943-8484-8b96854ce963",
+          "type": "Scope"
+        }
+      ]
+    },
+    {
+      "resourceAppId": "00000002-0000-0000-c000-000000000000",
+      "resourceAccess": [
+        {
+          "id": "311a71cc-e848-46a1-bdf8-97ff7156d8e6",
+          "type": "Scope"
+        }
+      ]
+    }
+  ],
+  "samlMetadataUrl": null,
+  "extensionProperties": [],
+  "objectType": "Application",
+  "objectId": "d6505679-1a08-46c2-8c71-1d75e6279ff8",
+  "deletionTimestamp": null,
+  "createdOnBehalfOf": null,
+  "createdObjects": [],
+  "manager": null,
+  "directReports": [],
+  "members": [],
+  "memberOf": [],
+  "owners": [],
+  "ownedObjects": []
+}

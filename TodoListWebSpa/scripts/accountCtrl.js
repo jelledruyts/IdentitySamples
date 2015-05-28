@@ -33,7 +33,8 @@ angular.module('todoApp')
             $scope.error = '';
             $scope.loadingMessage = '';
 
-            // Get the current user's claims from the user info profile.
+            // [NOTE] Get the current user's claims from the user info profile, which is
+            // automatically populated by ADAL.JS.
             var userClaims = [];
             for (var claimType in $scope.userInfo.profile) {
                 if ($scope.userInfo.profile.hasOwnProperty(claimType)) {

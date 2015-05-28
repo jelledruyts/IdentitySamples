@@ -31,11 +31,14 @@ namespace TodoListUniversal
 
         public MainPageViewModel()
         {
-            // [NOTE] Use the line below to retrieve the Redirect URL for the application.
+            // [NOTE] Use the line below to retrieve the Redirect URL for the application
+            // that needs to be registered in Azure Active Directory.
             var redirectUri = Windows.Security.Authentication.Web.WebAuthenticationBroker.GetCurrentApplicationCallbackUri();
+
             this.SignInCommand = new AsyncRelayCommand(SignIn, CanSignIn);
             this.SignOutCommand = new AsyncRelayCommand(SignOut, CanSignOut);
 #if WINDOWS_PHONE_APP
+            // [NOTE] Windows Phone uses an async factory pattern to create the AuthenticationContext.
             this.context = AuthenticationContext.CreateAsync(AppConfiguration.AadAuthority).GetResults();
 #else
             this.context = new AuthenticationContext(AppConfiguration.AadAuthority);
@@ -80,8 +83,10 @@ namespace TodoListUniversal
             var exception = default(Exception);
             try
             {
-                // Clear the authentication token cache.
+                // [NOTE] Clear the authentication token cache to sign a user out.
+                // This ensures the persistent tokens are cleared from the device.
                 this.context.TokenCache.Clear();
+                
                 this.userInfo = null;
 
                 this.StatusText = "Signed out.";
@@ -145,6 +150,8 @@ namespace TodoListUniversal
 
         private void FinalizeAuthentication(AuthenticationResult result)
         {
+            // [NOTE] At this point we have the authentication result, including the user information.
+            // From this point on we could use the regular OAuth 2.0 Bearer Token to call the Web API.
             this.userInfo = result.UserInfo;
             this.StatusText = "Signed in as " + this.userInfo.DisplayableId;
             this.SignInCommand.RaiseCanExecuteChanged();

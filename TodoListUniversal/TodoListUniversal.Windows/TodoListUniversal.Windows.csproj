@@ -112,6 +112,7 @@
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
+    <None Include="AadManifest.json" />
     <None Include="packages.config" />
     <None Include="TodoListUniversal.Windows_TemporaryKey.pfx" />
   </ItemGroup>

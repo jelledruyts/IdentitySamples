@@ -1,6 +1,7 @@
 ﻿'use strict';
 angular.module('todoApp', ['ngRoute', 'AdalAngular', 'configuration'])
 .config(['$routeProvider', '$httpProvider', 'adalAuthenticationServiceProvider', 'config', function ($routeProvider, $httpProvider, adalProvider, config) {
+    // [SCENARIO] OAuth 2.0 Implicit Grant
     // Configure the routes.
     $routeProvider.when("/Home", {
         controller: "homeCtrl",
@@ -15,17 +16,17 @@ angular.module('todoApp', ['ngRoute', 'AdalAngular', 'configuration'])
         requireADLogin: true // [NOTE] This implicitly triggers a sign-in.
     }).otherwise({ redirectTo: "/Home" });
 
-    // Allow Cross-Origin Resource Sharing (CORS) to the Web API domain.
+    // [NOTE] Allow Cross-Origin Resource Sharing (CORS) to the Web API domain.
     $httpProvider.defaults.useXDomain = true;
     delete $httpProvider.defaults.headers.common['X-Requested-With'];
 
-    // Initialize ADAL.
+    // [NOTE] Initialize ADAL.JS.
     adalProvider.init(
         {
             instance: config.aadEndpoint,
             tenant: config.aadTenant,
             clientId: config.todoListWebSpaClientId,
-            endpoints: config.webApiEndpoints,
+            endpoints: config.webApiEndpoints, // [NOTE] Instruct ADAL.JS to automatically attach tokens to these endpoints
             extraQueryParameter: 'nux=1', // Triggers the "New UX" logon experience in Azure AD.
         },
         $httpProvider
