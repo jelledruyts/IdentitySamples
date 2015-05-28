@@ -120,6 +120,7 @@ namespace TodoListUniversal
 
         private async Task SignInAsync()
         {
+            // [SCENARIO] OAuth 2.0 Authorization Code Grant, Public Client
             // Get a token to authenticate against the Web API.
 #if WINDOWS_PHONE_APP
             // Check if there is a cached token first.

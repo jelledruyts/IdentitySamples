@@ -26,11 +26,11 @@ Client n ---/
 | Project | Purpose | Technology | Protocol |
 |---------|---------|------------|----------|
 | TaxonomyWebApi | Taxonomy service | ASP.NET Web API | OAuth 2.0 Bearer Tokens |
-| TodoListWebApi | Todo List service | ASP.NET Web API | OAuth 2.0 Bearer Tokens, OAuth 2.0 On-Behalf-Of |
-| TodoListWebApp | Server-side web application | ASP.NET MVC | OpenID Connect |
+| TodoListWebApi | Todo List service | ASP.NET Web API | OAuth 2.0 Bearer Tokens; OAuth 2.0 On-Behalf-Of |
+| TodoListWebApp | Server-side web application | ASP.NET MVC | OpenID Connect; OAuth 2.0 Authorization Code Grant, Confidential Client |
 | TodoListWebSpa | Client-side Single Page Application (SPA) | AngularJS | OAuth 2.0 Implicit Grant |
-| TodoListWpf | Windows desktop application | WPF | OAuth 2.0 Authorization Code Grant, public client |
-| TodoListConsole | Windows desktop application | Console | OAuth 2.0 Authorization Code Grant, public client |
-| TodoListDaemon | Non-interactive daemon service | Console | OAuth 2.0 Authorization Code Grant, confidential client with certificate authentication |
-| TodoListUniversal.Windows | Windows Store application | Universal App | OAuth 2.0 Authorization Code Grant, public client |
-| TodoListUniversal.WindowsPhone | Windows Phone application | Universal App | OAuth 2.0 Authorization Code Grant, public client |
+| TodoListWpf | Windows desktop application | WPF | OAuth 2.0 Authorization Code Grant, Public Client |
+| TodoListConsole | Windows desktop application | Console | OAuth 2.0 Authorization Code Grant, Public Client |
+| TodoListDaemon | Non-interactive daemon service | Console | OAuth 2.0 Client Credential Grant; Confidential Client with Certificate authentication |
+| TodoListUniversal.Windows | Windows Store application | Universal App | OAuth 2.0 Authorization Code Grant, Public Client |
+| TodoListUniversal.WindowsPhone | Windows Phone application | Universal App | OAuth 2.0 Authorization Code Grant, Public Client |
