@@ -31,6 +31,6 @@ Client n ---/
 | TodoListWebSpa | Client-side Single Page Application (SPA) | AngularJS | OAuth 2.0 Implicit Grant |
 | TodoListWpf | Windows desktop application | WPF | OAuth 2.0 Authorization Code Grant, Public Client |
 | TodoListConsole | Windows desktop application | Console | OAuth 2.0 Authorization Code Grant, Public Client |
-| TodoListDaemon | Non-interactive daemon service | Console | OAuth 2.0 Client Credential Grant; Confidential Client with Certificate authentication |
+| TodoListDaemon | Non-interactive daemon service | Console | OAuth 2.0 Client Credential Grant, Confidential Client with Certificate authentication |
 | TodoListUniversal.Windows | Windows Store application | Universal App | OAuth 2.0 Authorization Code Grant, Public Client |
 | TodoListUniversal.WindowsPhone | Windows Phone application | Universal App | OAuth 2.0 Authorization Code Grant, Public Client |
