@@ -34,3 +34,5 @@ Client n ---/
 | TodoListDaemon | Non-interactive daemon service | Console | OAuth 2.0 Client Credential Grant, Confidential Client with Certificate authentication |
 | TodoListUniversal.Windows | Windows Store application | Universal App | OAuth 2.0 Authorization Code Grant, Public Client |
 | TodoListUniversal.WindowsPhone | Windows Phone application | Universal App | OAuth 2.0 Authorization Code Grant, Public Client |
+
+The implementation details of these scenarios are easily found in the code by searching for "[SCENARIO]". Other notable remarks can be found by searching for "[NOTE]".
