@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoListWebApp", "TodoListWebApp\TodoListWebApp.csproj", "{5FAB39E1-07CF-414C-9290-2A70E2B36F53}"
 EndProject
@@ -60,9 +60,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoListUniversal.WindowsPh
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TodoListUniversal", "TodoListUniversal", "{C5090A27-C666-4B73-9CFA-7D094F3521ED}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoListUniversalWindows10", "TodoListUniversalWindows10\TodoListUniversalWindows10.csproj", "{E3F270F8-ED94-482A-BC2F-DF4574D419E9}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		TodoListUniversal\TodoListUniversal.Shared\TodoListUniversal.Shared.projitems*{c1d4a783-05ab-4eb2-a7cf-636f5a244709}*SharedItemsImports = 13
 		TodoListUniversal\TodoListUniversal.Shared\TodoListUniversal.Shared.projitems*{42a5a20c-60b7-434b-b1b4-2ecbe60e2e07}*SharedItemsImports = 4
 		TodoListUniversal\TodoListUniversal.Shared\TodoListUniversal.Shared.projitems*{e1ee9023-f5ab-41b3-b510-76efe885aa55}*SharedItemsImports = 4
 	EndGlobalSection
@@ -201,6 +202,28 @@ Global
 		{E1EE9023-F5AB-41B3-B510-76EFE885AA55}.Release|x86.ActiveCfg = Release|x86
 		{E1EE9023-F5AB-41B3-B510-76EFE885AA55}.Release|x86.Build.0 = Release|x86
 		{E1EE9023-F5AB-41B3-B510-76EFE885AA55}.Release|x86.Deploy.0 = Release|x86
+		{E3F270F8-ED94-482A-BC2F-DF4574D419E9}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{E3F270F8-ED94-482A-BC2F-DF4574D419E9}.Debug|Any CPU.Build.0 = Debug|x86
+		{E3F270F8-ED94-482A-BC2F-DF4574D419E9}.Debug|Any CPU.Deploy.0 = Debug|x86
+		{E3F270F8-ED94-482A-BC2F-DF4574D419E9}.Debug|ARM.ActiveCfg = Debug|ARM
+		{E3F270F8-ED94-482A-BC2F-DF4574D419E9}.Debug|ARM.Build.0 = Debug|ARM
+		{E3F270F8-ED94-482A-BC2F-DF4574D419E9}.Debug|ARM.Deploy.0 = Debug|ARM
+		{E3F270F8-ED94-482A-BC2F-DF4574D419E9}.Debug|x64.ActiveCfg = Debug|x64
+		{E3F270F8-ED94-482A-BC2F-DF4574D419E9}.Debug|x64.Build.0 = Debug|x64
+		{E3F270F8-ED94-482A-BC2F-DF4574D419E9}.Debug|x64.Deploy.0 = Debug|x64
+		{E3F270F8-ED94-482A-BC2F-DF4574D419E9}.Debug|x86.ActiveCfg = Debug|x86
+		{E3F270F8-ED94-482A-BC2F-DF4574D419E9}.Debug|x86.Build.0 = Debug|x86
+		{E3F270F8-ED94-482A-BC2F-DF4574D419E9}.Debug|x86.Deploy.0 = Debug|x86
+		{E3F270F8-ED94-482A-BC2F-DF4574D419E9}.Release|Any CPU.ActiveCfg = Release|x86
+		{E3F270F8-ED94-482A-BC2F-DF4574D419E9}.Release|ARM.ActiveCfg = Release|ARM
+		{E3F270F8-ED94-482A-BC2F-DF4574D419E9}.Release|ARM.Build.0 = Release|ARM
+		{E3F270F8-ED94-482A-BC2F-DF4574D419E9}.Release|ARM.Deploy.0 = Release|ARM
+		{E3F270F8-ED94-482A-BC2F-DF4574D419E9}.Release|x64.ActiveCfg = Release|x64
+		{E3F270F8-ED94-482A-BC2F-DF4574D419E9}.Release|x64.Build.0 = Release|x64
+		{E3F270F8-ED94-482A-BC2F-DF4574D419E9}.Release|x64.Deploy.0 = Release|x64
+		{E3F270F8-ED94-482A-BC2F-DF4574D419E9}.Release|x86.ActiveCfg = Release|x86
+		{E3F270F8-ED94-482A-BC2F-DF4574D419E9}.Release|x86.Build.0 = Release|x86
+		{E3F270F8-ED94-482A-BC2F-DF4574D419E9}.Release|x86.Deploy.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -218,5 +241,6 @@ Global
 		{42A5A20C-60B7-434B-B1B4-2ECBE60E2E07} = {C5090A27-C666-4B73-9CFA-7D094F3521ED}
 		{E1EE9023-F5AB-41B3-B510-76EFE885AA55} = {C5090A27-C666-4B73-9CFA-7D094F3521ED}
 		{C5090A27-C666-4B73-9CFA-7D094F3521ED} = {079BF8E4-4430-4423-B65A-FEF5676C470B}
+		{E3F270F8-ED94-482A-BC2F-DF4574D419E9} = {079BF8E4-4430-4423-B65A-FEF5676C470B}
 	EndGlobalSection
 EndGlobal
