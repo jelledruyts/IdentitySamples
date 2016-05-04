@@ -73,7 +73,7 @@ namespace TodoListWpf.ViewModels
                 this.StatusText = "Signing in...";
 
                 // Retrieve identity information.
-                this.IdentityInfo = await GetIdentityInfoAsync();
+                this.IdentityInfo = await GetIdentityInfoAsync(true);
 
                 // Sign in as the user that the Web API sees.
                 var todoListWebApiIdentityClaims = this.IdentityInfo.Claims.Select(c => new Claim(c.Type, c.Value));
@@ -160,10 +160,10 @@ namespace TodoListWpf.ViewModels
 
         #region Web API Communication
 
-        private static async Task<IdentityInfo> GetIdentityInfoAsync()
+        private static async Task<IdentityInfo> GetIdentityInfoAsync(bool forceLogin)
         {
             // Get identity information from the Todo List Web API.
-            var todoListWebApiClient = GetTodoListClient();
+            var todoListWebApiClient = GetTodoListClient(forceLogin);
             var todoListWebApiIdentityInfoRequest = new HttpRequestMessage(HttpMethod.Get, AppConfiguration.TodoListWebApiRootUrl + "api/identity");
             var todoListWebApiIdentityInfoResponse = await todoListWebApiClient.SendAsync(todoListWebApiIdentityInfoRequest);
             todoListWebApiIdentityInfoResponse.EnsureSuccessStatusCode();
@@ -173,7 +173,7 @@ namespace TodoListWpf.ViewModels
 
         private static async Task<Tuple<IList<TodoItem>, IList<Category>>> GetTodoListDataAsync()
         {
-            var todoListWebApiClient = GetTodoListClient();
+            var todoListWebApiClient = GetTodoListClient(false);
 
             // Get the todo list.
             var todoListRequest = new HttpRequestMessage(HttpMethod.Get, AppConfiguration.TodoListWebApiRootUrl + "api/todolist");
@@ -194,19 +194,20 @@ namespace TodoListWpf.ViewModels
 
         private static async Task CreateTodoItem(TodoItemCreate item)
         {
-            var client = GetTodoListClient();
+            var client = GetTodoListClient(false);
             var newTodoItemRequest = new HttpRequestMessage(HttpMethod.Post, AppConfiguration.TodoListWebApiRootUrl + "api/todolist");
             newTodoItemRequest.Content = new JsonContent(item);
             var newTodoItemResponse = await client.SendAsync(newTodoItemRequest);
             newTodoItemResponse.EnsureSuccessStatusCode();
         }
 
-        private static HttpClient GetTodoListClient()
+        private static HttpClient GetTodoListClient(bool forceLogin)
         {
             // [SCENARIO] OAuth 2.0 Authorization Code Grant, Public Client
             // Get a token to authenticate against the Web API.
+            var promptBehavior = forceLogin ? PromptBehavior.Always : PromptBehavior.Auto;
             var context = new AuthenticationContext(AppConfiguration.AadAuthority);
-            var result = context.AcquireToken(AppConfiguration.TodoListWebApiResourceId, AppConfiguration.TodoListWpfClientId, new Uri(AppConfiguration.TodoListWpfRedirectUrl));
+            var result = context.AcquireToken(AppConfiguration.TodoListWebApiResourceId, AppConfiguration.TodoListWpfClientId, new Uri(AppConfiguration.TodoListWpfRedirectUrl), promptBehavior);
 
             var client = new HttpClient();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);

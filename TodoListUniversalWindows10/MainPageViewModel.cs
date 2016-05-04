@@ -59,7 +59,7 @@ namespace TodoListUniversalWindows10
 
                 var authority = AppConfiguration.AadAuthority; // [NOTE] Use "organizations" for *any* Azure AD tenant, or "consumers" for a Microsoft Account.
                 var provider = await WebAuthenticationCoreManager.FindAccountProviderAsync("https://login.microsoft.com", authority);
-                var request = new WebTokenRequest(provider, string.Empty, AppConfiguration.TodoListWindows10ClientId);
+                var request = new WebTokenRequest(provider, string.Empty, AppConfiguration.TodoListWindows10ClientId, WebTokenRequestPromptType.ForceAuthentication);
                 request.Properties.Add("resource", AppConfiguration.TodoListWebApiResourceId);
 
                 var result = await WebAuthenticationCoreManager.RequestTokenAsync(request);

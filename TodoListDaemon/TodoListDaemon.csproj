@@ -66,6 +66,7 @@
     <None Include="App.config" />
     <None Include="packages.config" />
     <None Include="Setup.ps1" />
+    <None Include="TodoListDaemon.pfx" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj">

@@ -1,5 +1,5 @@
 ﻿//----------------------------------------------------------------------
-// AdalJS v1.0.0
+// AdalJS v1.0.9
 // @preserve Copyright (c) Microsoft Open Technologies, Inc.
 // All Rights Reserved
 // Apache License 2.0
@@ -7,9 +7,9 @@
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,16 +19,14 @@
 'use strict';
 
 // node.js usage for tests
+var Logging = {
+    level: 0,
+    log: function () { }
+};
+
 var AuthenticationContext;
 if (typeof module !== 'undefined' && module.exports) {
-    var window, localStorage, angular, document, sessionStorage;
-    module.exports.inject = function (windowInj, storageInj, documentInj, MathInj, angularInj, conf) {
-        window = windowInj;
-        localStorage = storageInj;
-        sessionStorage = storageInj;
-        document = documentInj;
-        Math = MathInj; // jshint ignore:line
-        angular = angularInj;
+    module.exports.inject = function (conf) {
         return new AuthenticationContext(conf);
     };
 }
@@ -40,16 +38,16 @@ if (typeof module !== 'undefined' && module.exports) {
  * @property {tenant}          Your target tenant
  * @property {clientId}        Identifier assigned to your app by Azure Active Directory
  * @property {redirectUri}     Endpoint at which you expect to receive tokens
- * @property {instance}        Azure Active Directory Instance(default:https://login.windows.net/)
+ * @property {instance}        Azure Active Directory Instance(default:https://login.microsoftonline.com/)
  * @property {endpoints}       Collection of {Endpoint-ResourceId} used for autmatically attaching tokens in webApi calls
  */
 
 /**
-* User information from idtoken.
-*  @class User
-*  @property {string} userName - username assigned from upn or email.
-*  @property {object} profile - properties parsed from idtoken.
-*/
+ * User information from idtoken.
+ *  @class User
+ *  @property {string} userName - username assigned from upn or email.
+ *  @property {object} profile - properties parsed from idtoken.
+ */
 
 /**
  * Creates a new AuthenticationContext object.
@@ -59,20 +57,19 @@ if (typeof module !== 'undefined' && module.exports) {
  **/
 AuthenticationContext = function (config) {
     /**
-    * Enum for request type
-    * @enum {string}
-    */
+     * Enum for request type
+     * @enum {string}
+     */
     this.REQUEST_TYPE = {
         LOGIN: 'LOGIN',
         RENEW_TOKEN: 'RENEW_TOKEN',
-        ID_TOKEN: 'ID_TOKEN',
         UNKNOWN: 'UNKNOWN'
     };
 
     /**
-    * Enum for storage constants
-    * @enum {string}
-    */
+     * Enum for storage constants
+     * @enum {string}
+     */
     this.CONSTANTS = {
         ACCESS_TOKEN: 'access_token',
         EXPIRES_IN: 'expires_in',
@@ -84,11 +81,10 @@ AuthenticationContext = function (config) {
             ACCESS_TOKEN_KEY: 'adal.access.token.key',
             EXPIRATION_KEY: 'adal.expiration.key',
             START_PAGE: 'adal.start.page',
-            FAILED_RENEW: 'adal.failed.renew',
+            START_PAGE_PARAMS: 'adal.start.page.params',
             STATE_LOGIN: 'adal.state.login',
             STATE_RENEW: 'adal.state.renew',
             STATE_RENEW_RESOURCE: 'adal.state.renew.resource',
-            STATE_IDTOKEN: 'adal.state.idtoken',
             NONCE_IDTOKEN: 'adal.nonce.idtoken',
             SESSION_STATE: 'adal.session.state',
             USERNAME: 'adal.username',
@@ -101,6 +97,18 @@ AuthenticationContext = function (config) {
         RESOURCE_DELIMETER: '|',
         ERR_MESSAGES: {
             NO_TOKEN: 'User is not authorized'
+        },
+        LOGGING_LEVEL: {
+            ERROR: 0,
+            WARN: 1,
+            INFO: 2,
+            VERBOSE: 3
+        },
+        LEVEL_STRING_MAP: {
+            0: 'ERROR:',
+            1: 'WARNING:',
+            2: 'INFO:',
+            3: 'VERBOSE:'
         }
     };
 
@@ -110,16 +118,19 @@ AuthenticationContext = function (config) {
     AuthenticationContext.prototype._singletonInstance = this;
 
     // public
-    this.instance = 'https://login.windows.net/';
+    this.instance = 'https://login.microsoftonline.com/';
     this.config = {};
     this.callback = null;
     this.popUp = false;
 
     // private
     this._user = null;
-    this._renewActive = false;
+    this._activeRenewals = {};
     this._loginInProgress = false;
     this._renewStates = [];
+
+    window.callBackMappedToRenewStates = {};
+    window.callBacksMappedToRenewStates = {};
 
     // validate before constructor assignments
     if (config.displayCall && typeof config.displayCall !== 'function') {
@@ -128,6 +139,10 @@ AuthenticationContext = function (config) {
 
     if (!config.clientId) {
         throw new Error('clientId is required');
+    }
+
+    if (!config.correlationId) {
+        config.correlationId = this._guid();
     }
 
     this.config = this._cloneConfig(config);
@@ -140,8 +155,6 @@ AuthenticationContext = function (config) {
     if (!this.config.redirectUri) {
         this.config.redirectUri = window.location.href;
     }
-
-    this.config.resource = this.config.loginResource || '';
 };
 
 /**
@@ -153,15 +166,13 @@ AuthenticationContext.prototype.login = function () {
     var expectedState = this._guid();
     this.config.state = expectedState;
     this._idTokenNonce = this._guid();
-    this._logstatus('Expected state: ' + expectedState + ' startPage:' + window.location);
+    this.verbose('Expected state: ' + expectedState + ' startPage:' + window.location);
     this._saveItem(this.CONSTANTS.STORAGE.LOGIN_REQUEST, window.location);
     this._saveItem(this.CONSTANTS.STORAGE.LOGIN_ERROR, '');
     this._saveItem(this.CONSTANTS.STORAGE.STATE_LOGIN, expectedState);
     this._saveItem(this.CONSTANTS.STORAGE.NONCE_IDTOKEN, this._idTokenNonce);
-    this._saveItem(this.CONSTANTS.STORAGE.FAILED_RENEW, '');
     this._saveItem(this.CONSTANTS.STORAGE.ERROR, '');
     this._saveItem(this.CONSTANTS.STORAGE.ERROR_DESCRIPTION, '');
-
 
     var urlNavigate = this._getNavigateUrl('id_token', null) + '&nonce=' + encodeURIComponent(this._idTokenNonce);
     this.frameCallInProgress = false;
@@ -185,10 +196,10 @@ AuthenticationContext.prototype._hasResource = function (key) {
 };
 
 /**
-* Gets token for the specified resource from local storage cache
-* @param {string}   resource A URI that identifies the resource for which the token is valid.
-* @returns {string} token if exists and not expired or null
-*/
+ * Gets token for the specified resource from local storage cache
+ * @param {string}   resource A URI that identifies the resource for which the token is valid.
+ * @returns {string} token if exists and not expired or null
+ */
 AuthenticationContext.prototype.getCachedToken = function (resource) {
     if (!this._hasResource(resource)) {
         return null;
@@ -210,9 +221,9 @@ AuthenticationContext.prototype.getCachedToken = function (resource) {
 };
 
 /**
-* Retrieves and parse idToken from localstorage
-* @returns {User} user object
-*/
+ * Retrieves and parse idToken from localstorage
+ * @returns {User} user object
+ */
 AuthenticationContext.prototype.getCachedUser = function () {
     if (this._user) {
         return this._user;
@@ -223,53 +234,66 @@ AuthenticationContext.prototype.getCachedUser = function () {
     return this._user;
 };
 
+AuthenticationContext.prototype.registerCallback = function (expectedState, resource, callback) {
+    this._activeRenewals[resource] = expectedState;
+    if (!window.callBacksMappedToRenewStates[expectedState]) {
+        window.callBacksMappedToRenewStates[expectedState] = [];
+    }
+    var self = this;
+    window.callBacksMappedToRenewStates[expectedState].push(callback);
+    if (!window.callBackMappedToRenewStates[expectedState]) {
+        window.callBackMappedToRenewStates[expectedState] = function (message, token) {
+            for (var i = 0; i < window.callBacksMappedToRenewStates[expectedState].length; ++i) {
+                window.callBacksMappedToRenewStates[expectedState][i](message, token);
+            }
+            self._activeRenewals[resource] = null;
+            window.callBacksMappedToRenewStates[expectedState] = null;
+            window.callBackMappedToRenewStates[expectedState] = null;
+        };
+    }
+};
+
 // var errorResponse = {error:'', errorDescription:''};
 // var token = 'string token';
 // callback(errorResponse, token)
 // with callback
 /**
-* Acquires access token with hidden iframe
-* @param {string}   resource  ResourceUri identifying the target resource
-* @returns {string} access token if request is successfull
-*/
+ * Acquires access token with hidden iframe
+ * @param {string}   resource  ResourceUri identifying the target resource
+ * @returns {string} access token if request is successfull
+ */
 AuthenticationContext.prototype._renewToken = function (resource, callback) {
     // use iframe to try refresh token
     // use given resource to create new authz url
-    this._logstatus('renewToken is called for resource:' + resource);
-    if (!this._hasResource(resource)) {
-        var keys = this._getItem(this.CONSTANTS.STORAGE.TOKEN_KEYS) || '';
-        this._saveItem(this.CONSTANTS.STORAGE.TOKEN_KEYS, keys + resource + this.CONSTANTS.RESOURCE_DELIMETER);
-    }
-
-    var frameHandle = this._addAdalFrame('adalRenewFrame');
+    this.info('renewToken is called for resource:' + resource);
+    var frameHandle = this._addAdalFrame('adalRenewFrame' + resource);
     var expectedState = this._guid() + '|' + resource;
     this._idTokenNonce = this._guid();
     this.config.state = expectedState;
     // renew happens in iframe, so it keeps javascript context
     this._renewStates.push(expectedState);
 
-    this._saveItem(this.CONSTANTS.STORAGE.FAILED_RENEW, '');
-
-    this._logstatus('Renew token Expected state: ' + expectedState);
+    this.verbose('Renew token Expected state: ' + expectedState);
     var urlNavigate = this._getNavigateUrl('token', resource) + '&prompt=none&login_hint=' + encodeURIComponent(this._user.userName);
-    urlNavigate += '&domain_hint=' + encodeURIComponent(this._getDomainHint());
+
+    // don't add domain_hint twice if user provided it in the extraQueryParameter value
+    if (!this._urlContainsQueryStringParameter("domain_hint", urlNavigate)) {
+        urlNavigate += '&domain_hint=' + encodeURIComponent(this._getDomainHint());
+    }
+
     urlNavigate += '&nonce=' + encodeURIComponent(this._idTokenNonce);
     this.callback = callback;
+    this.registerCallback(expectedState, resource, callback);
     this.idTokenNonce = null;
-    this._logstatus('Navigate to:' + urlNavigate);
+    this.verbose('Navigate to:' + urlNavigate);
     this._saveItem(this.CONSTANTS.STORAGE.LOGIN_REQUEST, '');
     frameHandle.src = 'about:blank';
-    this._loadFrame(urlNavigate, 'adalRenewFrame');
+    this._loadFrame(urlNavigate, 'adalRenewFrame' + resource);
 };
 
 AuthenticationContext.prototype._renewIdToken = function (callback) {
     // use iframe to try refresh token
-    this._logstatus('renewIdToken is called');
-    if (!this._hasResource(this.config.clientId)) {
-        var keys = this._getItem(this.CONSTANTS.STORAGE.TOKEN_KEYS) || '';
-        this._saveItem(this.CONSTANTS.STORAGE.TOKEN_KEYS, keys + this.config.clientId + this.CONSTANTS.RESOURCE_DELIMETER);
-    }
-
+    this.info('renewIdToken is called');
     var frameHandle = this._addAdalFrame('adalIdTokenFrame');
     var expectedState = this._guid() + '|' + this.config.clientId;
     this._idTokenNonce = this._guid();
@@ -277,27 +301,35 @@ AuthenticationContext.prototype._renewIdToken = function (callback) {
     this.config.state = expectedState;
     // renew happens in iframe, so it keeps javascript context
     this._renewStates.push(expectedState);
-    this._saveItem(this.CONSTANTS.STORAGE.STATE_RENEW, expectedState);
-    this._saveItem(this.CONSTANTS.STORAGE.FAILED_RENEW, '');
 
-    this._logstatus('Renew token Expected state: ' + expectedState);
+    this.verbose('Renew Idtoken Expected state: ' + expectedState);
     var urlNavigate = this._getNavigateUrl('id_token', null) + '&prompt=none&login_hint=' + encodeURIComponent(this._user.userName);
-    urlNavigate += '&domain_hint=' + encodeURIComponent(this._getDomainHint());
+
+    // don't add domain_hint twice if user provided it in the extraQueryParameter value
+    if (!this._urlContainsQueryStringParameter("domain_hint", urlNavigate)) {
+        urlNavigate += '&domain_hint=' + encodeURIComponent(this._getDomainHint());
+    }
+
     urlNavigate += '&nonce=' + encodeURIComponent(this._idTokenNonce);
-    this.callback = callback;
+    this.registerCallback(expectedState, this.config.clientId, callback);
     this.idTokenNonce = null;
-    this._logstatus('Navigate to:' + urlNavigate);
+    this.verbose('Navigate to:' + urlNavigate);
     this._saveItem(this.CONSTANTS.STORAGE.LOGIN_REQUEST, '');
     frameHandle.src = 'about:blank';
     this._loadFrame(urlNavigate, 'adalIdTokenFrame');
 };
 
+AuthenticationContext.prototype._urlContainsQueryStringParameter = function (name, url) {
+    // regex to detect pattern of a ? or & followed by the name parameter and an equals character
+    var regex = new RegExp("[\\?&]" + name + "=");
+    return regex.test(url);
+}
 
 AuthenticationContext.prototype._loadFrame = function (urlNavigate, frameName) {
     // This trick overcomes iframe navigation in IE
     // IE does not load the page consistently in iframe
     var self = this;
-    self._logstatus('LoadFrame: ' + frameName);
+    self.info('LoadFrame: ' + frameName);
     var frameCheck = frameName;
     setTimeout(function () {
         var frameHandle = self._addAdalFrame(frameCheck);
@@ -309,71 +341,72 @@ AuthenticationContext.prototype._loadFrame = function (urlNavigate, frameName) {
 };
 
 /**
-* Acquire token from cache if not expired and available. Acquires token from iframe if expired.
-* @param {string}   resource  ResourceUri identifying the target resource
-* @param {requestCallback} callback 
-*/
+ * Acquire token from cache if not expired and available. Acquires token from iframe if expired.
+ * @param {string}   resource  ResourceUri identifying the target resource
+ * @param {requestCallback} callback
+ */
 AuthenticationContext.prototype.acquireToken = function (resource, callback) {
     if (this._isEmpty(resource)) {
+        this.warn('resource is required');
         callback('resource is required', null);
         return;
     }
 
     var token = this.getCachedToken(resource);
     if (token) {
-        this._logstatus('Token in cache');
+        this.info('Token is already in cache for resource:' + resource);
         callback(null, token);
         return;
     }
 
-    if (this._getItem(this.CONSTANTS.STORAGE.FAILED_RENEW)) {
-        this._logstatus('renewToken is failed:' + this._getItem(this.CONSTANTS.STORAGE.FAILED_RENEW));
-        callback(this._getItem(this.CONSTANTS.STORAGE.FAILED_RENEW), null);
-        return;
-    }
-
     if (!this._user) {
+        this.warn('User login is required');
         callback('User login is required', null);
         return;
     }
 
     // refresh attept with iframe
-    this._renewActive = true;
-    if (resource === this.config.clientId) {
-        // App uses idtoken to send to api endpoints
-        // Default resource is tracked as clientid to store this token
-        this._logstatus('renewing idtoken');
-        this._renewIdToken(callback);
-    } else {
-        this._renewToken(resource, callback);
+    //Already renewing for this resource, callback when we get the token.
+    if (this._activeRenewals[resource]) {
+        //Active renewals contains the state for each renewal.
+        this.registerCallback(this._activeRenewals[resource], resource, callback);
+    }
+    else {
+        if (resource === this.config.clientId) {
+            // App uses idtoken to send to api endpoints
+            // Default resource is tracked as clientid to store this token
+            this.verbose('renewing idtoken');
+            this._renewIdToken(callback);
+        } else {
+            this._renewToken(resource, callback);
+        }
     }
 };
 
 /**
-* Redirect the Browser to Azure AD Authorization endpoint
-* @param {string}   urlNavigate The authorization request url
-*/
+ * Redirect the Browser to Azure AD Authorization endpoint
+ * @param {string}   urlNavigate The authorization request url
+ */
 AuthenticationContext.prototype.promptUser = function (urlNavigate) {
     if (urlNavigate) {
-        this._logstatus('Navigate to:' + urlNavigate);
+        this.info('Navigate to:' + urlNavigate);
         window.location.replace(urlNavigate);
     } else {
-        this._logstatus('Navigate url is empty');
+        this.info('Navigate url is empty');
     }
 };
 
 /**
-* Clear cache items.
-*/
+ * Clear cache items.
+ */
 AuthenticationContext.prototype.clearCache = function () {
     this._saveItem(this.CONSTANTS.STORAGE.ACCESS_TOKEN_KEY, '');
     this._saveItem(this.CONSTANTS.STORAGE.EXPIRATION_KEY, 0);
-    this._saveItem(this.CONSTANTS.STORAGE.FAILED_RENEW, '');
     this._saveItem(this.CONSTANTS.STORAGE.SESSION_STATE, '');
     this._saveItem(this.CONSTANTS.STORAGE.STATE_LOGIN, '');
     this._renewStates = [];
-    this._saveItem(this.CONSTANTS.STORAGE.STATE_IDTOKEN, '');
     this._saveItem(this.CONSTANTS.STORAGE.START_PAGE, '');
+    this._saveItem(this.CONSTANTS.STORAGE.START_PAGE_PARAMS, '');
     this._saveItem(this.CONSTANTS.STORAGE.USERNAME, '');
     this._saveItem(this.CONSTANTS.STORAGE.IDTOKEN, '');
     this._saveItem(this.CONSTANTS.STORAGE.ERROR, '');
@@ -391,12 +424,10 @@ AuthenticationContext.prototype.clearCache = function () {
 };
 
 /**
-* Clear cache items for a resource.
-*/
+ * Clear cache items for a resource.
+ */
 AuthenticationContext.prototype.clearCacheForResource = function (resource) {
-    this._saveItem(this.CONSTANTS.STORAGE.FAILED_RENEW, '');
     this._saveItem(this.CONSTANTS.STORAGE.STATE_RENEW, '');
-    this._saveItem(this.CONSTANTS.STORAGE.STATE_IDTOKEN, '');
     this._saveItem(this.CONSTANTS.STORAGE.ERROR, '');
     this._saveItem(this.CONSTANTS.STORAGE.ERROR_DESCRIPTION, '');
     if (this._hasResource(resource)) {
@@ -406,9 +437,9 @@ AuthenticationContext.prototype.clearCacheForResource = function (resource) {
 };
 
 /**
-* Logout user will redirect page to logout endpoint. 
-* After logout, it will redirect to post_logout page if provided.
-*/
+ * Logout user will redirect page to logout endpoint.
+ * After logout, it will redirect to post_logout page if provided.
+ */
 AuthenticationContext.prototype.logOut = function () {
     this.clearCache();
     var tenant = 'common';
@@ -427,7 +458,7 @@ AuthenticationContext.prototype.logOut = function () {
     }
 
     var urlNavigate = this.instance + tenant + '/oauth2/logout?' + logout;
-    this._logstatus('Logout navigate to: ' + urlNavigate);
+    this.info('Logout navigate to: ' + urlNavigate);
     this.promptUser(urlNavigate);
 };
 
@@ -463,10 +494,11 @@ AuthenticationContext.prototype.getUser = function (callback) {
     // frame is used to get idtoken
     var idtoken = this._getItem(this.CONSTANTS.STORAGE.IDTOKEN);
     if (!this._isEmpty(idtoken)) {
-        this._logstatus('User exists in cache: ');
+        this.info('User exists in cache: ');
         this._user = this._createUser(idtoken);
         this.callback(null, this._user);
     } else {
+        this.warn('User information is not available');
         this.callback('User information is not available');
     }
 };
@@ -499,7 +531,7 @@ AuthenticationContext.prototype._createUser = function (idToken) {
                 user.userName = parsedJson.email;
             }
         } else {
-            this._logstatus('IdToken has invalid aud field');
+            this.warn('IdToken has invalid aud field');
         }
 
     }
@@ -526,10 +558,10 @@ AuthenticationContext.prototype.isCallback = function (hash) {
     hash = this._getHash(hash);
     var parameters = this._deserialize(hash);
     return (
-            parameters.hasOwnProperty(this.CONSTANTS.ERROR_DESCRIPTION) ||
-            parameters.hasOwnProperty(this.CONSTANTS.ACCESS_TOKEN) ||
-            parameters.hasOwnProperty(this.CONSTANTS.ID_TOKEN)
-            );
+        parameters.hasOwnProperty(this.CONSTANTS.ERROR_DESCRIPTION) ||
+        parameters.hasOwnProperty(this.CONSTANTS.ACCESS_TOKEN) ||
+        parameters.hasOwnProperty(this.CONSTANTS.ID_TOKEN)
+    );
 };
 
 /**
@@ -547,7 +579,13 @@ AuthenticationContext.prototype.getLoginError = function () {
 AuthenticationContext.prototype.getRequestInfo = function (hash) {
     hash = this._getHash(hash);
     var parameters = this._deserialize(hash);
-    var requestInfo = { valid: false, parameters: {}, stateMatch: false, stateResponse: '', requestType: this.REQUEST_TYPE.UNKNOWN };
+    var requestInfo = {
+        valid: false,
+        parameters: {},
+        stateMatch: false,
+        stateResponse: '',
+        requestType: this.REQUEST_TYPE.UNKNOWN
+    };
     if (parameters) {
         requestInfo.parameters = parameters;
         if (parameters.hasOwnProperty(this.CONSTANTS.ERROR_DESCRIPTION) ||
@@ -559,30 +597,24 @@ AuthenticationContext.prototype.getRequestInfo = function (hash) {
             // which call
             var stateResponse = '';
             if (parameters.hasOwnProperty('state')) {
-                this._logstatus('State: ' + parameters.state);
+                this.verbose('State: ' + parameters.state);
                 stateResponse = parameters.state;
             } else {
-                this._logstatus('No state returned');
+                this.warn('No state returned');
+                return requestInfo;
             }
 
             requestInfo.stateResponse = stateResponse;
 
             // async calls can fire iframe and login request at the same time if developer does not use the API as expected
             // incoming callback needs to be looked up to find the request type
-            switch (stateResponse) {
-                case this._getItem(this.CONSTANTS.STORAGE.STATE_LOGIN):
-                    requestInfo.requestType = this.REQUEST_TYPE.LOGIN;
-                    requestInfo.stateMatch = true;
-                    break;
-
-                case this._getItem(this.CONSTANTS.STORAGE.STATE_IDTOKEN):
-                    requestInfo.requestType = this.REQUEST_TYPE.ID_TOKEN;
-                    this._saveItem(this.CONSTANTS.STORAGE.STATE_IDTOKEN, '');
-                    requestInfo.stateMatch = true;
-                    break;
+            if (stateResponse === this._getItem(this.CONSTANTS.STORAGE.STATE_LOGIN)) {
+                requestInfo.requestType = this.REQUEST_TYPE.LOGIN;
+                requestInfo.stateMatch = true;
+                return requestInfo;
             }
 
-            // external api requests may have many renewtoken requests for different resource          
+            // external api requests may have many renewtoken requests for different resource
             if (!requestInfo.stateMatch && window.parent && window.parent.AuthenticationContext()) {
                 var statesInParentContext = window.parent.AuthenticationContext()._renewStates;
                 for (var i = 0; i < statesInParentContext.length; i++) {
@@ -616,30 +648,26 @@ AuthenticationContext.prototype._getResourceFromState = function (state) {
  * @returns {string} error message related to login
  */
 AuthenticationContext.prototype.saveTokenFromHash = function (requestInfo) {
-    this._logstatus('State status:' + requestInfo.stateMatch);
+    this.info('State status:' + requestInfo.stateMatch + '; Request type:' + requestInfo.requestType);
     this._saveItem(this.CONSTANTS.STORAGE.ERROR, '');
     this._saveItem(this.CONSTANTS.STORAGE.ERROR_DESCRIPTION, '');
 
     // Record error
     if (requestInfo.parameters.hasOwnProperty(this.CONSTANTS.ERROR_DESCRIPTION)) {
-        this._logstatus('Error :' + requestInfo.parameters.error);
-        this._logstatus('Error description:' + requestInfo.parameters[this.CONSTANTS.ERROR_DESCRIPTION]);
-        this._saveItem(this.CONSTANTS.STORAGE.FAILED_RENEW, requestInfo.parameters[this.CONSTANTS.ERROR_DESCRIPTION]);
+        this.info('Error :' + requestInfo.parameters.error + '; Error description:' + requestInfo.parameters[this.CONSTANTS.ERROR_DESCRIPTION]);
         this._saveItem(this.CONSTANTS.STORAGE.ERROR, requestInfo.parameters.error);
         this._saveItem(this.CONSTANTS.STORAGE.ERROR_DESCRIPTION, requestInfo.parameters[this.CONSTANTS.ERROR_DESCRIPTION]);
 
         if (requestInfo.requestType === this.REQUEST_TYPE.LOGIN) {
             this._loginInProgress = false;
             this._saveItem(this.CONSTANTS.STORAGE.LOGIN_ERROR, requestInfo.parameters.errorDescription);
-        } else {
-            this._renewActive = false;
         }
     } else {
 
         // It must verify the state from redirect
         if (requestInfo.stateMatch) {
             // record tokens to storage if exists
-            this._logstatus('State is right');
+            this.info('State is right');
             if (requestInfo.parameters.hasOwnProperty(this.CONSTANTS.SESSION_STATE)) {
                 this._saveItem(this.CONSTANTS.STORAGE.SESSION_STATE, requestInfo.parameters[this.CONSTANTS.SESSION_STATE]);
             }
@@ -647,25 +675,19 @@ AuthenticationContext.prototype.saveTokenFromHash = function (requestInfo) {
             var keys, resource;
 
             if (requestInfo.parameters.hasOwnProperty(this.CONSTANTS.ACCESS_TOKEN)) {
-                this._logstatus('Fragment has access token');
-                // default resource
-                this._renewActive = false;
-                resource = this.config.loginResource;
+                this.info('Fragment has access token');
+                resource = this._getResourceFromState(requestInfo.stateResponse);
                 if (!this._hasResource(resource)) {
                     keys = this._getItem(this.CONSTANTS.STORAGE.TOKEN_KEYS) || '';
                     this._saveItem(this.CONSTANTS.STORAGE.TOKEN_KEYS, keys + resource + this.CONSTANTS.RESOURCE_DELIMETER);
                 }
-
-                if (requestInfo.requestType === this.REQUEST_TYPE.RENEW_TOKEN) {
-                    resource = this._getResourceFromState(requestInfo.stateResponse);
-                }
-
                 // save token with related resource
                 this._saveItem(this.CONSTANTS.STORAGE.ACCESS_TOKEN_KEY + resource, requestInfo.parameters[this.CONSTANTS.ACCESS_TOKEN]);
                 this._saveItem(this.CONSTANTS.STORAGE.EXPIRATION_KEY + resource, this._expiresIn(requestInfo.parameters[this.CONSTANTS.EXPIRES_IN]));
             }
 
             if (requestInfo.parameters.hasOwnProperty(this.CONSTANTS.ID_TOKEN)) {
+                this.info('Fragment has id token');
                 this._loginInProgress = false;
                 this._user = this._createUser(requestInfo.parameters[this.CONSTANTS.ID_TOKEN]);
                 if (this._user && this._user.profile) {
@@ -676,7 +698,7 @@ AuthenticationContext.prototype.saveTokenFromHash = function (requestInfo) {
                         this._saveItem(this.CONSTANTS.STORAGE.IDTOKEN, requestInfo.parameters[this.CONSTANTS.ID_TOKEN]);
 
                         // Save idtoken as access token for app itself
-                        resource = this.config.clientId;
+                        resource = this.config.loginResource ? this.config.loginResource : this.config.clientId;
                         if (!this._hasResource(resource)) {
                             keys = this._getItem(this.CONSTANTS.STORAGE.TOKEN_KEYS) || '';
                             this._saveItem(this.CONSTANTS.STORAGE.TOKEN_KEYS, keys + resource + this.CONSTANTS.RESOURCE_DELIMETER);
@@ -688,10 +710,7 @@ AuthenticationContext.prototype.saveTokenFromHash = function (requestInfo) {
             }
         } else {
             this._saveItem(this.CONSTANTS.STORAGE.ERROR, 'Invalid_state');
-            this._saveItem(this.CONSTANTS.STORAGE.ERROR_DESCRIPTION, 'Invalid_state');
-            if (requestInfo.requestType === this.REQUEST_TYPE.LOGIN) {
-                this._saveItem(this.CONSTANTS.STORAGE.LOGIN_ERROR, 'State is not same as ' + requestInfo.stateResponse);
-            }
+            this._saveItem(this.CONSTANTS.STORAGE.ERROR_DESCRIPTION, 'Invalid_state. state: ' + requestInfo.stateResponse);
         }
     }
 };
@@ -713,7 +732,28 @@ AuthenticationContext.prototype.getResourceForEndpoint = function (endpoint) {
 
     // default resource will be clientid if nothing specified
     // App will use idtoken for calls to itself
-    return this.config.loginResource;
+    // check if it's staring from http or https, needs to match with app host
+    if (endpoint.indexOf('http://') > -1 || endpoint.indexOf('https://') > -1) {
+        if (this._getHostFromUri(endpoint) === this._getHostFromUri(this.config.redirectUri)) {
+            return this.config.loginResource;
+        }
+    }
+    // in angular level, the url for $http interceptor call could be relative url, 
+    // if it's relative call, we'll treat it as app backend call. 
+    else {
+        return this.config.loginResource;
+    }
+
+    // if not the app's own backend or not a domain listed in the endpoints structure
+    return null;
+};
+
+AuthenticationContext.prototype._getHostFromUri = function (uri) {
+    // remove http:// or https:// from uri
+    var extractedUri = String(uri).replace(/^(https?:)\/\//, '');
+
+    extractedUri = extractedUri.split('/')[0];
+    return extractedUri;
 };
 
 /*exported  oauth2Callback */
@@ -723,28 +763,23 @@ AuthenticationContext.prototype.handleWindowCallback = function () {
     var hash = window.location.hash;
     if (this.isCallback(hash)) {
         var requestInfo = this.getRequestInfo(hash);
+        this.info('Returned from redirect url');
         this.saveTokenFromHash(requestInfo);
         var callback = null;
-        if ((requestInfo.requestType === this.REQUEST_TYPE.RENEW_TOKEN ||
-            requestInfo.requestType === this.REQUEST_TYPE.ID_TOKEN) &&
-            window.parent) {
+        if ((requestInfo.requestType === this.REQUEST_TYPE.RENEW_TOKEN && window.parent)) {
             // iframe call but same single page
-            console.log('Window is in iframe');
-            callback = window.parent.AuthenticationContext().callback;
+            this.verbose('Window is in iframe');
+            callback = window.parent.callBackMappedToRenewStates[requestInfo.stateResponse];
             window.src = '';
         } else if (window && window.oauth2Callback) {
-            console.log('Window is redirecting');
+            this.verbose('Window is redirecting');
             callback = this.callback;
         }
 
         window.location.hash = '';
         window.location = this._getItem(this.CONSTANTS.STORAGE.LOGIN_REQUEST);
         if (requestInfo.requestType === this.REQUEST_TYPE.RENEW_TOKEN) {
-            callback(this._getItem(this.CONSTANTS.STORAGE.ERROR_DESCRIPTION), requestInfo.parameters[this.CONSTANTS.ACCESS_TOKEN]);
-            return;
-        } else if (requestInfo.requestType === this.REQUEST_TYPE.ID_TOKEN) {
-            // JS context may not have the user if callback page was different, so parse idtoken again to callback
-            callback(this._getItem(this.CONSTANTS.STORAGE.ERROR_DESCRIPTION), this._createUser(this._getItem(this.CONSTANTS.STORAGE.IDTOKEN)));
+            callback(this._getItem(this.CONSTANTS.STORAGE.ERROR_DESCRIPTION), requestInfo.parameters[this.CONSTANTS.ACCESS_TOKEN] || requestInfo.parameters[this.CONSTANTS.ID_TOKEN]);
             return;
         }
     }
@@ -760,8 +795,8 @@ AuthenticationContext.prototype._getNavigateUrl = function (responseType, resour
         this.instance = this.config.instance;
     }
 
-    var urlNavigate = this.instance + tenant + '/oauth2/authorize' + this._serialize(responseType, this.config, resource) + this._addClientId();
-    console.log('Navigate url:' + urlNavigate);
+    var urlNavigate = this.instance + tenant + '/oauth2/authorize' + this._serialize(responseType, this.config, resource) + this._addLibMetadata();
+    this.info('Navigate url:' + urlNavigate);
     return urlNavigate;
 };
 
@@ -776,14 +811,14 @@ AuthenticationContext.prototype._extractIdToken = function (encodedIdToken) {
         var base64IdToken = decodedToken.JWSPayload;
         var base64Decoded = this._base64DecodeStringUrlSafe(base64IdToken);
         if (!base64Decoded) {
-            this._logstatus('The returned id_token could not be base64 url safe decoded.');
+            this.info('The returned id_token could not be base64 url safe decoded.');
             return null;
         }
 
         // ECMA script has JSON built-in support
         return JSON.parse(base64Decoded);
     } catch (err) {
-        this._logstatus('The returned id_token could not be decoded: ' + err.stack);
+        this.error('The returned id_token could not be decoded', err);
     }
 
     return null;
@@ -801,7 +836,7 @@ AuthenticationContext.prototype._extractUserName = function (encodedIdToken) {
             }
         }
     } catch (err) {
-        this._logstatus('The returned id_token could not be decoded: ' + err.stack);
+        this.error('The returned id_token could not be decoded', err);
     }
 
     return null;
@@ -813,19 +848,70 @@ AuthenticationContext.prototype._base64DecodeStringUrlSafe = function (base64IdT
     if (window.atob) {
         return decodeURIComponent(escape(window.atob(base64IdToken))); // jshint ignore:line
     }
+    else {
+        return decodeURIComponent(escape(this._decode(base64IdToken)));
+    }
+};
 
-    // TODO add support for this
-    this._logstatus('Browser is not supported');
-    return null;
+//Take https://cdnjs.cloudflare.com/ajax/libs/Base64/0.3.0/base64.js and https://en.wikipedia.org/wiki/Base64 as reference. 
+AuthenticationContext.prototype._decode = function (base64IdToken) {
+    var codes = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+    base64IdToken = String(base64IdToken).replace(/=+$/, '');
+
+    var length = base64IdToken.length;
+    if (length % 4 === 1) {
+        throw new Error('The token to be decoded is not correctly encoded.');
+    }
+
+    var h1, h2, h3, h4, bits, c1, c2, c3, decoded = '';
+    for (var i = 0; i < length; i += 4) {
+        //Every 4 base64 encoded character will be converted to 3 byte string, which is 24 bits
+        // then 6 bits per base64 encoded character
+        h1 = codes.indexOf(base64IdToken.charAt(i));
+        h2 = codes.indexOf(base64IdToken.charAt(i + 1));
+        h3 = codes.indexOf(base64IdToken.charAt(i + 2));
+        h4 = codes.indexOf(base64IdToken.charAt(i + 3));
+
+        // For padding, if last two are '='
+        if (i + 2 === length - 1) {
+            bits = h1 << 18 | h2 << 12 | h3 << 6;
+            c1 = bits >> 16 & 255;
+            c2 = bits >> 8 & 255;
+            decoded += String.fromCharCode(c1, c2);
+            break;
+        }
+        // if last one is '='
+        else if (i + 1 === length - 1) {
+            bits = h1 << 18 | h2 << 12
+            c1 = bits >> 16 & 255;
+            decoded += String.fromCharCode(c1);
+            break;
+        }
+
+        bits = h1 << 18 | h2 << 12 | h3 << 6 | h4;
+
+        // then convert to 3 byte chars
+        c1 = bits >> 16 & 255;
+        c2 = bits >> 8 & 255;
+        c3 = bits & 255;
+
+        decoded += String.fromCharCode(c1, c2, c3);
+    }
+
+    return decoded;
 };
 
 // Adal.node js crack function
 AuthenticationContext.prototype._decodeJwt = function (jwtToken) {
+    if (this._isEmpty(jwtToken)) {
+        return null;
+    };
+
     var idTokenPartsRegex = /^([^\.\s]*)\.([^\.\s]+)\.([^\.\s]*)$/;
 
     var matches = idTokenPartsRegex.exec(jwtToken);
     if (!matches || matches.length < 4) {
-        this._logstatus('The returned id_token is not parseable.');
+        this.warn('The returned id_token is not parseable.');
         return null;
     }
 
@@ -861,6 +947,10 @@ AuthenticationContext.prototype._serialize = function (responseType, obj, resour
         if (obj.hasOwnProperty('extraQueryParameter')) {
             str.push(obj.extraQueryParameter);
         }
+
+        if (obj.correlationId) {
+            str.push('client-request-id=' + encodeURIComponent(obj.correlationId));
+        }
     }
 
     return str.join('&');
@@ -870,7 +960,9 @@ AuthenticationContext.prototype._deserialize = function (query) {
     var match,
         pl = /\+/g,  // Regex for replacing addition symbol with a space
         search = /([^&=]+)=?([^&]*)/g,
-        decode = function (s) { return decodeURIComponent(s.replace(pl, ' ')); },
+        decode = function (s) {
+            return decodeURIComponent(s.replace(pl, ' '));
+        },
         obj = {};
     match = search.exec(query);
     while (match) {
@@ -890,14 +982,14 @@ AuthenticationContext.prototype._guid = function () {
     //        clock_seq_hi_and_reserved to zero and one, respectively.
     //     Set the four most significant bits (bits 12 through 15) of the
     //        time_hi_and_version field to the 4-bit version number from
-    //        Section 4.1.3. Version4 
+    //        Section 4.1.3. Version4
     //     Set all the other bits to randomly (or pseudo-randomly) chosen
     //     values.
     // UUID                   = time-low "-" time-mid "-"time-high-and-version "-"clock-seq-reserved and low(2hexOctet)"-" node
     // time-low               = 4hexOctet
     // time-mid               = 2hexOctet
     // time-high-and-version  = 2hexOctet
-    // clock-seq-and-reserved = hexOctet: 
+    // clock-seq-and-reserved = hexOctet:
     // clock-seq-low          = hexOctet
     // node                   = 6hexOctet
     // Format: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
@@ -943,7 +1035,7 @@ AuthenticationContext.prototype._addAdalFrame = function (iframeId) {
         return;
     }
 
-    this._logstatus('Add adal frame to document:' + iframeId);
+    this.info('Add adal frame to document:' + iframeId);
     var adalFrame = document.getElementById(iframeId);
 
     if (!adalFrame) {
@@ -968,18 +1060,12 @@ AuthenticationContext.prototype._addAdalFrame = function (iframeId) {
     return adalFrame;
 };
 
-AuthenticationContext.prototype._logstatus = function (msg) {
-    if (console) {
-        console.log(msg);
-    }
-};
-
 AuthenticationContext.prototype._saveItem = function (key, obj) {
 
     if (this.config && this.config.cacheLocation && this.config.cacheLocation === 'localStorage') {
 
         if (!this._supportsLocalStorage()) {
-            this._logStatus('Local storage is not supported');
+            this.info('Local storage is not supported');
             return false;
         }
 
@@ -990,7 +1076,7 @@ AuthenticationContext.prototype._saveItem = function (key, obj) {
 
     // Default as session storage
     if (!this._supportsSessionStorage()) {
-        this._logstatus('Session storage is not supported');
+        this.info('Session storage is not supported');
         return false;
     }
 
@@ -1003,7 +1089,7 @@ AuthenticationContext.prototype._getItem = function (key) {
     if (this.config && this.config.cacheLocation && this.config.cacheLocation === 'localStorage') {
 
         if (!this._supportsLocalStorage()) {
-            this._logstatus('Local storage is not supported');
+            this.info('Local storage is not supported');
             return null;
         }
 
@@ -1012,7 +1098,7 @@ AuthenticationContext.prototype._getItem = function (key) {
 
     // Default as session storage
     if (!this._supportsSessionStorage()) {
-        this._logstatus('Session storage is not supported');
+        this.info('Session storage is not supported');
         return null;
     }
 
@@ -1049,12 +1135,43 @@ AuthenticationContext.prototype._cloneConfig = function (obj) {
     return copy;
 };
 
-AuthenticationContext.prototype._libVersion = function () {
-    return '1.0.0';
+AuthenticationContext.prototype._addLibMetadata = function () {
+    // x-client-SKU
+    // x-client-Ver
+    return '&x-client-SKU=Js&x-client-Ver=' + this._libVersion();
 };
 
-AuthenticationContext.prototype._addClientId = function() {
-    // x-client-SKU 
-    // x-client-Ver 
-    return '&x-client-SKU=Js&x-client-Ver=' + this._libVersion();
+AuthenticationContext.prototype.log = function (level, message, error) {
+    if (level <= Logging.level) {
+        var correlationId = this.config.correlationId;
+        var timestamp = new Date().toUTCString();
+
+        var formattedMessage = timestamp + ':' + correlationId + '-' + this._libVersion() + '-' + this.CONSTANTS.LEVEL_STRING_MAP[level] + ' ' + message;
+
+        if (error) {
+            formattedMessage += '\nstack:\n' + error.stack;
+        }
+
+        Logging.log(formattedMessage);
+    }
+};
+
+AuthenticationContext.prototype.error = function (message, error) {
+    this.log(this.CONSTANTS.LOGGING_LEVEL.ERROR, message, error);
+};
+
+AuthenticationContext.prototype.warn = function (message) {
+    this.log(this.CONSTANTS.LOGGING_LEVEL.WARN, message, null);
+};
+
+AuthenticationContext.prototype.info = function (message) {
+    this.log(this.CONSTANTS.LOGGING_LEVEL.INFO, message, null);
+};
+
+AuthenticationContext.prototype.verbose = function (message) {
+    this.log(this.CONSTANTS.LOGGING_LEVEL.VERBOSE, message, null);
+};
+
+AuthenticationContext.prototype._libVersion = function () {
+    return '1.0.9';
 };
