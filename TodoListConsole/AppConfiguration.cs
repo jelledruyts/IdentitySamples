@@ -1,5 +1,4 @@
-﻿using Common;
-using System.Configuration;
+﻿using System.Configuration;
 
 namespace TodoListConsole
 {
@@ -11,8 +10,5 @@ namespace TodoListConsole
         public static readonly string TodoListConsoleClientId = ConfigurationManager.AppSettings["TodoListConsoleClientId"];
         public static readonly string TodoListWebApiRootUrl = ConfigurationManager.AppSettings["TodoListWebApiRootUrl"];
         public static readonly string TodoListWebApiResourceId = ConfigurationManager.AppSettings["TodoListWebApiResourceId"];
-
-        public static readonly string AadTenant = ConfigurationManager.AppSettings["AadTenant"];
-        public static readonly string AadAuthority = Constants.AadEndpoint + AadTenant;
     }
 }

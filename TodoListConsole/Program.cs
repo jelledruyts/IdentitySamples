@@ -41,7 +41,7 @@ namespace TodoListConsole
             // [SCENARIO] OAuth 2.0 Authorization Code Grant, Public Client
             // Get a token to authenticate against the Web API.
             var promptBehavior = forceLogin ? PromptBehavior.Always : PromptBehavior.Auto;
-            var context = new AuthenticationContext(AppConfiguration.AadAuthority);
+            var context = new AuthenticationContext(StsConfiguration.Authority, StsConfiguration.CanValidateAuthority);
             var result = context.AcquireToken(AppConfiguration.TodoListWebApiResourceId, AppConfiguration.TodoListConsoleClientId, new Uri(AppConfiguration.TodoListConsoleRedirectUrl), promptBehavior);
 
             var client = new HttpClient();

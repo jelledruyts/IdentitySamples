@@ -77,7 +77,7 @@ namespace TodoListWpf.ViewModels
 
                 // Sign in as the user that the Web API sees.
                 var todoListWebApiIdentityClaims = this.IdentityInfo.Claims.Select(c => new Claim(c.Type, c.Value));
-                this.CurrentUser = new ClaimsPrincipal(new ClaimsIdentity(todoListWebApiIdentityClaims, this.IdentityInfo.AuthenticationType, "name", "roles"));
+                this.CurrentUser = new ClaimsPrincipal(new ClaimsIdentity(todoListWebApiIdentityClaims, this.IdentityInfo.AuthenticationType, StsConfiguration.NameClaimType, StsConfiguration.RoleClaimType));
                 this.IsUserSignedIn = true;
 
                 // Immediately get the Todo List data as well.
@@ -206,7 +206,7 @@ namespace TodoListWpf.ViewModels
             // [SCENARIO] OAuth 2.0 Authorization Code Grant, Public Client
             // Get a token to authenticate against the Web API.
             var promptBehavior = forceLogin ? PromptBehavior.Always : PromptBehavior.Auto;
-            var context = new AuthenticationContext(AppConfiguration.AadAuthority);
+            var context = new AuthenticationContext(StsConfiguration.Authority, StsConfiguration.CanValidateAuthority);
             var result = context.AcquireToken(AppConfiguration.TodoListWebApiResourceId, AppConfiguration.TodoListWpfClientId, new Uri(AppConfiguration.TodoListWpfRedirectUrl), promptBehavior);
 
             var client = new HttpClient();

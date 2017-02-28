@@ -7,7 +7,5 @@ namespace TaxonomyWebApi
         public static readonly string TaxonomyWebApiResourceId = ConfigurationManager.AppSettings["TaxonomyWebApiResourceId"];
         public static readonly string TaxonomyWebApiClientId = ConfigurationManager.AppSettings["TaxonomyWebApiClientId"];
         public static readonly string TaxonomyWebApiClientSecret = ConfigurationManager.AppSettings["TaxonomyWebApiClientSecret"];
-
-        public static readonly string AadTenant = ConfigurationManager.AppSettings["AadTenant"];
     }
 }

@@ -41,7 +41,7 @@ namespace TodoListDaemon
         {
             // [SCENARIO] OAuth 2.0 Client Credential Grant with Client Certificate
             // Get a token to authenticate against the Web API.
-            var context = new AuthenticationContext(AppConfiguration.AadAuthority);
+            var context = new AuthenticationContext(StsConfiguration.Authority, StsConfiguration.CanValidateAuthority);
             var certificate = GetCertificate(AppConfiguration.TodoListDaemonCertificateName);
             var clientCertificate = new ClientAssertionCertificate(AppConfiguration.TodoListDaemonClientId, certificate);
             var result = await context.AcquireTokenAsync(AppConfiguration.TodoListWebApiResourceId, clientCertificate);

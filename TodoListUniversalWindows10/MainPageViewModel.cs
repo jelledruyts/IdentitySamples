@@ -34,9 +34,7 @@ namespace TodoListUniversalWindows10
         {
             // [NOTE] Use the line below to retrieve the Redirect URL for the application
             // that needs to be registered in Azure Active Directory.
-            var callbackUri = WebAuthenticationBroker.GetCurrentApplicationCallbackUri().ToString();
-            var applicationSid = callbackUri.Replace("ms-app://", string.Empty).TrimEnd('/').ToUpperInvariant();
-            var redirectUri = "ms-appx-web://Microsoft.AAD.BrokerPlugin/" + applicationSid;
+            var redirectUri = string.Format("ms-appx-web://microsoft.aad.brokerplugin/{0}", WebAuthenticationBroker.GetCurrentApplicationCallbackUri().Host.ToUpperInvariant());
 
             this.SignInCommand = new AsyncRelayCommand(SignIn, CanSignIn);
             this.SignOutCommand = new AsyncRelayCommand(SignOut, CanSignOut);
@@ -57,10 +55,13 @@ namespace TodoListUniversalWindows10
             {
                 this.StatusText = "Signing in...";
 
-                var authority = AppConfiguration.AadAuthority; // [NOTE] Use "organizations" for *any* Azure AD tenant, or "consumers" for a Microsoft Account.
-                var provider = await WebAuthenticationCoreManager.FindAccountProviderAsync("https://login.microsoft.com", authority);
+                var provider = await WebAuthenticationCoreManager.FindAccountProviderAsync("https://login.microsoft.com/", AppConfiguration.AccountProviderAuthority);
                 var request = new WebTokenRequest(provider, string.Empty, AppConfiguration.TodoListWindows10ClientId, WebTokenRequestPromptType.ForceAuthentication);
                 request.Properties.Add("resource", AppConfiguration.TodoListWebApiResourceId);
+                request.Properties.Add("authority", AppConfiguration.StsAuthority);
+                // Skip authority validation for AD FS, otherwise you get the following error:
+                // ERROR: The value specified for 'authority' is invalid. It is not in the valid authority list or not discovered. (3399548934)
+                request.Properties.Add("validateAuthority", AppConfiguration.CanValidateAuthority.ToString());
 
                 var result = await WebAuthenticationCoreManager.RequestTokenAsync(request);
                 if (result.ResponseStatus == WebTokenRequestStatus.Success)

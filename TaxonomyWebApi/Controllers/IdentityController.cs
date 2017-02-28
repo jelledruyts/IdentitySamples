@@ -12,7 +12,11 @@ namespace TaxonomyWebApi.Controllers
         /// </summary>
         public async Task<IdentityInfo> Get()
         {
-            var graphClient = new AadGraphClient(SiteConfiguration.AadTenant, SiteConfiguration.TaxonomyWebApiClientId, SiteConfiguration.TaxonomyWebApiClientSecret);
+            var graphClient = default(AadGraphClient);
+            if (StsConfiguration.StsType == StsType.AzureActiveDirectory)
+            {
+                graphClient = new AadGraphClient(StsConfiguration.Authority, StsConfiguration.AadTenant, SiteConfiguration.TaxonomyWebApiClientId, SiteConfiguration.TaxonomyWebApiClientSecret);
+            }
             return await IdentityInfo.FromCurrent("Taxonomy Web API", null, graphClient);
         }
     }

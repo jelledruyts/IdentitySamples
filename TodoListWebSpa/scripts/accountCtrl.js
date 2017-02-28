@@ -47,7 +47,7 @@ angular.module('todoApp')
             // Create a root identity info object for the current application, and embed the
             // retrieved Web API identity info into it.
             $scope.identityInfo = {
-                application: config.applicationName,
+                application: config.ApplicationName,
                 isAuthenticated: $scope.userInfo.isAuthenticated,
                 authenticationType: 'JWT',
                 name: $scope.userInfo.userName,

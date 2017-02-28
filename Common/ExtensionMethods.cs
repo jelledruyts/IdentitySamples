@@ -30,13 +30,25 @@ namespace Common
                 throw new ArgumentNullException("identity");
             }
 
-            // [NOTE] The "Object Identifier" claim is ensured to be unique, non-changeable and non-reusable across multiple identities.
+            // [NOTE] The "Object Identifier" claim is ensured to be unique, non-changeable and non-reusable across multiple identities in Azure AD.
             var objectIdentifierClaim = identity.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier");
-            if (objectIdentifierClaim == null || string.IsNullOrWhiteSpace(objectIdentifierClaim.Value))
+            if (objectIdentifierClaim != null && !string.IsNullOrWhiteSpace(objectIdentifierClaim.Value))
             {
-                throw new ArgumentException("The specified identity does not contain an object identifier claim.");
+                return objectIdentifierClaim.Value;
             }
-            return objectIdentifierClaim.Value;
+            // If the "Object Identifier" is not present, fall back to the "Name Identifier" if possible.
+            var nameIdentifierClaim = identity.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier");
+            if (nameIdentifierClaim != null && !string.IsNullOrWhiteSpace(nameIdentifierClaim.Value))
+            {
+                return nameIdentifierClaim.Value;
+            }
+            // If the "Name Identifier" is not present, fall back to the "UPN" if possible.
+            var upnClaim = identity.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn");
+            if (upnClaim != null && !string.IsNullOrWhiteSpace(upnClaim.Value))
+            {
+                return upnClaim.Value;
+            }
+            throw new ArgumentException("The specified identity does not contain a unique identifier claim.");
         }
 
         #endregion

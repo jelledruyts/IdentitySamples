@@ -23,10 +23,10 @@ angular.module('todoApp', ['ngRoute', 'AdalAngular', 'configuration'])
     // [NOTE] Initialize ADAL.JS.
     adalProvider.init(
         {
-            instance: config.aadEndpoint,
-            tenant: config.aadTenant,
-            clientId: config.todoListWebSpaClientId,
-            endpoints: config.webApiEndpoints, // [NOTE] Instruct ADAL.JS to automatically attach tokens to these endpoints
+            instance: config.StsRootUrl,
+            tenant: config.StsPath,
+            clientId: config.TodoListWebSpaClientId,
+            endpoints: config.WebApiEndpoints, // [NOTE] Instruct ADAL.JS to automatically attach tokens to these endpoints
             extraQueryParameter: 'nux=1', // Triggers the "New UX" logon experience in Azure AD.
         },
         $httpProvider

@@ -33,18 +33,18 @@ namespace Common
         /// <summary>
         /// Creates a new <see cref="AadGraphClient"/> instance.
         /// </summary>
+        /// <param name="authority">The Azure AD authority representing the tenant.</param>
         /// <param name="tenant">The Azure AD tenant name or identifier.</param>
         /// <param name="clientId">The Client ID of the client application calling the Azure AD Graph API.</param>
         /// <param name="clientSecret">The Client Secret of the client application calling the Azure AD Graph API.</param>
-        public AadGraphClient(string tenant, string clientId, string clientSecret)
+        public AadGraphClient(string authority, string tenant, string clientId, string clientSecret)
         {
             var aadGraphApiTenant = AadGraphApiEndpoint + tenant;
-            var aadAuthority = Constants.AadEndpoint + tenant;
             this.client = new ActiveDirectoryClient(new Uri(aadGraphApiTenant), async () =>
             {
                 // [SCENARIO] OAuth 2.0 Client Credential Grant with Client Secret
                 // [NOTE] This uses the OAuth 2.0 Client Credentials Grant to authenticate as the client application itself (not as a user).
-                var authenticationContext = new AuthenticationContext(aadAuthority, false);
+                var authenticationContext = new AuthenticationContext(authority, false);
                 var credential = new ClientCredential(clientId, clientSecret);
                 var authenticationResult = await authenticationContext.AcquireTokenAsync(AadGraphApiEndpoint, credential);
                 return authenticationResult.AccessToken;

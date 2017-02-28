@@ -28,13 +28,14 @@ namespace TodoListWebApp
                 new OpenIdConnectAuthenticationOptions
                 {
                     ClientId = SiteConfiguration.TodoListWebAppClientId,
-                    Authority = SiteConfiguration.AadAuthority,
+                    Authority = StsConfiguration.Authority,
                     PostLogoutRedirectUri = postLogoutRedirectUri,
+                    RedirectUri = SiteConfiguration.TodoListWebAppRootUrl,
 
                     TokenValidationParameters = new System.IdentityModel.Tokens.TokenValidationParameters
                     {
-                        NameClaimType = "name", // [NOTE] This indicates that the user's display name is defined in the "name" claim
-                        RoleClaimType = "roles" // [NOTE] This indicates that the user's roles are defined in the "roles" claim
+                        NameClaimType = StsConfiguration.NameClaimType,
+                        RoleClaimType = StsConfiguration.RoleClaimType
                     },
 
                     Notifications = new OpenIdConnectAuthenticationNotifications()
@@ -49,7 +50,7 @@ namespace TodoListWebApp
                             // any other resource defined in the same directory tenant the user has access to.
                             var credential = new ClientCredential(SiteConfiguration.TodoListWebAppClientId, SiteConfiguration.TodoListWebAppClientSecret);
                             var userId = context.AuthenticationTicket.Identity.GetUniqueIdentifier();
-                            var authContext = new AuthenticationContext(SiteConfiguration.AadAuthority, TokenCacheFactory.GetTokenCache(userId));
+                            var authContext = new AuthenticationContext(StsConfiguration.Authority, StsConfiguration.CanValidateAuthority, TokenCacheFactory.GetTokenCache(userId));
                             var result = await authContext.AcquireTokenByAuthorizationCodeAsync(context.Code, new Uri(HttpContext.Current.Request.Url.GetLeftPart(UriPartial.Path)), credential, SiteConfiguration.TodoListWebApiResourceId);
                             // No need to do anything with the result at this time, it is stored in the cache
                             // for later use.

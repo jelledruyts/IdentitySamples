@@ -47,7 +47,7 @@ namespace TodoListWebApi.Controllers
         {
             // [SCENARIO] OAuth 2.0 On-Behalf-Of Grant
             // Get an On-Behalf-Of token to authenticate against the Taxonomy Web API.
-            var authContext = new AuthenticationContext(SiteConfiguration.AadAuthority, TokenCacheFactory.GetTokenCacheForCurrentPrincipal());
+            var authContext = new AuthenticationContext(StsConfiguration.Authority, StsConfiguration.CanValidateAuthority, TokenCacheFactory.GetTokenCacheForCurrentPrincipal());
             var credential = new ClientCredential(SiteConfiguration.TodoListWebApiClientId, SiteConfiguration.TodoListWebApiClientSecret);
             var userIdentity = (ClaimsIdentity)ClaimsPrincipal.Current.Identity;
             var bootstrapContext = userIdentity.BootstrapContext as System.IdentityModel.Tokens.BootstrapContext;

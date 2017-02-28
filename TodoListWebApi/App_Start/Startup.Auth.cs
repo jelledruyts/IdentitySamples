@@ -1,4 +1,5 @@
-﻿using Microsoft.Owin.Cors;
+﻿using Common;
+using Microsoft.Owin.Cors;
 using Microsoft.Owin.Security.ActiveDirectory;
 using Owin;
 using System.IdentityModel.Tokens;
@@ -13,18 +14,30 @@ namespace TodoListWebApi
             app.UseCors(CorsOptions.AllowAll);
 
             // [SCENARIO] OAuth 2.0 Bearer Token Authorization 
-            // Use bearer authentication with tokens coming from Azure Active Directory.
-            app.UseWindowsAzureActiveDirectoryBearerAuthentication(new WindowsAzureActiveDirectoryBearerAuthenticationOptions
+            // Use bearer authentication with tokens coming from Azure Active Directory / AD FS.
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidAudience = SiteConfiguration.TodoListWebApiResourceId, // [NOTE] This ensures the token is actually intended for the current application
+                SaveSigninToken = true, // [NOTE] This places the original token on the ClaimsIdentity.BootstrapContext
+                NameClaimType = StsConfiguration.NameClaimType,
+                RoleClaimType = StsConfiguration.RoleClaimType
+            };
+            if (StsConfiguration.StsType == StsType.AzureActiveDirectory)
+            {
+                app.UseWindowsAzureActiveDirectoryBearerAuthentication(new WindowsAzureActiveDirectoryBearerAuthenticationOptions
                 {
-                    TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidAudience = SiteConfiguration.TodoListWebApiResourceId, // [NOTE] This ensures the token is actually intended for the current application
-                        SaveSigninToken = true, // [NOTE] This places the original token on the ClaimsIdentity.BootstrapContext
-                        NameClaimType = "name", // [NOTE] This indicates that the user's display name is defined in the "name" claim
-                        RoleClaimType = "roles" // [NOTE] This indicates that the user's roles are defined in the "roles" claim
-                    },
-                    Tenant = SiteConfiguration.AadTenant
+                    TokenValidationParameters = tokenValidationParameters,
+                    Tenant = StsConfiguration.AadTenant
                 });
+            }
+            else
+            {
+                app.UseActiveDirectoryFederationServicesBearerAuthentication(new ActiveDirectoryFederationServicesBearerAuthenticationOptions
+                {
+                    TokenValidationParameters = tokenValidationParameters,
+                    MetadataEndpoint = StsConfiguration.FederationMetadataUrl
+                });
+            }
         }
     }
 }

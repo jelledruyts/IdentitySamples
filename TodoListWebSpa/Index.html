@@ -32,7 +32,7 @@
                         </p>
                     </li>
                     <li><a class="btn btn-link" ng-hide="userInfo.isAuthenticated" ng-click="signin()">Sign In</a></li>
-                    <li><a class="btn btn-link" ng-show="userInfo.isAuthenticated" ng-click="signout()">Sign Out</a></li>
+                    <li><a class="btn btn-link" ng-show="canSignout && userInfo.isAuthenticated" ng-click="signout()">Sign Out</a></li>
                 </ul>
             </div>
         </div>

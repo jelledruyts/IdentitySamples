@@ -3,6 +3,8 @@ using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.OpenIdConnect;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
@@ -17,16 +19,29 @@ namespace TodoListWebApp.Controllers
         public async Task<ActionResult> Index()
         {
             // Get identity information from the Todo List Web API.
-            var todoListWebApiClient = await TodoListController.GetTodoListClient();
-            var todoListWebApiIdentityInfoRequest = new HttpRequestMessage(HttpMethod.Get, SiteConfiguration.TodoListWebApiRootUrl + "api/identity");
-            var todoListWebApiIdentityInfoResponse = await todoListWebApiClient.SendAsync(todoListWebApiIdentityInfoRequest);
-            todoListWebApiIdentityInfoResponse.EnsureSuccessStatusCode();
-            var todoListWebApiIdentityInfoResponseString = await todoListWebApiIdentityInfoResponse.Content.ReadAsStringAsync();
-            var todoListWebApiIdentityInfo = JsonConvert.DeserializeObject<IdentityInfo>(todoListWebApiIdentityInfoResponseString);
+            var relatedApplicationIdentities = new List<IdentityInfo>();
+            try
+            {
+                var todoListWebApiClient = await TodoListController.GetTodoListClient();
+                var todoListWebApiIdentityInfoRequest = new HttpRequestMessage(HttpMethod.Get, SiteConfiguration.TodoListWebApiRootUrl + "api/identity");
+                var todoListWebApiIdentityInfoResponse = await todoListWebApiClient.SendAsync(todoListWebApiIdentityInfoRequest);
+                todoListWebApiIdentityInfoResponse.EnsureSuccessStatusCode();
+                var todoListWebApiIdentityInfoResponseString = await todoListWebApiIdentityInfoResponse.Content.ReadAsStringAsync();
+                var todoListWebApiIdentityInfo = JsonConvert.DeserializeObject<IdentityInfo>(todoListWebApiIdentityInfoResponseString);
+                relatedApplicationIdentities.Add(todoListWebApiIdentityInfo);
+            }
+            catch (Exception exc)
+            {
+                relatedApplicationIdentities.Add(new IdentityInfo { Name = "Error: " + exc.ToString(), Application = "ERROR" });
+            }
 
             // Gather identity information from the current application and aggregate it with the identity information from the Web API.
-            var graphClient = new AadGraphClient(SiteConfiguration.AadTenant, SiteConfiguration.TodoListWebAppClientId, SiteConfiguration.TodoListWebAppClientSecret);
-            var identityInfo = await IdentityInfo.FromCurrent(SiteConfiguration.ApplicationName, new IdentityInfo[] { todoListWebApiIdentityInfo }, graphClient);
+            var graphClient = default(AadGraphClient);
+            if (StsConfiguration.StsType == StsType.AzureActiveDirectory)
+            {
+                graphClient = new AadGraphClient(StsConfiguration.Authority, StsConfiguration.AadTenant, SiteConfiguration.TodoListWebAppClientId, SiteConfiguration.TodoListWebAppClientSecret);
+            }
+            var identityInfo = await IdentityInfo.FromCurrent(SiteConfiguration.ApplicationName, relatedApplicationIdentities, graphClient);
 
             return View(new AccountIndexViewModel(identityInfo));
         }
@@ -46,13 +61,14 @@ namespace TodoListWebApp.Controllers
             return RedirectToAction("Index");
         }
 
+        [AllowAnonymous]
         public ActionResult SignIn()
         {
             if (!Request.IsAuthenticated)
             {
                 // [NOTE] Send an OpenID Connect sign-in request.
                 HttpContext.GetOwinContext().Authentication.Challenge(new AuthenticationProperties { RedirectUri = Url.Action("Index", "Home") }, OpenIdConnectAuthenticationDefaults.AuthenticationType);
-                return new EmptyResult(); // The challenge will take care of the response.
+                return new EmptyResult(); // The Challenge will take care of the response.
             }
             else
             {
@@ -61,11 +77,20 @@ namespace TodoListWebApp.Controllers
             }
         }
 
-        public void SignOut()
+        [AllowAnonymous]
+        public ActionResult SignOut()
         {
-            // [NOTE] Remove the token cache for this user and send an OpenID Connect sign-out request.
-            TokenCacheFactory.DeleteTokenCacheForCurrentPrincipal();
-            HttpContext.GetOwinContext().Authentication.SignOut(OpenIdConnectAuthenticationDefaults.AuthenticationType, CookieAuthenticationDefaults.AuthenticationType);
+            if (!Request.IsAuthenticated)
+            {
+                return RedirectToAction("SignedOut");
+            }
+            else
+            {
+                // [NOTE] Remove the token cache for this user and send an OpenID Connect sign-out request.
+                TokenCacheFactory.DeleteTokenCacheForCurrentPrincipal();
+                HttpContext.GetOwinContext().Authentication.SignOut(OpenIdConnectAuthenticationDefaults.AuthenticationType, CookieAuthenticationDefaults.AuthenticationType);
+                return new EmptyResult(); // The SignOut will take care of the response.
+            }
         }
 
         [AllowAnonymous]

@@ -33,30 +33,46 @@ namespace TodoListWebApi.Controllers
             }
             catch (AdalException exc)
             {
-                // Ignore exceptions when attempting to retrieve identity information from down-stream applications.
-                // This will fail e.g. for a daemon client which cannot perform an On-Behalf-Of token request because
-                // it is using the application's service principal identity, not an actual directory user, which
-                // results in the following error:
-                // AADSTS50034: To sign into this application the account must be added to the <tenant>.onmicrosoft.com directory
-                Trace.WriteLine("Failed to retrieve related application identity information: " + exc.ToString());
+                if (exc.Message.Contains("AADSTS50034"))
+                {
+                    // Ignore certain exceptions when attempting to retrieve identity information from down-stream applications.
+                    // This will fail e.g. for a daemon client which cannot perform an On-Behalf-Of token request because
+                    // it is using the application's service principal identity, not an actual directory user, which
+                    // results in the following error:
+                    // AADSTS50034: To sign into this application the account must be added to the <tenant>.onmicrosoft.com directory
+                    Trace.WriteLine("Failed to retrieve related application identity information: " + exc.ToString());
+                }
+                else
+                {
+                    throw;
+                }
             }
 
             // Aggregate the current identity information with the downstream identities.
-            var graphClient = new AadGraphClient(SiteConfiguration.AadTenant, SiteConfiguration.TodoListWebApiClientId, SiteConfiguration.TodoListWebApiClientSecret);
+            var graphClient = default(AadGraphClient);
+            if (StsConfiguration.StsType == StsType.AzureActiveDirectory)
+            {
+                graphClient = new AadGraphClient(StsConfiguration.Authority, StsConfiguration.AadTenant, SiteConfiguration.TodoListWebApiClientId, SiteConfiguration.TodoListWebApiClientSecret);
+            }
             return await IdentityInfo.FromCurrent("Todo List Web API", relatedApplicationIdentities, graphClient);
         }
 
         /// <summary>
         /// Updates information about a user in Azure Active Directory.
         /// </summary>
-        public async Task Post(IdentityUpdate identity)
+        public async Task<IHttpActionResult> Post(IdentityUpdate identity)
         {
+            if (StsConfiguration.StsType != StsType.AzureActiveDirectory)
+            {
+                return this.BadRequest("Updating user information is only supported when using Azure Active Directory.");
+            }
             if (identity != null && !string.IsNullOrWhiteSpace(identity.DisplayName))
             {
                 var userId = ClaimsPrincipal.Current.GetUniqueIdentifier();
-                var graphClient = new AadGraphClient(SiteConfiguration.AadTenant, SiteConfiguration.TodoListWebApiClientId, SiteConfiguration.TodoListWebApiClientSecret);
+                var graphClient = new AadGraphClient(StsConfiguration.Authority, StsConfiguration.AadTenant, SiteConfiguration.TodoListWebApiClientId, SiteConfiguration.TodoListWebApiClientSecret);
                 await graphClient.UpdateUserAsync(userId, identity.DisplayName);
             }
+            return Ok();
         }
     }
 }

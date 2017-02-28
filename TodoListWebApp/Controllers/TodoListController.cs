@@ -53,7 +53,7 @@ namespace TodoListWebApp.Controllers
         {
             // [SCENARIO] OAuth 2.0 Authorization Code Grant, Confidential Client
             // Get a token to authenticate against the Web API.
-            var authContext = new AuthenticationContext(SiteConfiguration.AadAuthority, TokenCacheFactory.GetTokenCacheForCurrentPrincipal());
+            var authContext = new AuthenticationContext(StsConfiguration.Authority, StsConfiguration.CanValidateAuthority, TokenCacheFactory.GetTokenCacheForCurrentPrincipal());
             var credential = new ClientCredential(SiteConfiguration.TodoListWebAppClientId, SiteConfiguration.TodoListWebAppClientSecret);
             var userIdentifier = new UserIdentifier(ClaimsPrincipal.Current.GetUniqueIdentifier(), UserIdentifierType.UniqueId);
 
