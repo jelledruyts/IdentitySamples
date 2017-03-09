@@ -1,0 +1,14 @@
+<ConfigurationValues>
+  <TodoListWebAppRootUrl>https://localhost:44306/</TodoListWebAppRootUrl>
+  <TodoListWebAppResourceId>http://identitysamples/todolistwebapp</TodoListWebAppResourceId>
+  <TodoListWebApiRootUrl>https://localhost:44307/</TodoListWebApiRootUrl>
+  <TodoListWebApiResourceId>http://identitysamples/todolistwebapi</TodoListWebApiResourceId>
+  <TaxonomyWebApiRootUrl>https://localhost:44308/</TaxonomyWebApiRootUrl>
+  <TaxonomyWebApiResourceId>http://identitysamples/taxonomywebapi</TaxonomyWebApiResourceId>
+  <TodoListWebSpaRootUrl>https://localhost:44310/</TodoListWebSpaRootUrl>
+  <TodoListDaemonResourceId>http://identitysamples/todolistdaemon</TodoListDaemonResourceId>
+  <TodoListDaemonCertificateName>TodoListDaemon</TodoListDaemonCertificateName>
+  <TodoListWpfRedirectUrl>wpf://todolistwpf-redirect-uri</TodoListWpfRedirectUrl>
+  <TodoListConsoleRedirectUrl>console://todolistconsole-redirect-uri</TodoListConsoleRedirectUrl>
+  <TodoListWindows10RedirectUrl>ms-appx-web://microsoft.aad.brokerplugin/S-1-15-2-2304902392-2563821604-2476182484-3201470989-4008826171-3818320237-2811840085</TodoListWindows10RedirectUrl>
+</ConfigurationValues>

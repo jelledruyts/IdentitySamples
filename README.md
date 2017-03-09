@@ -32,7 +32,10 @@ Client n ---/
 | TodoListWpf | Windows desktop application | WPF | OAuth 2.0 Authorization Code Grant, Public Client |
 | TodoListConsole | Windows desktop application | Console | OAuth 2.0 Authorization Code Grant, Public Client |
 | TodoListDaemon | Non-interactive daemon service | Console | OAuth 2.0 Client Credential Grant, Confidential Client with Certificate authentication |
-| TodoListUniversal.Windows | Windows Store application | Universal App | OAuth 2.0 Authorization Code Grant, Public Client |
-| TodoListUniversal.WindowsPhone | Windows Phone application | Universal App | OAuth 2.0 Authorization Code Grant, Public Client |
+| TodoListUniversalWindows10 | Windows Store application | Windows 10 Universal App | OAuth 2.0 Authorization Code Grant, Public Client |
 
 The implementation details of these scenarios are easily found in the code by searching for "[SCENARIO]". Other notable remarks can be found by searching for "[NOTE]".
+
+## Setup
+
+To use these samples, run the "Setup.ps1" PowerShell script in the "Setup" folder. This script allows you to create a client certificate (for the daemon service), register all applications in Azure Active Directory and/or AD FS, and update all configuration values inside the solution source code.

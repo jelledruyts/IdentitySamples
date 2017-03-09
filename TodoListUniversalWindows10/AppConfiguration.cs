@@ -12,7 +12,7 @@
         //   - The full tenant name for one specific Azure AD tenant
         //   - "organizations" for *any* Azure AD tenant, or when using AD FS
         //   - "consumers" for a Microsoft Account
-        public const string AccountProviderAuthority = StsAuthority;
+        public const string AccountProviderAuthority = "https://login.microsoftonline.com/identitysamples.onmicrosoft.com";
         // Authority validation is not supported for AD FS, only for Azure AD.
         public const bool CanValidateAuthority = true;
     }
