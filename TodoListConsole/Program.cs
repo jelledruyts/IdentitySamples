@@ -14,14 +14,27 @@ namespace TodoListConsole
         [STAThread]
         static void Main(string[] args)
         {
-            try
+            while (true)
             {
-                var identity = GetIdentityInfoFromWebApiAsync().Result;
-                identity.WriteToConsole();
-            }
-            catch (Exception exc)
-            {
-                Console.WriteLine(exc.ToString());
+                try
+                {
+                    Console.WriteLine("A - Sign in and show identity information as seen by the Web API");
+                    Console.Write("Type your choice and press Enter: ");
+                    var choice = Console.ReadLine();
+                    if (string.Equals(choice, "A", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        var identity = GetIdentityInfoFromWebApiAsync().Result;
+                        identity.WriteToConsole();
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                catch (Exception exc)
+                {
+                    Console.WriteLine(exc.ToString());
+                }
             }
         }
 
