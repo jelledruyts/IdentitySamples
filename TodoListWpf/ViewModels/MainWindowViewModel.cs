@@ -163,7 +163,7 @@ namespace TodoListWpf.ViewModels
         private static async Task<IdentityInfo> GetIdentityInfoAsync(bool forceLogin)
         {
             // Get identity information from the Todo List Web API.
-            var todoListWebApiClient = GetTodoListClient(forceLogin);
+            var todoListWebApiClient = await GetTodoListClientAsync(forceLogin);
             var todoListWebApiIdentityInfoRequest = new HttpRequestMessage(HttpMethod.Get, AppConfiguration.TodoListWebApiRootUrl + "api/identity");
             var todoListWebApiIdentityInfoResponse = await todoListWebApiClient.SendAsync(todoListWebApiIdentityInfoRequest);
             todoListWebApiIdentityInfoResponse.EnsureSuccessStatusCode();
@@ -173,7 +173,7 @@ namespace TodoListWpf.ViewModels
 
         private static async Task<Tuple<IList<TodoItem>, IList<Category>>> GetTodoListDataAsync()
         {
-            var todoListWebApiClient = GetTodoListClient(false);
+            var todoListWebApiClient = await GetTodoListClientAsync(false);
 
             // Get the todo list.
             var todoListRequest = new HttpRequestMessage(HttpMethod.Get, AppConfiguration.TodoListWebApiRootUrl + "api/todolist");
@@ -194,20 +194,20 @@ namespace TodoListWpf.ViewModels
 
         private static async Task CreateTodoItem(TodoItemCreate item)
         {
-            var client = GetTodoListClient(false);
+            var client = await GetTodoListClientAsync(false);
             var newTodoItemRequest = new HttpRequestMessage(HttpMethod.Post, AppConfiguration.TodoListWebApiRootUrl + "api/todolist");
             newTodoItemRequest.Content = new JsonContent(item);
             var newTodoItemResponse = await client.SendAsync(newTodoItemRequest);
             newTodoItemResponse.EnsureSuccessStatusCode();
         }
 
-        private static HttpClient GetTodoListClient(bool forceLogin)
+        private static async Task<HttpClient> GetTodoListClientAsync(bool forceLogin)
         {
             // [SCENARIO] OAuth 2.0 Authorization Code Grant, Public Client
             // Get a token to authenticate against the Web API.
             var promptBehavior = forceLogin ? PromptBehavior.Always : PromptBehavior.Auto;
             var context = new AuthenticationContext(StsConfiguration.Authority, StsConfiguration.CanValidateAuthority);
-            var result = context.AcquireToken(AppConfiguration.TodoListWebApiResourceId, AppConfiguration.TodoListWpfClientId, new Uri(AppConfiguration.TodoListWpfRedirectUrl), promptBehavior);
+            var result = await context.AcquireTokenAsync(AppConfiguration.TodoListWebApiResourceId, AppConfiguration.TodoListWpfClientId, new Uri(AppConfiguration.TodoListWpfRedirectUrl), new PlatformParameters(promptBehavior));
 
             var client = new HttpClient();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
