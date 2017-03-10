@@ -23,19 +23,22 @@ Client n ---/
 
 ## Implementation
 
-| Project | Purpose | Technology | Protocol |
-|---------|---------|------------|----------|
-| TaxonomyWebApi | Taxonomy service | ASP.NET Web API | OAuth 2.0 Bearer Tokens |
-| TodoListWebApi | Todo List service | ASP.NET Web API | OAuth 2.0 Bearer Tokens; OAuth 2.0 On-Behalf-Of |
-| TodoListWebApp | Server-side web application | ASP.NET MVC | OpenID Connect; OAuth 2.0 Authorization Code Grant, Confidential Client |
-| TodoListWebSpa | Client-side Single Page Application (SPA) | AngularJS | OAuth 2.0 Implicit Grant |
-| TodoListWpf | Windows desktop application | WPF | OAuth 2.0 Authorization Code Grant, Public Client |
-| TodoListConsole | Windows desktop application | Console | OAuth 2.0 Authorization Code Grant, Public Client |
-| TodoListDaemon | Non-interactive daemon service | Console | OAuth 2.0 Client Credential Grant, Confidential Client with Certificate authentication |
-| TodoListUniversalWindows10 | Windows Store application | Windows 10 Universal App | OAuth 2.0 Authorization Code Grant, Public Client |
+| Project | Purpose | Protocol | Technology | Library/API |
+|---------|---------|----------|------------|-------------|
+| TaxonomyWebApi | Taxonomy service | OAuth 2.0 Bearer Tokens | ASP.NET Web API | [Microsoft.Owin.Security.ActiveDirectory (Katana)](https://github.com/aspnet/AspNetKatana) |
+| TodoListWebApi | Todo List service | OAuth 2.0 Bearer Tokens; OAuth 2.0 On-Behalf-Of | ASP.NET Web API | [Microsoft.Owin.Security.ActiveDirectory (Katana)](https://github.com/aspnet/AspNetKatana) |
+| TodoListWebApp | Server-side web application | OpenID Connect; OAuth 2.0 Authorization Code Grant, Confidential Client | ASP.NET MVC | [Microsoft.Owin.Security.OpenIdConnect (Katana)](https://github.com/aspnet/AspNetKatana) |
+| TodoListWebSpa | Client-side Single Page Application (SPA) | OAuth 2.0 Implicit Grant | AngularJS | [ADAL.js](https://github.com/AzureAD/azure-activedirectory-library-for-js) |
+| TodoListWpf | Windows desktop application | OAuth 2.0 Authorization Code Grant, Public Client | WPF | [Microsoft.IdentityModel.Clients.ActiveDirectory (ADAL .NET)](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet) |
+| TodoListConsole | Windows desktop application | OAuth 2.0 Authorization Code Grant, Public Client | Console | [Microsoft.IdentityModel.Clients.ActiveDirectory (ADAL .NET)](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet) |
+| TodoListDaemon | Non-interactive daemon service | OAuth 2.0 Client Credential Grant, Confidential Client with Certificate authentication | Console | [Microsoft.IdentityModel.Clients.ActiveDirectory (ADAL .NET)](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet) |
+| TodoListUniversalWindows10 | Windows Store application | OAuth 2.0 Authorization Code Grant, Public Client | Windows 10 Universal App | [WebAuthenticationCoreManager](https://docs.microsoft.com/en-us/uwp/api/Windows.Security.Authentication.Web.Core.WebAuthenticationCoreManager) |
 
 The implementation details of these scenarios are easily found in the code by searching for "[SCENARIO]". Other notable remarks can be found by searching for "[NOTE]".
 
 ## Setup
 
-To use these samples, run the "Setup.ps1" PowerShell script in the "Setup" folder. This script allows you to create a client certificate (for the daemon service), register all applications in Azure Active Directory and/or AD FS, and update all configuration values inside the solution source code.
+To use these samples, run the "Setup.ps1" PowerShell script in the "Setup" folder. This script allows you to:
+* Create a client certificate (for the daemon service)
+* Register all applications in Azure Active Directory and/or AD FS (storing the registered Client ID's and other configuration details in an XML file)
+* Update the various configuration files in the solution with the values from the identity server (as stored in the XML file mentioned above)
