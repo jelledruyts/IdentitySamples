@@ -44,7 +44,7 @@ namespace TodoListWebApi.Controllers
                 }
                 else
                 {
-                    throw;
+                    relatedApplicationIdentities.Add(IdentityInfo.FromException("Taxonomy Web API", exc));
                 }
             }
 

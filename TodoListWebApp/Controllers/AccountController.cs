@@ -32,7 +32,7 @@ namespace TodoListWebApp.Controllers
             }
             catch (Exception exc)
             {
-                relatedApplicationIdentities.Add(new IdentityInfo { Name = "Error: " + exc.ToString(), Application = "ERROR" });
+                relatedApplicationIdentities.Add(IdentityInfo.FromException("Todo List Web API", exc));
             }
 
             // Gather identity information from the current application and aggregate it with the identity information from the Web API.

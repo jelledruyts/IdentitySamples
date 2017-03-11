@@ -124,6 +124,19 @@ namespace Common
             };
         }
 
+        public static IdentityInfo FromException(string application, Exception exc)
+        {
+            return new IdentityInfo
+            {
+                Application = application,
+                IsAuthenticated = false,
+                Claims = new[] {
+                    new ClaimInfo { Type = "ExceptionMessage", Value = exc.Message },
+                    new ClaimInfo { Type = "ExceptionDetail", Value = exc.ToString() }
+                }
+            };
+        }
+
         private static string GetRemark(Claim claim, IList<IGroup> groups)
         {
             // [NOTE] Certain claims can be interpreted to more meaningful information.
