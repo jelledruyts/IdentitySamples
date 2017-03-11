@@ -21,12 +21,15 @@ angular.module('todoApp', ['ngRoute', 'AdalAngular', 'configuration'])
     delete $httpProvider.defaults.headers.common['X-Requested-With'];
 
     // [NOTE] Initialize ADAL.JS.
+    // [NOTE] The "endpoints" object is used by ADAL.JS to automatically attach tokens to these endpoints.
+    var endpoints = {};
+    endpoints[config.TodoListWebApiRootUrl] = config.TodoListWebApiResourceId;
     adalProvider.init(
         {
             instance: config.StsRootUrl,
             tenant: config.StsPath,
             clientId: config.TodoListWebSpaClientId,
-            endpoints: config.WebApiEndpoints, // [NOTE] Instruct ADAL.JS to automatically attach tokens to these endpoints
+            endpoints: endpoints,
             extraQueryParameter: 'nux=1', // Triggers the "New UX" logon experience in Azure AD.
         },
         $httpProvider
