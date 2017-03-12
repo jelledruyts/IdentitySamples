@@ -11,4 +11,31 @@
   <TodoListWpfRedirectUrl>wpf://todolistwpf-redirect-uri</TodoListWpfRedirectUrl>
   <TodoListConsoleRedirectUrl>console://todolistconsole-redirect-uri</TodoListConsoleRedirectUrl>
   <TodoListWindows10RedirectUrl>ms-appx-web://microsoft.aad.brokerplugin/S-1-15-2-2304902392-2563821604-2476182484-3201470989-4008826171-3818320237-2811840085</TodoListWindows10RedirectUrl>
+  <StsRootUrl>https://login.microsoftonline.com/</StsRootUrl>
+  <StsPath>tenant.onmicrosoft.com</StsPath>
+  <StsSupportsLogOut>true</StsSupportsLogOut>
+  <CanValidateAuthority>true</CanValidateAuthority>
+  <AccountProviderAuthority>https://login.microsoftonline.com/tenant.onmicrosoft.com</AccountProviderAuthority>
+  <TaxonomyWebApiClientSecret>
+  </TaxonomyWebApiClientSecret>
+  <TaxonomyWebApiClientId>
+  </TaxonomyWebApiClientId>
+  <TodoListWebApiClientSecret>
+  </TodoListWebApiClientSecret>
+  <TodoListWebApiClientId>
+  </TodoListWebApiClientId>
+  <TodoListDaemonClientId>
+  </TodoListDaemonClientId>
+  <TodoListWebAppClientSecret>
+  </TodoListWebAppClientSecret>
+  <TodoListWebAppClientId>
+  </TodoListWebAppClientId>
+  <TodoListWebSpaClientId>
+  </TodoListWebSpaClientId>
+  <TodoListWpfClientId>
+  </TodoListWpfClientId>
+  <TodoListConsoleClientId>
+  </TodoListConsoleClientId>
+  <TodoListWindows10ClientId>
+  </TodoListWindows10ClientId>
 </ConfigurationValues>
