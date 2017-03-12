@@ -211,6 +211,26 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
                 )
             }
         )
+        "oauth2Permissions" = @( # Define app-specific permissions
+            @{
+                "id" = New-Guid
+                "value" = "Todo.Read"
+                "type" = "User" # User consent is allowed (otherwise use "Admin" for admin-only consent)
+                "adminConsentDescription" = "Allow the application to read todo's on behalf of the signed-in user."
+                "adminConsentDisplayName" = "Read todo's"
+                "userConsentDescription" = "Allow the application to read todo's on your behalf."
+                "userConsentDisplayName" = "Read todo's"
+            },
+            @{
+                "id" = New-Guid
+                "value" = "Todo.Write"
+                "type" = "User" # User consent is allowed (otherwise use "Admin" for admin-only consent)
+                "adminConsentDescription" = "Allow the application to write todo's on behalf of the signed-in user."
+                "adminConsentDisplayName" = "Write todo's"
+                "userConsentDescription" = "Allow the application to write todo's on your behalf."
+                "userConsentDisplayName" = "Write todo's"
+            }
+        )
         "appRoles" =  @( # Define app-specific roles
             @{
                 "id" = New-Guid
@@ -243,7 +263,8 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
     Add-AzureADRoleMember -TenantName $TenantName -Headers $Headers -RoleObjectId $DirectoryWriterRole.objectId -ServicePrincipalObjectId $TodoListApiServicePrincipal.objectId
     $ConfigurationValues["TodoListWebApiClientId"] = $TodoListApi.appId
     # Note that the "user_impersonation" permission is automatically added.
-    $TodoListApiUserImpersonationPermissionId = Get-AzureADOAuth2PermissionId -AzureADApplication $TodoListApi -PermissionValue "user_impersonation"
+    $TodoListApiTodoReadPermissionId = Get-AzureADOAuth2PermissionId -AzureADApplication $TodoListApi -PermissionValue "Todo.Read"
+    $TodoListApiTodoWritePermissionId = Get-AzureADOAuth2PermissionId -AzureADApplication $TodoListApi -PermissionValue "Todo.Write"
     # Grant admin consent for the TodoList API to access the Taxonomy API.
     Grant-AzureADAdminConsent -TenantName $TenantName -Headers $Headers -ClientServicePrincipalObjectId $TodoListApiServicePrincipal.objectId -ResourceServicePrincipalObjectId $TaxonomyApiServicePrincipal.objectId -Scope "user_impersonation"
     
@@ -267,7 +288,11 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
                 "resourceAppId" = $TodoListApi.appId # Declare access to the TodoList API
                 "resourceAccess" = @(
                     @{
-                        "id" = $TodoListApiUserImpersonationPermissionId # The ID for the "user_impersonation" access permission
+                        "id" = $TodoListApiTodoReadPermissionId # The ID for the "Todo.Read" access permission
+                        "type" = "Scope" # Delegated (User) Permission
+                    },
+                    @{
+                        "id" = $TodoListApiTodoWritePermissionId # The ID for the "Todo.Write" access permission
                         "type" = "Scope" # Delegated (User) Permission
                     }
                 )
@@ -316,7 +341,11 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
                 "resourceAppId" = $TodoListApi.appId # Declare access to the TodoList API
                 "resourceAccess" = @(
                     @{
-                        "id" = $TodoListApiUserImpersonationPermissionId # The ID for the "user_impersonation" access permission
+                        "id" = $TodoListApiTodoReadPermissionId # The ID for the "Todo.Read" access permission
+                        "type" = "Scope" # Delegated (User) Permission
+                    },
+                    @{
+                        "id" = $TodoListApiTodoWritePermissionId # The ID for the "Todo.Write" access permission
                         "type" = "Scope" # Delegated (User) Permission
                     }
                 )
@@ -360,7 +389,11 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
                 "resourceAppId" = $TodoListApi.appId # Declare access to the TodoList API
                 "resourceAccess" = @(
                     @{
-                        "id" = $TodoListApiUserImpersonationPermissionId # The ID for the "user_impersonation" access permission
+                        "id" = $TodoListApiTodoReadPermissionId # The ID for the "Todo.Read" access permission
+                        "type" = "Scope" # Delegated (User) Permission
+                    },
+                    @{
+                        "id" = $TodoListApiTodoWritePermissionId # The ID for the "Todo.Write" access permission
                         "type" = "Scope" # Delegated (User) Permission
                     }
                 )
@@ -394,7 +427,11 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
                 "resourceAppId" = $TodoListApi.appId # Declare access to the TodoList API
                 "resourceAccess" = @(
                     @{
-                        "id" = $TodoListApiUserImpersonationPermissionId # The ID for the "user_impersonation" access permission
+                        "id" = $TodoListApiTodoReadPermissionId # The ID for the "Todo.Read" access permission
+                        "type" = "Scope" # Delegated (User) Permission
+                    },
+                    @{
+                        "id" = $TodoListApiTodoWritePermissionId # The ID for the "Todo.Write" access permission
                         "type" = "Scope" # Delegated (User) Permission
                     }
                 )
@@ -426,7 +463,11 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
                 "resourceAppId" = $TodoListApi.appId # Declare access to the TodoList API
                 "resourceAccess" = @(
                     @{
-                        "id" = $TodoListApiUserImpersonationPermissionId # The ID for the "user_impersonation" access permission
+                        "id" = $TodoListApiTodoReadPermissionId # The ID for the "Todo.Read" access permission
+                        "type" = "Scope" # Delegated (User) Permission
+                    },
+                    @{
+                        "id" = $TodoListApiTodoWritePermissionId # The ID for the "Todo.Write" access permission
                         "type" = "Scope" # Delegated (User) Permission
                     }
                 )
@@ -458,7 +499,11 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
                 "resourceAppId" = $TodoListApi.appId # Declare access to the TodoList API
                 "resourceAccess" = @(
                     @{
-                        "id" = $TodoListApiUserImpersonationPermissionId # The ID for the "user_impersonation" access permission
+                        "id" = $TodoListApiTodoReadPermissionId # The ID for the "Todo.Read" access permission
+                        "type" = "Scope" # Delegated (User) Permission
+                    },
+                    @{
+                        "id" = $TodoListApiTodoWritePermissionId # The ID for the "Todo.Write" access permission
                         "type" = "Scope" # Delegated (User) Permission
                     }
                 )
