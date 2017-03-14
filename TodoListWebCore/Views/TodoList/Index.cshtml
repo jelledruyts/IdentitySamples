@@ -1,0 +1,55 @@
+﻿@model TodoListWebCore.Models.TodoListIndexViewModel
+@{
+    ViewBag.Title = "Todo List";
+}
+<h1>@ViewBag.Title</h1>
+
+<h3>New Todo Item</h3>
+<div class="well">
+    @using (Html.BeginForm("Index", "TodoList", FormMethod.Post))
+    {
+        <div class="form-group">
+            <label for="title">Title</label>
+            <input type="text" class="form-control" id="title" name="title" placeholder="Enter a title">
+        </div>
+        <div class="form-group">
+            <label for="categoryId">Category</label>
+            <select id="categoryId" name="categoryId" class="form-control">
+                @foreach (var category in Model.Categories)
+                {
+                    <option value="@category.Id">@(category.Name + (category.IsPrivate ? " [Private]" : ""))</option>
+                }
+            </select>
+        </div>
+        <div class="form-group form-inline">
+            <label for="newCategoryName">Or new:</label>
+            <input type="text" class="form-control" id="newCategoryName" name="newCategoryName" placeholder="Enter a new category" />
+            <div class="checkbox">
+                <label for="newCategoryIsPrivate" title="Make the new category only visible to yourself">
+                    <input type="checkbox" id="newCategoryIsPrivate" name="newCategoryIsPrivate" value="true"> Private
+                </label>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-default btn-primary">Submit</button>
+    }
+</div>
+
+@if (Model.TodoItems.Any())
+{
+    <h3>@Model.TodoItems.Count Todo Item@(Model.TodoItems.Count != 1 ? "s" : "")</h3>
+    <ul class="list-group">
+        @foreach (var item in Model.TodoItems)
+        {
+            var category = Model.Categories.FirstOrDefault(c => c.Id == item.CategoryId);
+            <li class="list-group-item">
+                @if (category != null)
+                {
+                    <span class="pull-right label label-@(category.IsPrivate ? "warning" : "success")" title="@(category.IsPrivate ? "Private" : "Public") category">
+                        @category.Name
+                    </span>
+                }
+                @item.Title
+            </li>
+        }
+    </ul>
+}

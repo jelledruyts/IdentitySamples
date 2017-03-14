@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoListWebApp", "TodoListWebApp\TodoListWebApp.csproj", "{5FAB39E1-07CF-414C-9290-2A70E2B36F53}"
 EndProject
@@ -53,6 +53,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoListDaemon", "TodoListDaemon\TodoListDaemon.csproj", "{B18FEF85-88F6-469C-A126-012D810CFE86}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoListUniversalWindows10", "TodoListUniversalWindows10\TodoListUniversalWindows10.csproj", "{E3F270F8-ED94-482A-BC2F-DF4574D419E9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoListWebCore", "TodoListWebCore\TodoListWebCore.csproj", "{F17AE9AC-9124-467C-9D7E-7B74A3B66D96}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -168,6 +170,22 @@ Global
 		{E3F270F8-ED94-482A-BC2F-DF4574D419E9}.Release|x86.ActiveCfg = Release|x86
 		{E3F270F8-ED94-482A-BC2F-DF4574D419E9}.Release|x86.Build.0 = Release|x86
 		{E3F270F8-ED94-482A-BC2F-DF4574D419E9}.Release|x86.Deploy.0 = Release|x86
+		{F17AE9AC-9124-467C-9D7E-7B74A3B66D96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F17AE9AC-9124-467C-9D7E-7B74A3B66D96}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F17AE9AC-9124-467C-9D7E-7B74A3B66D96}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{F17AE9AC-9124-467C-9D7E-7B74A3B66D96}.Debug|ARM.Build.0 = Debug|Any CPU
+		{F17AE9AC-9124-467C-9D7E-7B74A3B66D96}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F17AE9AC-9124-467C-9D7E-7B74A3B66D96}.Debug|x64.Build.0 = Debug|Any CPU
+		{F17AE9AC-9124-467C-9D7E-7B74A3B66D96}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F17AE9AC-9124-467C-9D7E-7B74A3B66D96}.Debug|x86.Build.0 = Debug|Any CPU
+		{F17AE9AC-9124-467C-9D7E-7B74A3B66D96}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F17AE9AC-9124-467C-9D7E-7B74A3B66D96}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F17AE9AC-9124-467C-9D7E-7B74A3B66D96}.Release|ARM.ActiveCfg = Release|Any CPU
+		{F17AE9AC-9124-467C-9D7E-7B74A3B66D96}.Release|ARM.Build.0 = Release|Any CPU
+		{F17AE9AC-9124-467C-9D7E-7B74A3B66D96}.Release|x64.ActiveCfg = Release|Any CPU
+		{F17AE9AC-9124-467C-9D7E-7B74A3B66D96}.Release|x64.Build.0 = Release|Any CPU
+		{F17AE9AC-9124-467C-9D7E-7B74A3B66D96}.Release|x86.ActiveCfg = Release|Any CPU
+		{F17AE9AC-9124-467C-9D7E-7B74A3B66D96}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -182,5 +200,6 @@ Global
 		{D59C9BC8-7423-4615-A224-F0F49CD5A0B6} = {079BF8E4-4430-4423-B65A-FEF5676C470B}
 		{B18FEF85-88F6-469C-A126-012D810CFE86} = {079BF8E4-4430-4423-B65A-FEF5676C470B}
 		{E3F270F8-ED94-482A-BC2F-DF4574D419E9} = {079BF8E4-4430-4423-B65A-FEF5676C470B}
+		{F17AE9AC-9124-467C-9D7E-7B74A3B66D96} = {079BF8E4-4430-4423-B65A-FEF5676C470B}
 	EndGlobalSection
 EndGlobal

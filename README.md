@@ -28,6 +28,7 @@ Client n ---/
 | TaxonomyWebApi | Taxonomy service | OAuth 2.0 Bearer Tokens | ASP.NET Web API | [Microsoft.Owin.Security.ActiveDirectory (Katana)](https://github.com/aspnet/AspNetKatana) |
 | TodoListWebApi | Todo List service | OAuth 2.0 Bearer Tokens; OAuth 2.0 On-Behalf-Of | ASP.NET Web API | [Microsoft.Owin.Security.ActiveDirectory (Katana)](https://github.com/aspnet/AspNetKatana) |
 | TodoListWebApp | Server-side web application | OpenID Connect; OAuth 2.0 Authorization Code Grant, Confidential Client | ASP.NET MVC | [Microsoft.Owin.Security.OpenIdConnect (Katana)](https://github.com/aspnet/AspNetKatana) |
+| TodoListWebCore | Server-side web application | OpenID Connect; OAuth 2.0 Authorization Code Grant, Confidential Client | ASP.NET Core | [Microsoft.AspNetCore.Authentication.OpenIdConnect](https://github.com/aspnet/Security) |
 | TodoListWebSpa | Client-side Single Page Application (SPA) | OAuth 2.0 Implicit Grant | AngularJS | [ADAL.js](https://github.com/AzureAD/azure-activedirectory-library-for-js) |
 | TodoListWpf | Windows desktop application | OAuth 2.0 Authorization Code Grant, Public Client | WPF | [Microsoft.IdentityModel.Clients.ActiveDirectory (ADAL .NET)](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet) |
 | TodoListConsole | Windows desktop application | OAuth 2.0 Authorization Code Grant, Public Client | Console | [Microsoft.IdentityModel.Clients.ActiveDirectory (ADAL .NET)](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet) |

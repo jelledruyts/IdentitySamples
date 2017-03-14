@@ -1,0 +1,96 @@
+﻿@model Common.IdentityInfo
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h4 class="panel-title">
+            <a data-toggle="collapse" href="#application-panel-@Model.Application.GetHashCode()">@Model.Application</a>
+        </h4>
+    </div>
+    <div id="application-panel-@Model.Application.GetHashCode()" class="panel-collapse collapse in">
+        <div class="panel-body">
+            <div class="panel-group">
+                <!-- Identity Information -->
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" href="#identity-panel-@Model.Application.GetHashCode()">Identity</a>
+                        </h4>
+                    </div>
+                    <div id="identity-panel-@Model.Application.GetHashCode()" class="panel-collapse collapse in">
+                        <div class="panel-body">
+                            <dl class="dl-horizontal">
+                                <dt>Is Authenticated</dt>
+                                <dd>@Model.IsAuthenticated.ToString().ToLowerInvariant()</dd>
+                                <dt>Name</dt>
+                                <dd>@Model.Name</dd>
+                                <dt>Authentication Type</dt>
+                                <dd>@Model.AuthenticationType</dd>
+                                @if (Model.RoleNames != null && Model.RoleNames.Any())
+                                    {
+                                    <dt>Application Roles</dt>
+                                    <dd>@string.Join(", ", Model.RoleNames)</dd>
+                                    }
+                                @if (Model.GroupNames != null && Model.GroupNames.Any())
+                                    {
+                                    <dt>Groups</dt>
+                                    <dd>@string.Join(", ", Model.GroupNames)</dd>
+                                    }
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+                <!-- Claims Information -->
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" href="#claims-panel-@Model.Application.GetHashCode()">
+                                Claims
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="claims-panel-@Model.Application.GetHashCode()" class="panel-collapse collapse in">
+                        <div class="panel-body">
+                            <table class="table table-bordered table-striped table-responsive">
+                                <thead>
+                                    <tr>
+                                        <th>Claim Type</th>
+                                        <th>Claim Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var claim in Model.Claims)
+                                        {
+                                        <tr>
+                                            <td>@claim.Type</td>
+                                            <td><abbr title="@claim.Remark">@claim.Value</abbr></td>
+                                        </tr>
+                                        }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- Related Application Identities Information -->
+                @if (Model.RelatedApplicationIdentities != null && Model.RelatedApplicationIdentities.Any())
+                    {
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" href="#related-panel-@Model.Application.GetHashCode()">
+                                    Related Application Identities
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="related-panel-@Model.Application.GetHashCode()" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                @foreach (var relatedApplicationIdentity in Model.RelatedApplicationIdentities)
+                                {
+                                    Html.RenderPartial("_IdentityInfoPartial", relatedApplicationIdentity);
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    }
+            </div>
+        </div>
+    </div>
+</div>

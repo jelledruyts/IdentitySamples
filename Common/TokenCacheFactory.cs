@@ -15,13 +15,23 @@ namespace Common
 
         public static TokenCache GetTokenCacheForCurrentPrincipal()
         {
-            var userId = ClaimsPrincipal.Current.GetUniqueIdentifier();
+            return GetTokenCacheForPrincipal(ClaimsPrincipal.Current);
+        }
+
+        public static TokenCache GetTokenCacheForPrincipal(ClaimsPrincipal principal)
+        {
+            var userId = principal.GetUniqueIdentifier();
             return GetTokenCache(userId);
         }
 
         public static void DeleteTokenCacheForCurrentPrincipal()
         {
-            var userId = ClaimsPrincipal.Current.GetUniqueIdentifier();
+            DeleteTokenCacheForPrincipal(ClaimsPrincipal.Current);
+        }
+
+        public static void DeleteTokenCacheForPrincipal(ClaimsPrincipal principal)
+        {
+            var userId = principal.GetUniqueIdentifier();
             DeleteTokenCache(userId);
         }
 

@@ -5,6 +5,8 @@
   <TodoListWebApiResourceId>http://identitysamples/todolistwebapi</TodoListWebApiResourceId>
   <TaxonomyWebApiRootUrl>https://localhost:44308/</TaxonomyWebApiRootUrl>
   <TaxonomyWebApiResourceId>http://identitysamples/taxonomywebapi</TaxonomyWebApiResourceId>
+  <TodoListWebCoreRootUrl>https://localhost:44309/</TodoListWebCoreRootUrl>
+  <TodoListWebCoreResourceId>http://identitysamples/todolistwebcore</TodoListWebCoreResourceId>
   <TodoListWebSpaRootUrl>https://localhost:44310/</TodoListWebSpaRootUrl>
   <TodoListDaemonResourceId>http://identitysamples/todolistdaemon</TodoListDaemonResourceId>
   <TodoListDaemonCertificateName>TodoListDaemon</TodoListDaemonCertificateName>
@@ -30,6 +32,10 @@
   </TodoListWebAppClientSecret>
   <TodoListWebAppClientId>
   </TodoListWebAppClientId>
+  <TodoListWebCoreClientSecret>
+  </TodoListWebCoreClientSecret>
+  <TodoListWebCoreClientId>
+  </TodoListWebCoreClientId>
   <TodoListWebSpaClientId>
   </TodoListWebSpaClientId>
   <TodoListWpfClientId>

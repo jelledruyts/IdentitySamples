@@ -61,6 +61,17 @@ function Initialize-AdfsApplicationGroup ($ConfigurationValues)
     $ConfigurationValues["TodoListWebAppClientId"] = $WebAppClient.Identifier
     $ConfigurationValues["TodoListWebAppClientSecret"] = $WebAppClient.ClientSecret
 
+    # Register the Server application for the Web Core.
+    $WebCoreClientDisplayName = "$ApplicationGroupIdentifier - Web Core Client"
+    Write-Host "Creating ""$WebCoreClientDisplayName"" in AD FS"
+    # The ASP.NET Core middleware listens for sign ins on the "/signin-oidc" endpoint.
+    $WebCoreClientRedirectUri = $ConfigurationValues["TodoListWebCoreRootUrl"]
+    $WebCoreClientRedirectUri = $WebCoreClientRedirectUri.TrimEnd('/')
+    $WebCoreClientRedirectUri = "$WebCoreClientRedirectUri/signin-oidc"
+    $WebCoreClient = Add-AdfsServerApplication -ApplicationGroupIdentifier $ApplicationGroupIdentifier -Name $WebCoreClientDisplayName -Identifier $(New-Guid) -RedirectUri @($WebCoreClientRedirectUri) -GenerateClientSecret -PassThru
+    $ConfigurationValues["TodoListWebCoreClientId"] = $WebCoreClient.Identifier
+    $ConfigurationValues["TodoListWebCoreClientSecret"] = $WebCoreClient.ClientSecret
+
     # Register the Server application for the Daemon app.
     $DaemonClientDisplayName = "$ApplicationGroupIdentifier - Daemon Client"
     Write-Host "Creating ""$DaemonClientDisplayName"" in AD FS"
@@ -102,13 +113,15 @@ function Initialize-AdfsApplicationGroup ($ConfigurationValues)
     $ConfigurationValues["TaxonomyWebApiClientSecret"] = "" # Not needed in this case
 
     # Grant client applications access to the TodoList API.
+    # The "openid" scope is needed for the OAuth 2.0 Refresh Token grant.
     Write-Host "Granting client applications access to ""$TodoListApiDisplayName"""
-    Grant-AdfsApplicationPermission -ServerRoleIdentifier $TodoListApi.Identifier[0] -ClientRoleIdentifier $WebSpaClient.Identifier -ScopeNames "user_impersonation"
-    Grant-AdfsApplicationPermission -ServerRoleIdentifier $TodoListApi.Identifier[0] -ClientRoleIdentifier $Windows10Client.Identifier -ScopeNames "user_impersonation"
-    Grant-AdfsApplicationPermission -ServerRoleIdentifier $TodoListApi.Identifier[0] -ClientRoleIdentifier $ConsoleClient.Identifier -ScopeNames "user_impersonation"
-    Grant-AdfsApplicationPermission -ServerRoleIdentifier $TodoListApi.Identifier[0] -ClientRoleIdentifier $WpfClientApp.Identifier -ScopeNames "user_impersonation"
-    Grant-AdfsApplicationPermission -ServerRoleIdentifier $TodoListApi.Identifier[0] -ClientRoleIdentifier $WebAppClient.Identifier -ScopeNames "user_impersonation"
-    Grant-AdfsApplicationPermission -ServerRoleIdentifier $TodoListApi.Identifier[0] -ClientRoleIdentifier $DaemonClient.Identifier -ScopeNames "user_impersonation"
+    Grant-AdfsApplicationPermission -ServerRoleIdentifier $TodoListApi.Identifier[0] -ClientRoleIdentifier $WebSpaClient.Identifier -ScopeNames @("user_impersonation")
+    Grant-AdfsApplicationPermission -ServerRoleIdentifier $TodoListApi.Identifier[0] -ClientRoleIdentifier $Windows10Client.Identifier -ScopeNames @("user_impersonation", "openid")
+    Grant-AdfsApplicationPermission -ServerRoleIdentifier $TodoListApi.Identifier[0] -ClientRoleIdentifier $ConsoleClient.Identifier -ScopeNames @("user_impersonation", "openid")
+    Grant-AdfsApplicationPermission -ServerRoleIdentifier $TodoListApi.Identifier[0] -ClientRoleIdentifier $WpfClientApp.Identifier -ScopeNames @("user_impersonation", "openid")
+    Grant-AdfsApplicationPermission -ServerRoleIdentifier $TodoListApi.Identifier[0] -ClientRoleIdentifier $WebAppClient.Identifier -ScopeNames @("user_impersonation", "openid")
+    Grant-AdfsApplicationPermission -ServerRoleIdentifier $TodoListApi.Identifier[0] -ClientRoleIdentifier $WebCoreClient.Identifier -ScopeNames @("user_impersonation", "openid")
+    Grant-AdfsApplicationPermission -ServerRoleIdentifier $TodoListApi.Identifier[0] -ClientRoleIdentifier $DaemonClient.Identifier -ScopeNames @("user_impersonation")
 
     # Grant client applications access to the Taxonomy API.
     Write-Host "Granting client applications access to ""$TaxonomyApiDisplayName"""

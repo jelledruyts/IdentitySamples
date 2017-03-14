@@ -25,8 +25,9 @@ function Save-ConfigurationValues ($FileName, $ConfigurationValues)
 function Get-StringReplacedValue ($Text, $Pattern, $Key, $Value)
 {
     # Replace the pattern using a regular expression.
-    $Find = $Pattern -replace "_KEY_", $Key -replace "_VALUE_", ".*?"
-    $Replace = $Pattern -replace "_KEY_", $Key -replace "_VALUE_", $Value
+    $Find = $Pattern -replace "_KEY_", $Key -replace "_VALUE_", ")(.*?)(?<post>"
+    $Find = "(?<pre>$Find)"
+    $Replace = "`${pre}$Value`${post}"
     $Text = $Text -replace $Find, $Replace
     return $Text.TrimEnd()
 }
@@ -69,16 +70,20 @@ function Update-ConfigurationFiles ($SourceDir, $ConfigurationValues)
     $CsharpConfigurationFiles = @(
         "$SourceDir\TodoListUniversalWindows10\AppConfiguration.cs"
     )
+    $JsonConfigurationFiles = @(
+        "$SourceDir\TodoListWebCore\appsettings.json"
+    )
 
-    # Don't quote configuration values with the keys below
+    # Don't quote configuration values with the keys below.
     $UnquotedConfigurationKeys = @(
         "StsSupportsLogOut"
         "CanValidateAuthority"
     )
 
     $XmlConfigurationFiles | ForEach-Object { Update-ConfigurationFile -FileName $_ -ConfigurationValues $ConfigurationValues -Pattern '<add key="_KEY_" value="_VALUE_" />' -QuoteChar "" -UnquotedConfigurationKeys $UnquotedConfigurationKeys }
-    $JavaScriptConfigurationFiles | ForEach-Object { Update-ConfigurationFile -FileName $_ -ConfigurationValues $ConfigurationValues -Pattern '_KEY_: _VALUE_,' -QuoteChar "'" -UnquotedConfigurationKeys $UnquotedConfigurationKeys }
+    $JavaScriptConfigurationFiles | ForEach-Object { Update-ConfigurationFile -FileName $_ -ConfigurationValues $ConfigurationValues -Pattern '"?_KEY_"?: _VALUE_,?\r\n' -QuoteChar "'" -UnquotedConfigurationKeys $UnquotedConfigurationKeys }
     $CsharpConfigurationFiles | ForEach-Object { Update-ConfigurationFile -FileName $_ -ConfigurationValues $ConfigurationValues -Pattern '_KEY_ = _VALUE_;' -QuoteChar '"' -UnquotedConfigurationKeys $UnquotedConfigurationKeys }
+    $JsonConfigurationFiles | ForEach-Object { Update-ConfigurationFile -FileName $_ -ConfigurationValues $ConfigurationValues -Pattern '"?_KEY_"?: _VALUE_,?\r\n' -QuoteChar '"' -UnquotedConfigurationKeys $UnquotedConfigurationKeys }
 }
 
 function Get-ClientCertificate ($SubjectName)

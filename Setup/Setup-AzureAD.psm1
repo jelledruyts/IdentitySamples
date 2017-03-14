@@ -116,11 +116,12 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
     $TodoListApiDisplayName = "TodoList API"
     $WebSpaClientDisplayName = "TodoList Web SPA Client"
     $WebAppClientDisplayName = "TodoList Web App Client"
+    $WebCoreClientDisplayName = "TodoList Web Core Client"
     $WpfClientDisplayName = "TodoList WPF Client"
     $ConsoleClientDisplayName = "TodoList Console Client"
     $Windows10ClientDisplayName = "TodoList Windows 10 Client"
     $DaemonClientDisplayName = "TodoList Daemon Client"
-    $ApplicationDisplayNames = @($TaxonomyApiDisplayName, $TodoListApiDisplayName, $WebSpaClientDisplayName, $WebAppClientDisplayName, $WpfClientDisplayName, $ConsoleClientDisplayName, $Windows10ClientDisplayName, $DaemonClientDisplayName)
+    $ApplicationDisplayNames = @($TaxonomyApiDisplayName, $TodoListApiDisplayName, $WebSpaClientDisplayName, $WebAppClientDisplayName, $WebCoreClientDisplayName, $WpfClientDisplayName, $ConsoleClientDisplayName, $Windows10ClientDisplayName, $DaemonClientDisplayName)
 
     # Ensure we start from scratch.
     $ExistingApplications = Get-AzureADApplications -TenantName $TenantName -Headers $Headers
@@ -366,6 +367,58 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
     # Add the service principal to the "Directory Readers" role (which is done automatically when an admin consents to the application when it needs directory read permissions).
     Add-AzureADRoleMember -TenantName $TenantName -Headers $Headers -RoleObjectId $DirectoryReaderRole.objectId -ServicePrincipalObjectId $WebAppClientServicePrincipal.objectId
     $ConfigurationValues["TodoListWebAppClientId"] = $WebAppClient.appId
+    
+    # Register the Server application for the TodoList Web Core.
+    Write-Host "Creating ""$WebCoreClientDisplayName"" in Azure AD"
+    $ConfigurationValues["TodoListWebCoreClientSecret"] = New-ClientSecret
+    $WebCoreClientDefinition = @{
+        "displayName" = $WebCoreClientDisplayName
+        "groupMembershipClaims" = "SecurityGroup" # Emit (security) group membership claims
+        "replyUrls" = @($ConfigurationValues["TodoListWebCoreRootUrl"])
+        "identifierUris" = @($ConfigurationValues["TodoListWebCoreResourceId"])
+        "requiredResourceAccess" = @( # Define access to other applications
+            @{
+                "resourceAppId" = "00000002-0000-0000-c000-000000000000" # Declare access to Azure Active Directory
+                "resourceAccess" = @(
+                    @{
+                        "id" = "5778995a-e1bf-45b8-affa-663a9f3f4d04" # "Directory.Read": Read directory data
+                        "type" = "Role" # Application Permission
+                    },
+                    @{
+                        "id" = "311a71cc-e848-46a1-bdf8-97ff7156d8e6" # "UserProfile.Read": Sign in and read user profile
+                        "type" = "Scope" # Delegated (User) Permission
+                    }
+                )
+            },
+            @{
+                "resourceAppId" = $TodoListApi.appId # Declare access to the TodoList API
+                "resourceAccess" = @(
+                    @{
+                        "id" = $TodoListApiTodoReadPermissionId # The ID for the "Todo.Read" access permission
+                        "type" = "Scope" # Delegated (User) Permission
+                    },
+                    @{
+                        "id" = $TodoListApiTodoWritePermissionId # The ID for the "Todo.Write" access permission
+                        "type" = "Scope" # Delegated (User) Permission
+                    }
+                )
+            }
+        )
+        "passwordCredentials" = @( # Add a client secret
+            @{
+                "keyId" = New-Guid
+                "startDate" = $CredentialStartDate
+                "endDate" = $CredentialEndDate
+                "value" = $ConfigurationValues["TodoListWebCoreClientSecret"]
+            }
+        )
+    }
+    $WebCoreClient = New-AzureADApplication -TenantName $TenantName -Headers $Headers -ApplicationDefinition $WebCoreClientDefinition
+    # Create the service principal representing the application instance in the directory.
+    $WebCoreClientServicePrincipal = New-AzureADServicePrincipal -TenantName $TenantName -Headers $Headers -AppId $WebCoreClient.appId
+    # Add the service principal to the "Directory Readers" role (which is done automatically when an admin consents to the application when it needs directory read permissions).
+    Add-AzureADRoleMember -TenantName $TenantName -Headers $Headers -RoleObjectId $DirectoryReaderRole.objectId -ServicePrincipalObjectId $WebCoreClientServicePrincipal.objectId
+    $ConfigurationValues["TodoListWebCoreClientId"] = $WebCoreClient.appId
 
     # Register the Native application for the Web SPA app.
     Write-Host "Creating ""$WebSpaClientDisplayName"" in Azure AD"
