@@ -14,6 +14,8 @@ function Initialize-AdfsApplicationGroup ($ConfigurationValues)
     $AdfsHttpsPort = $AdfsProperties.HttpsPort
     $ConfigurationValues["StsRootUrl"] = "https://${AdfsHostName}:${AdfsHttpsPort}/"
     $ConfigurationValues["StsPath"] = "adfs"
+    $ConfigurationValues["StsAccessTokenIssuer"] = $AdfsProperties.Identifier
+    $ConfigurationValues["StsIdTokenIssuer"] = $AdfsProperties.IdTokenIssuer
     $ConfigurationValues["StsSupportsLogOut"] = "false"
     $ConfigurationValues["CanValidateAuthority"] = "false"
 

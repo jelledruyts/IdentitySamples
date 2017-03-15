@@ -62,6 +62,7 @@ namespace TaxonomyWebApi
                 {
                     NameClaimType = StsConfiguration.NameClaimType,
                     RoleClaimType = StsConfiguration.RoleClaimType,
+                    ValidIssuer = this.SiteConfiguration.StsAccessTokenIssuer
                 },
                 SaveToken = true // This makes the JWT token available through "this.HttpContext.Authentication.GetTokenAsync(...)".
             });

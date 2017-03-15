@@ -8,5 +8,6 @@
 
         public string StsRootUrl { get; set; }
         public string StsPath { get; set; }
+        public string StsAccessTokenIssuer { get; set; }
     }
 }

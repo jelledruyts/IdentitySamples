@@ -15,33 +15,37 @@
   <TodoListWindows10RedirectUrl>ms-appx-web://microsoft.aad.brokerplugin/S-1-15-2-2304902392-2563821604-2476182484-3201470989-4008826171-3818320237-2811840085</TodoListWindows10RedirectUrl>
   <StsRootUrl>https://login.microsoftonline.com/</StsRootUrl>
   <StsPath>tenant.onmicrosoft.com</StsPath>
+  <StsAccessTokenIssuer>
+  </StsAccessTokenIssuer>
+  <StsIdTokenIssuer>
+  </StsIdTokenIssuer>
   <StsSupportsLogOut>true</StsSupportsLogOut>
   <CanValidateAuthority>true</CanValidateAuthority>
-  <AccountProviderAuthority>https://login.microsoftonline.com/tenant.onmicrosoft.com</AccountProviderAuthority>
-  <TaxonomyWebApiClientSecret>
-  </TaxonomyWebApiClientSecret>
-  <TaxonomyWebApiClientId>
-  </TaxonomyWebApiClientId>
-  <TodoListWebApiClientSecret>
-  </TodoListWebApiClientSecret>
-  <TodoListWebApiClientId>
-  </TodoListWebApiClientId>
-  <TodoListDaemonClientId>
-  </TodoListDaemonClientId>
-  <TodoListWebAppClientSecret>
-  </TodoListWebAppClientSecret>
-  <TodoListWebAppClientId>
-  </TodoListWebAppClientId>
-  <TodoListWebCoreClientSecret>
-  </TodoListWebCoreClientSecret>
-  <TodoListWebCoreClientId>
-  </TodoListWebCoreClientId>
   <TodoListWebSpaClientId>
   </TodoListWebSpaClientId>
-  <TodoListWpfClientId>
-  </TodoListWpfClientId>
-  <TodoListConsoleClientId>
-  </TodoListConsoleClientId>
   <TodoListWindows10ClientId>
   </TodoListWindows10ClientId>
+  <AccountProviderAuthority>https://login.microsoftonline.com/tenant.onmicrosoft.com</AccountProviderAuthority>
+  <TodoListConsoleClientId>
+  </TodoListConsoleClientId>
+  <TodoListWpfClientId>
+  </TodoListWpfClientId>
+  <TodoListWebAppClientId>
+  </TodoListWebAppClientId>
+  <TodoListWebAppClientSecret>
+  </TodoListWebAppClientSecret>
+  <TodoListWebCoreClientId>
+  </TodoListWebCoreClientId>
+  <TodoListWebCoreClientSecret>
+  </TodoListWebCoreClientSecret>
+  <TodoListDaemonClientId>
+  </TodoListDaemonClientId>
+  <TodoListWebApiClientId>
+  </TodoListWebApiClientId>
+  <TodoListWebApiClientSecret>
+  </TodoListWebApiClientSecret>
+  <TaxonomyWebApiClientId>
+  </TaxonomyWebApiClientId>
+  <TaxonomyWebApiClientSecret>
+  </TaxonomyWebApiClientSecret>
 </ConfigurationValues>

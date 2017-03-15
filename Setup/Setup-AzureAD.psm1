@@ -105,6 +105,8 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
     # Determine the STS configuration values.
     $ConfigurationValues["StsRootUrl"] = $AzureADInstance
     $ConfigurationValues["StsPath"] = $TenantName
+    $ConfigurationValues["StsAccessTokenIssuer"] = $null
+    $ConfigurationValues["StsIdTokenIssuer"] = $null
     $ConfigurationValues["StsSupportsLogOut"] = "true"
     $ConfigurationValues["CanValidateAuthority"] = "true"
     $ConfigurationValues["AccountProviderAuthority"] = $AzureADAuthority
