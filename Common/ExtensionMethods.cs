@@ -1,21 +1,22 @@
 ﻿using System;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Principal;
 
 namespace Common
 {
     public static class ExtensionMethods
     {
-        #region ClaimsPrincipal.GetUniqueIdentifier
+        #region GetUniqueIdentifier
 
         /// <summary>
         /// Gets a unique identifier for the specified principal.
         /// </summary>
         /// <param name="principal">The principal.</param>
         /// <returns>A unique identifier for the specified principal.</returns>
-        public static string GetUniqueIdentifier(this ClaimsPrincipal principal)
+        public static string GetUniqueIdentifier(this IPrincipal principal)
         {
-            return ((ClaimsIdentity)principal.Identity).GetUniqueIdentifier();
+            return (principal.Identity as ClaimsIdentity).GetUniqueIdentifier();
         }
 
         /// <summary>

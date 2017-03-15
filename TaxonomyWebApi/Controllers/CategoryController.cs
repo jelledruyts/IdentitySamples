@@ -1,16 +1,17 @@
 ﻿using Common;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
-using System.Web.Http;
 using TaxonomyWebApi.Models;
 
 namespace TaxonomyWebApi.Controllers
 {
+    [Route("api/[controller]")]
     [Authorize]
-    public class CategoryController : ApiController
+    public class CategoryController : Controller
     {
         #region In-Memory Database
 
@@ -37,22 +38,24 @@ namespace TaxonomyWebApi.Controllers
         /// <summary>
         /// Gets all public categories as well as the current user's private categories.
         /// </summary>
+        [HttpGet]
         public IEnumerable<Category> Get()
         {
-            var userId = ClaimsPrincipal.Current.GetUniqueIdentifier();
+            var userId = this.User.GetUniqueIdentifier();
             return database.Where(c => c.UserId == null || c.UserId == userId).OrderBy(c => c.Name).Select(c => new Category { Id = c.Id, Name = c.Name, IsPrivate = c.UserId != null });
         }
 
         /// <summary>
         /// Creates a new category.
         /// </summary>
-        public IHttpActionResult Post(Category value)
+        [HttpPost]
+        public IActionResult Post([FromBody]Category value)
         {
             if (value == null || string.IsNullOrWhiteSpace(value.Name))
             {
                 return BadRequest("Name is required");
             }
-            var userId = value.IsPrivate ? ClaimsPrincipal.Current.GetUniqueIdentifier() : null;
+            var userId = value.IsPrivate ? this.User.GetUniqueIdentifier() : null;
             var data = new CategoryData(value.Name, userId);
             database.Add(data);
             value.Id = data.Id;

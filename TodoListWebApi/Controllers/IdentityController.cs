@@ -4,7 +4,6 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net.Http;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web.Http;
 using TodoListWebApi.Models;
@@ -23,7 +22,7 @@ namespace TodoListWebApi.Controllers
             var relatedApplicationIdentities = new List<IdentityInfo>();
             try
             {
-                var taxonomyWebApiClient = await CategoryController.GetTaxonomyClient();
+                var taxonomyWebApiClient = await CategoryController.GetTaxonomyClient(this.User);
                 var taxonomyWebApiIdentityInfoRequest = new HttpRequestMessage(HttpMethod.Get, SiteConfiguration.TaxonomyWebApiRootUrl + "api/identity");
                 var taxonomyWebApiIdentityInfoResponse = await taxonomyWebApiClient.SendAsync(taxonomyWebApiIdentityInfoRequest);
                 taxonomyWebApiIdentityInfoResponse.EnsureSuccessStatusCode();
@@ -54,7 +53,7 @@ namespace TodoListWebApi.Controllers
             {
                 graphClient = new AadGraphClient(StsConfiguration.Authority, StsConfiguration.AadTenant, SiteConfiguration.TodoListWebApiClientId, SiteConfiguration.TodoListWebApiClientSecret);
             }
-            return await IdentityInfo.FromCurrent("Todo List Web API", relatedApplicationIdentities, graphClient);
+            return await IdentityInfo.FromPrincipal(this.User, "Todo List Web API", relatedApplicationIdentities, graphClient);
         }
 
         /// <summary>
@@ -68,7 +67,7 @@ namespace TodoListWebApi.Controllers
             }
             if (identity != null && !string.IsNullOrWhiteSpace(identity.DisplayName))
             {
-                var userId = ClaimsPrincipal.Current.GetUniqueIdentifier();
+                var userId = this.User.GetUniqueIdentifier();
                 var graphClient = new AadGraphClient(StsConfiguration.Authority, StsConfiguration.AadTenant, SiteConfiguration.TodoListWebApiClientId, SiteConfiguration.TodoListWebApiClientSecret);
                 await graphClient.UpdateUserAsync(userId, identity.DisplayName);
             }

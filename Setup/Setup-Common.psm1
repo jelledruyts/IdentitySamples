@@ -57,7 +57,6 @@ function Update-ConfigurationFiles ($SourceDir, $ConfigurationValues)
 {
     # Define the configuration files to update per file type.
     $XmlConfigurationFiles = @(
-        "$SourceDir\TaxonomyWebApi\Web.config",
         "$SourceDir\TodoListWebApi\Web.config"
         "$SourceDir\TodoListWebApp\Web.config"
         "$SourceDir\TodoListConsole\App.config"
@@ -71,6 +70,7 @@ function Update-ConfigurationFiles ($SourceDir, $ConfigurationValues)
         "$SourceDir\TodoListUniversalWindows10\AppConfiguration.cs"
     )
     $JsonConfigurationFiles = @(
+        "$SourceDir\TaxonomyWebApi\appsettings.json"
         "$SourceDir\TodoListWebCore\appsettings.json"
     )
 

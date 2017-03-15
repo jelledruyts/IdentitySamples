@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Principal;
 using System.Threading.Tasks;
 
 namespace Common
@@ -79,14 +80,15 @@ namespace Common
         #region Static Factory Methods
 
         /// <summary>
-        /// Creates identity infromation about the current principal's identity.
+        /// Creates identity infromation about the specified principal's identity.
         /// </summary>
+        /// <param name="principal">The principal.</param>
         /// <param name="application">The application from which the identity is observed.</param>
         /// <param name="relatedApplicationIdentities">The identities as seen from other applications related to the current application.</param>
         /// <returns>Identity information about the current principal's identity</returns>
-        public static async Task<IdentityInfo> FromCurrent(string application, IList<IdentityInfo> relatedApplicationIdentities, AadGraphClient graphClient)
+        public static async Task<IdentityInfo> FromPrincipal(IPrincipal principal, string application, IList<IdentityInfo> relatedApplicationIdentities, AadGraphClient graphClient)
         {
-            return await FromIdentity((ClaimsIdentity)ClaimsPrincipal.Current.Identity, application, relatedApplicationIdentities, graphClient);
+            return await FromIdentity(principal.Identity as ClaimsIdentity, application, relatedApplicationIdentities, graphClient);
         }
 
         /// <summary>
@@ -99,6 +101,15 @@ namespace Common
         /// <returns>Identity information about the specified identity.</returns>
         public static async Task<IdentityInfo> FromIdentity(ClaimsIdentity identity, string application, IList<IdentityInfo> relatedApplicationIdentities, AadGraphClient graphClient)
         {
+            if (identity == null)
+            {
+                return new IdentityInfo
+                {
+                    Application = application,
+                    IsAuthenticated = false
+                };
+            }
+
             var groups = default(IList<IGroup>);
             if (graphClient != null)
             {

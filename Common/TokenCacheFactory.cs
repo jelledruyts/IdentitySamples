@@ -1,6 +1,6 @@
 ﻿using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using System.Collections.Generic;
-using System.Security.Claims;
+using System.Security.Principal;
 
 namespace Common
 {
@@ -13,23 +13,13 @@ namespace Common
         // or a database.
         private static Dictionary<string, TokenCache> tokenCachePerUserId = new Dictionary<string, TokenCache>();
 
-        public static TokenCache GetTokenCacheForCurrentPrincipal()
-        {
-            return GetTokenCacheForPrincipal(ClaimsPrincipal.Current);
-        }
-
-        public static TokenCache GetTokenCacheForPrincipal(ClaimsPrincipal principal)
+        public static TokenCache GetTokenCacheForPrincipal(IPrincipal principal)
         {
             var userId = principal.GetUniqueIdentifier();
             return GetTokenCache(userId);
         }
 
-        public static void DeleteTokenCacheForCurrentPrincipal()
-        {
-            DeleteTokenCacheForPrincipal(ClaimsPrincipal.Current);
-        }
-
-        public static void DeleteTokenCacheForPrincipal(ClaimsPrincipal principal)
+        public static void DeleteTokenCacheForPrincipal(IPrincipal principal)
         {
             var userId = principal.GetUniqueIdentifier();
             DeleteTokenCache(userId);

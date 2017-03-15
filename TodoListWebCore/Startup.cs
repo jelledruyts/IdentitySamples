@@ -81,7 +81,7 @@ namespace TodoListWebCore
                 ClientSecret = this.SiteConfiguration.TodoListWebCoreClientSecret,
                 ResponseType = OpenIdConnectResponseType.CodeIdToken, // We want to retrieve an ID token as well as an authorization code (hybrid flow).
                 SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme,
-                SaveTokens = true, // Persists the tokens in the cookie, so they can be retrieved later with e.g. "this.HttpContext.Authentication.GetTokenAsync(OpenIdConnectParameterNames.AccessToken)".
+                SaveTokens = true, // Persists the tokens in the cookie, so they can be retrieved later with e.g. "this.HttpContext.Authentication.GetTokenAsync(...)".
                 TokenValidationParameters = new TokenValidationParameters
                 {
                     NameClaimType = StsConfiguration.NameClaimType,

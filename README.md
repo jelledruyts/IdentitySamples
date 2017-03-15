@@ -25,7 +25,7 @@ Client n ---/
 
 | Project | Purpose | Protocol | Technology | Library/API |
 |---------|---------|----------|------------|-------------|
-| TaxonomyWebApi | Taxonomy service | OAuth 2.0 Bearer Tokens | ASP.NET Web API | [Microsoft.Owin.Security.ActiveDirectory (Katana)](https://github.com/aspnet/AspNetKatana) |
+| TaxonomyWebApi | Taxonomy service | OAuth 2.0 Bearer Tokens | ASP.NET Core Web API | [Microsoft.AspNetCore.Authentication.JwtBearer](https://github.com/aspnet/Security) |
 | TodoListWebApi | Todo List service | OAuth 2.0 Bearer Tokens; OAuth 2.0 On-Behalf-Of | ASP.NET Web API | [Microsoft.Owin.Security.ActiveDirectory (Katana)](https://github.com/aspnet/AspNetKatana) |
 | TodoListWebApp | Server-side web application | OpenID Connect; OAuth 2.0 Authorization Code Grant, Confidential Client | ASP.NET MVC | [Microsoft.Owin.Security.OpenIdConnect (Katana)](https://github.com/aspnet/AspNetKatana) |
 | TodoListWebCore | Server-side web application | OpenID Connect; OAuth 2.0 Authorization Code Grant, Confidential Client | ASP.NET Core | [Microsoft.AspNetCore.Authentication.OpenIdConnect](https://github.com/aspnet/Security) |

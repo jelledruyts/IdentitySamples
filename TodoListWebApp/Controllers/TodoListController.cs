@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Security.Claims;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using TodoListWebApp.Models;
@@ -16,7 +16,7 @@ namespace TodoListWebApp.Controllers
     {
         public async Task<ActionResult> Index()
         {
-            var client = await GetTodoListClient();
+            var client = await GetTodoListClient(this.User);
 
             // Get the todo list.
             var todoListRequest = new HttpRequestMessage(HttpMethod.Get, SiteConfiguration.TodoListWebApiRootUrl + "api/todolist");
@@ -40,7 +40,7 @@ namespace TodoListWebApp.Controllers
         {
             if (!string.IsNullOrWhiteSpace(model.Title))
             {
-                var client = await GetTodoListClient();
+                var client = await GetTodoListClient(this.User);
                 var newTodoItemRequest = new HttpRequestMessage(HttpMethod.Post, SiteConfiguration.TodoListWebApiRootUrl + "api/todolist");
                 newTodoItemRequest.Content = new JsonContent(model);
                 var newTodoItemResponse = await client.SendAsync(newTodoItemRequest);
@@ -49,13 +49,13 @@ namespace TodoListWebApp.Controllers
             return RedirectToAction("Index");
         }
 
-        public static async Task<HttpClient> GetTodoListClient()
+        public static async Task<HttpClient> GetTodoListClient(IPrincipal user)
         {
             // [SCENARIO] OAuth 2.0 Authorization Code Grant, Confidential Client
             // Get a token to authenticate against the Web API.
-            var authContext = new AuthenticationContext(StsConfiguration.Authority, StsConfiguration.CanValidateAuthority, TokenCacheFactory.GetTokenCacheForCurrentPrincipal());
+            var authContext = new AuthenticationContext(StsConfiguration.Authority, StsConfiguration.CanValidateAuthority, TokenCacheFactory.GetTokenCacheForPrincipal(user));
             var credential = new ClientCredential(SiteConfiguration.TodoListWebAppClientId, SiteConfiguration.TodoListWebAppClientSecret);
-            var userIdentifier = new UserIdentifier(ClaimsPrincipal.Current.GetUniqueIdentifier(), UserIdentifierType.UniqueId);
+            var userIdentifier = new UserIdentifier(user.GetUniqueIdentifier(), UserIdentifierType.UniqueId);
 
             // We can acquire the token silently here because we have redeemed the OpenID Connect authorization code at signin
             // for an access token and stored it in the token cache.

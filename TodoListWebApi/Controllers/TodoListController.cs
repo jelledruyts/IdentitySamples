@@ -5,7 +5,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web.Http;
 using TodoListWebApi.Models;
@@ -47,12 +46,12 @@ namespace TodoListWebApi.Controllers
         /// </summary>
         public IEnumerable<TodoItem> Get()
         {
-            // [NOTE] The ClaimsPrincipal.Current is automatically populated
+            // [NOTE] The User is automatically populated
             // by the Bearer Token middleware with the claims coming from the
             // authorization token.
             // When using application roles, these can be checked with the
-            // standard mechanisms, e.g. ClaimsPrincipal.Current.IsInRole("Contributor")
-            var userId = ClaimsPrincipal.Current.GetUniqueIdentifier();
+            // standard mechanisms, e.g. User.IsInRole("Contributor")
+            var userId = this.User.GetUniqueIdentifier();
             return database.Where(t => t.UserId == userId).OrderBy(t => t.CreatedTime).Select(t => new TodoItem { Id = t.Id, Title = t.Title, CategoryId = t.CategoryId });
         }
 
@@ -73,7 +72,7 @@ namespace TodoListWebApi.Controllers
             // Create a new category via the Taxonomy Web API if requested.
             if (!string.IsNullOrWhiteSpace(value.NewCategoryName))
             {
-                var client = await CategoryController.GetTaxonomyClient();
+                var client = await CategoryController.GetTaxonomyClient(this.User);
                 var newCategory = new Category { Name = value.NewCategoryName, IsPrivate = value.NewCategoryIsPrivate };
                 var newCategoryRequest = new HttpRequestMessage(HttpMethod.Post, SiteConfiguration.TaxonomyWebApiRootUrl + "api/category");
                 newCategoryRequest.Content = new JsonContent(newCategory);
@@ -84,7 +83,7 @@ namespace TodoListWebApi.Controllers
                 value.CategoryId = category.Id;
             }
 
-            var userId = ClaimsPrincipal.Current.GetUniqueIdentifier();
+            var userId = this.User.GetUniqueIdentifier();
             var data = new TodoItemData(value.Title, value.CategoryId, userId);
             database.Add(data);
             return Ok();

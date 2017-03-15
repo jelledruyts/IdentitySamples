@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Web.Http;
 using TodoListWebApi.Models;
@@ -19,7 +20,7 @@ namespace TodoListWebApi.Controllers
         /// </summary>
         public async Task<IEnumerable<Category>> Get()
         {
-            var client = await GetTaxonomyClient();
+            var client = await GetTaxonomyClient(this.User);
             var categoryListRequest = new HttpRequestMessage(HttpMethod.Get, SiteConfiguration.TaxonomyWebApiRootUrl + "api/category");
             var categoryListResponse = await client.SendAsync(categoryListRequest);
             categoryListResponse.EnsureSuccessStatusCode();
@@ -33,7 +34,7 @@ namespace TodoListWebApi.Controllers
         /// </summary>
         public async Task<IHttpActionResult> Post(Category value)
         {
-            var client = await GetTaxonomyClient();
+            var client = await GetTaxonomyClient(this.User);
             var newCategoryRequest = new HttpRequestMessage(HttpMethod.Post, SiteConfiguration.TaxonomyWebApiRootUrl + "api/category");
             newCategoryRequest.Content = new JsonContent(value);
             var newCategoryResponse = await client.SendAsync(newCategoryRequest);
@@ -43,13 +44,13 @@ namespace TodoListWebApi.Controllers
             return Ok(newCategory);
         }
 
-        internal static async Task<HttpClient> GetTaxonomyClient()
+        internal static async Task<HttpClient> GetTaxonomyClient(IPrincipal user)
         {
             // [SCENARIO] OAuth 2.0 On-Behalf-Of Grant
             // Get an On-Behalf-Of token to authenticate against the Taxonomy Web API.
-            var authContext = new AuthenticationContext(StsConfiguration.Authority, StsConfiguration.CanValidateAuthority, TokenCacheFactory.GetTokenCacheForCurrentPrincipal());
+            var authContext = new AuthenticationContext(StsConfiguration.Authority, StsConfiguration.CanValidateAuthority, TokenCacheFactory.GetTokenCacheForPrincipal(user));
             var credential = new ClientCredential(SiteConfiguration.TodoListWebApiClientId, SiteConfiguration.TodoListWebApiClientSecret);
-            var userIdentity = (ClaimsIdentity)ClaimsPrincipal.Current.Identity;
+            var userIdentity = (ClaimsIdentity)user.Identity;
             var bootstrapContext = userIdentity.BootstrapContext as System.IdentityModel.Tokens.BootstrapContext;
             var userAssertion = new UserAssertion(bootstrapContext.Token);
             var result = await authContext.AcquireTokenAsync(SiteConfiguration.TaxonomyWebApiResourceId, credential, userAssertion);

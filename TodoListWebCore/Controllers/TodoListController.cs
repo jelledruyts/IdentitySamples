@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Security.Claims;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using TodoListWebCore.Models;
 
@@ -57,7 +57,7 @@ namespace TodoListWebCore.Controllers
             return RedirectToAction("Index");
         }
 
-        public static async Task<HttpClient> GetTodoListClient(SiteConfiguration siteConfiguration, ClaimsPrincipal user)
+        public static async Task<HttpClient> GetTodoListClient(SiteConfiguration siteConfiguration, IPrincipal user)
         {
             // [SCENARIO] OAuth 2.0 Authorization Code Grant, Confidential Client
             // Get a token to authenticate against the Web API.

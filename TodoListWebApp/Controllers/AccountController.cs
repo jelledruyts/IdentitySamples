@@ -22,7 +22,7 @@ namespace TodoListWebApp.Controllers
             var relatedApplicationIdentities = new List<IdentityInfo>();
             try
             {
-                var todoListWebApiClient = await TodoListController.GetTodoListClient();
+                var todoListWebApiClient = await TodoListController.GetTodoListClient(this.User);
                 var todoListWebApiIdentityInfoRequest = new HttpRequestMessage(HttpMethod.Get, SiteConfiguration.TodoListWebApiRootUrl + "api/identity");
                 var todoListWebApiIdentityInfoResponse = await todoListWebApiClient.SendAsync(todoListWebApiIdentityInfoRequest);
                 todoListWebApiIdentityInfoResponse.EnsureSuccessStatusCode();
@@ -41,7 +41,7 @@ namespace TodoListWebApp.Controllers
             {
                 graphClient = new AadGraphClient(StsConfiguration.Authority, StsConfiguration.AadTenant, SiteConfiguration.TodoListWebAppClientId, SiteConfiguration.TodoListWebAppClientSecret);
             }
-            var identityInfo = await IdentityInfo.FromCurrent(SiteConfiguration.ApplicationName, relatedApplicationIdentities, graphClient);
+            var identityInfo = await IdentityInfo.FromPrincipal(this.User, SiteConfiguration.ApplicationName, relatedApplicationIdentities, graphClient);
 
             return View(new AccountIndexViewModel(identityInfo));
         }
@@ -52,7 +52,7 @@ namespace TodoListWebApp.Controllers
             if (model != null && !string.IsNullOrWhiteSpace(model.DisplayName))
             {
                 // Update identity information through the Todo List Web API.
-                var todoListWebApiClient = await TodoListController.GetTodoListClient();
+                var todoListWebApiClient = await TodoListController.GetTodoListClient(this.User);
                 var identityUpdateRequest = new HttpRequestMessage(HttpMethod.Post, SiteConfiguration.TodoListWebApiRootUrl + "api/identity");
                 identityUpdateRequest.Content = new JsonContent(model);
                 var todoListWebApiIdentityInfoResponse = await todoListWebApiClient.SendAsync(identityUpdateRequest);
@@ -87,7 +87,7 @@ namespace TodoListWebApp.Controllers
             else
             {
                 // [NOTE] Remove the token cache for this user and send an OpenID Connect sign-out request.
-                TokenCacheFactory.DeleteTokenCacheForCurrentPrincipal();
+                TokenCacheFactory.DeleteTokenCacheForPrincipal(this.User);
                 HttpContext.GetOwinContext().Authentication.SignOut(OpenIdConnectAuthenticationDefaults.AuthenticationType, CookieAuthenticationDefaults.AuthenticationType);
                 return new EmptyResult(); // The SignOut will take care of the response.
             }
