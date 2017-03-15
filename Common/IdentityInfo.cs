@@ -16,7 +16,6 @@ namespace Common
     {
         #region Constants
 
-        private static readonly string[] ClaimTypesToSkip = { "nonce", "at_hash", "c_hash" };
         private static readonly string[] GroupClaimTypes = { "groups", "http://schemas.microsoft.com/ws/2008/06/identity/claims/groups" };
         private static readonly string[] RoleClaimTypes = { "roles", "http://schemas.microsoft.com/ws/2008/06/identity/claims/role" };
         private static readonly DateTimeOffset UnixTimestampEpoch = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
@@ -130,7 +129,7 @@ namespace Common
                 AuthenticationType = identity.AuthenticationType,
                 GroupNames = (groups == null ? new string[0] : groups.Select(g => g.DisplayName).ToArray()),
                 RoleNames = identity.Claims.Where(claim => RoleClaimTypes.Any(roleClaimType => string.Equals(claim.Type, roleClaimType, StringComparison.OrdinalIgnoreCase))).Select(claim => claim.Value).ToArray(),
-                Claims = identity.Claims.Where(claim => !ClaimTypesToSkip.Any(claimTypeToSkip => string.Equals(claimTypeToSkip, claim.Type, StringComparison.OrdinalIgnoreCase))).Select(claim => new ClaimInfo { Issuer = claim.Issuer, Type = claim.Type, Value = claim.Value, Remark = GetRemark(claim, groups) }).ToArray(),
+                Claims = identity.Claims.Select(claim => new ClaimInfo { Issuer = claim.Issuer, Type = claim.Type, Value = claim.Value, Remark = GetRemark(claim, groups) }).ToArray(),
                 RelatedApplicationIdentities = relatedApplicationIdentities ?? new IdentityInfo[0]
             };
         }
@@ -151,13 +150,19 @@ namespace Common
         private static string GetRemark(Claim claim, IList<IGroup> groups)
         {
             // [NOTE] Certain claims can be interpreted to more meaningful information.
-            // See https://msdn.microsoft.com/en-us/library/azure/dn195587.aspx among others.
+            // See https://msdn.microsoft.com/en-us/library/azure/dn195587.aspx and
+            // https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-token-and-claims among others.
             switch (claim.Type.ToLowerInvariant())
             {
                 case "aud":
                     return "Audience URI of the targeted application, i.e. the intended recipient of the token";
                 case "iss":
                     return "Issued by Security Token Service";
+                case "idp":
+                    return "Identity Provider";
+                case "scp":
+                case "http://schemas.microsoft.com/identity/claims/scope":
+                    return "Scope, i.e. the impersonation permissions granted to the client application";
                 case "iat":
                     return GetTimestampDescription("Issued at", claim.Value, true);
                 case "nbf":
@@ -169,9 +174,25 @@ namespace Common
                 case "pwd_exp":
                     return GetTimestampDescription("Password expires", claim.Value, false);
                 case "appid":
-                    return "Application that is using the token to access a resource";
+                    return "Application id of the client that is using the token to access a resource";
                 case "appidacr":
                     return "Application Authentication Context Class Reference" + (claim.Value == "0" ? ": Public Client" : (claim.Value == "1" ? ": Confidential Client (Client ID + Secret)" : (claim.Value == "2" ? ": Confidential Client (X509 Certificate)" : null)));
+                case "auth_time":
+                    return GetTimestampDescription("Authentication time", claim.Value, true);
+                case "http://schemas.microsoft.com/ws/2008/06/identity/claims/authenticationinstant":
+                    return GetTimestampDescription("Authentication instant", claim.Value, true);
+                case "oid":
+                    return "Object identifier";
+                case "sub":
+                    return "Subject, i.e. the principal about which the token asserts information, such as the user of an application";
+                case "tid":
+                    return "Tenant identifier";
+                case "http://schemas.microsoft.com/claims/authnmethodsreferences":
+                case "amr":
+                    return "Authentication method";
+                case "http://schemas.microsoft.com/claims/authnclassreference":
+                case "acr":
+                    return "Authentication Context Class Reference" + (claim.Value == "0" ? ": End-user authentication did not meet the requirements of ISO/IEC 29115" : null);
             }
             if (groups != null && GroupClaimTypes.Any(groupClaimType => string.Equals(claim.Type, groupClaimType, StringComparison.OrdinalIgnoreCase)))
             {
