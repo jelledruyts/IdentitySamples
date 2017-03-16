@@ -67,6 +67,7 @@
   <ItemGroup>
     <Compile Include="AadGraphClient.cs" />
     <Compile Include="ClaimInfo.cs" />
+    <Compile Include="IdentityInfoFactory.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="IdentityInfo.cs" />
     <Compile Include="JsonContent.cs" />

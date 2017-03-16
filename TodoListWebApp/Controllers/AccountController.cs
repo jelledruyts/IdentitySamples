@@ -32,7 +32,7 @@ namespace TodoListWebApp.Controllers
             }
             catch (Exception exc)
             {
-                relatedApplicationIdentities.Add(IdentityInfo.FromException("Todo List Web API", exc));
+                relatedApplicationIdentities.Add(IdentityInfoFactory.FromException("Todo List Web API", exc));
             }
 
             // Gather identity information from the current application and aggregate it with the identity information from the Web API.
@@ -41,7 +41,7 @@ namespace TodoListWebApp.Controllers
             {
                 graphClient = new AadGraphClient(StsConfiguration.Authority, StsConfiguration.AadTenant, SiteConfiguration.TodoListWebAppClientId, SiteConfiguration.TodoListWebAppClientSecret);
             }
-            var identityInfo = await IdentityInfo.FromPrincipal(this.User, SiteConfiguration.ApplicationName, relatedApplicationIdentities, graphClient);
+            var identityInfo = await IdentityInfoFactory.FromPrincipal(this.User, SiteConfiguration.ApplicationName, relatedApplicationIdentities, graphClient);
 
             return View(new AccountIndexViewModel(identityInfo));
         }

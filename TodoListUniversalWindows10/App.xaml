@@ -4,5 +4,69 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:TodoListUniversalWindows10"
     RequestedTheme="Light">
+    <Application.Resources>
+        <local:IdentityInfoTemplateSelector x:Key="IdentityInfoTemplateSelector" />
+        <local:StringListConverter x:Key="StringListConverter" />
+        <DataTemplate x:Key="IdentityInfoTemplate">
+            <StackPanel Orientation="Vertical">
+                <TextBlock Text="{Binding Path=Application}" FontSize="24" FontWeight="Bold" />
+                <TextBlock Text="Identity" FontSize="18" FontWeight="Bold" />
+                <Grid Margin="15,5,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
 
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Is Authenticated" VerticalAlignment="Center" />
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Path=IsAuthenticated}" VerticalAlignment="Center" Margin="5,0,0,0" />
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Name" VerticalAlignment="Center" />
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Path=Name}" VerticalAlignment="Center" Margin="5,0,0,0" />
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Authentication Type" VerticalAlignment="Center" />
+                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Path=AuthenticationType}" VerticalAlignment="Center" Margin="5,0,0,0" />
+
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Application Roles" VerticalAlignment="Center" />
+                    <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Path=RoleNames, Converter={StaticResource StringListConverter}}" VerticalAlignment="Center" Margin="5,0,0,0" />
+
+                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Groups" VerticalAlignment="Center" />
+                    <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding Path=GroupNames, Converter={StaticResource StringListConverter}}" VerticalAlignment="Center" Margin="5,0,0,0" />
+                </Grid>
+
+                <TextBlock Text="Claims" FontSize="18" FontWeight="Bold" Margin="0,5,0,0" />
+                <ListView ItemsSource="{Binding Path=Claims}" Margin="10,5,0,0">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="0,0,0,5" ToolTipService.ToolTip="{Binding Path=Remark}">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Type" Foreground="Gray" VerticalAlignment="Center" />
+                                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Path=Type}" Foreground="Gray" VerticalAlignment="Center" Margin="5,0,0,0" />
+
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Value" VerticalAlignment="Center" />
+                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Path=Value}" VerticalAlignment="Center" Margin="5,0,0,0" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+
+                <TextBlock Text="Related Application Identities" FontSize="18" FontWeight="Bold" Margin="0,5,0,0" />
+                <ItemsControl ItemsSource="{Binding Path=RelatedApplicationIdentities}" ItemTemplateSelector="{StaticResource IdentityInfoTemplateSelector}" Margin="15,5,0,0" />
+            </StackPanel>
+        </DataTemplate>
+    </Application.Resources>
 </Application>

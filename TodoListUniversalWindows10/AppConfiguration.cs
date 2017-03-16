@@ -4,6 +4,7 @@
     {
         public const string TodoListWindows10ClientId = "";
         public const string TodoListWebApiResourceId = "http://identitysamples/todolistwebapi";
+        public const string TodoListWebApiRootUrl = "https://localhost:44307/";
 
         public const string StsRootUrl = "https://login.microsoftonline.com/";
         public const string StsPath = "tenant.onmicrosoft.com";

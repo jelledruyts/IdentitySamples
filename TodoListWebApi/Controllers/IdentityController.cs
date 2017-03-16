@@ -31,7 +31,7 @@ namespace TodoListWebApi.Controllers
             }
             catch (Exception exc)
             {
-                relatedApplicationIdentities.Add(IdentityInfo.FromException("Taxonomy Web API", exc));
+                relatedApplicationIdentities.Add(IdentityInfoFactory.FromException("Taxonomy Web API", exc));
             }
 
             // Aggregate the current identity information with the downstream identities.
@@ -40,7 +40,7 @@ namespace TodoListWebApi.Controllers
             {
                 graphClient = new AadGraphClient(StsConfiguration.Authority, StsConfiguration.AadTenant, SiteConfiguration.TodoListWebApiClientId, SiteConfiguration.TodoListWebApiClientSecret);
             }
-            return await IdentityInfo.FromPrincipal(this.User, "Todo List Web API", relatedApplicationIdentities, graphClient);
+            return await IdentityInfoFactory.FromPrincipal(this.User, "Todo List Web API", relatedApplicationIdentities, graphClient);
         }
 
         /// <summary>

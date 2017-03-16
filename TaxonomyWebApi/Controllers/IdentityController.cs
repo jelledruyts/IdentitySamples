@@ -27,7 +27,7 @@ namespace TaxonomyWebApi.Controllers
             {
                 graphClient = new AadGraphClient(StsConfiguration.Authority, StsConfiguration.AadTenant, this.siteConfiguration.TaxonomyWebApiClientId, this.siteConfiguration.TaxonomyWebApiClientSecret);
             }
-            return await IdentityInfo.FromPrincipal(this.User, "Taxonomy Web API", null, graphClient);
+            return await IdentityInfoFactory.FromPrincipal(this.User, "Taxonomy Web API", null, graphClient);
         }
     }
 }
