@@ -14,14 +14,16 @@ It is based on the [official Azure Active Directory samples repository](https://
 * Categories can be either _public_ (for all users) or _private_ (only for the user that created it) and are maintained in a separate _Taxonomy_ service (to show delegated on-behalf-of access from one service to another).
 * The Todo List service can be accessed via a number of client applications.
 
-```
-Client 1 --\
-Client 2 ---\
-...          > ---> Todo List Service ---> Taxonomy Service
-Client n ---/
-```
+## Setup
+
+To use these samples, run the "Setup.ps1" PowerShell script in the "Setup" folder. This script allows you to:
+* Create a client certificate (for the daemon service)
+* Register all applications in Azure Active Directory and/or AD FS (storing the registered Client ID's and other configuration details in an XML file)
+* Update the various configuration files in the solution with the values from the identity server (as stored in the XML file mentioned above)
 
 ## Implementation
+
+![Solution Overview](Documentation/IdentitySamples-SolutionOverview.png "Solution Overview")
 
 | Project | Purpose | Protocol | Technology | Library/API |
 |---------|---------|----------|------------|-------------|
@@ -36,10 +38,3 @@ Client n ---/
 | TodoListUniversalWindows10 | Windows Store application | OAuth 2.0 Authorization Code Grant, Public Client | Windows 10 Universal App | [WebAuthenticationCoreManager](https://docs.microsoft.com/en-us/uwp/api/Windows.Security.Authentication.Web.Core.WebAuthenticationCoreManager) |
 
 The implementation details of these scenarios are easily found in the code by searching for "[SCENARIO]". Other notable remarks can be found by searching for "[NOTE]".
-
-## Setup
-
-To use these samples, run the "Setup.ps1" PowerShell script in the "Setup" folder. This script allows you to:
-* Create a client certificate (for the daemon service)
-* Register all applications in Azure Active Directory and/or AD FS (storing the registered Client ID's and other configuration details in an XML file)
-* Update the various configuration files in the solution with the values from the identity server (as stored in the XML file mentioned above)
