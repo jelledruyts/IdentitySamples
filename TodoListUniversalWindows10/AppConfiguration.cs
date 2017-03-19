@@ -2,6 +2,7 @@
 {
     public static class AppConfiguration
     {
+        public const string ApplicationName = "Todo List (UWP)";
         public const string TodoListWindows10ClientId = "";
         public const string TodoListWebApiResourceId = "http://identitysamples/todolistwebapi";
         public const string TodoListWebApiRootUrl = "https://localhost:44307/";

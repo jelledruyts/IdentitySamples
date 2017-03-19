@@ -35,6 +35,8 @@
                         <div id="identity-panel-{{getHashCode(identityInfo.application)}}" class="panel-collapse collapse in">
                             <div class="panel-body">
                                 <dl class="dl-horizontal">
+                                    <dt>Is Source</dt>
+                                    <dd>{{identityInfo.source}}</dd>
                                     <dt>Is Authenticated</dt>
                                     <dd>{{identityInfo.isAuthenticated}}</dd>
                                     <dt>Name</dt>
@@ -86,7 +88,7 @@
                                 </a>
                             </h4>
                         </div>
-                        <div id="related-panel-{{getHashCode(identityInfo.application)}}" class="panel-collapse collapse">
+                        <div id="related-panel-{{getHashCode(identityInfo.application)}}" class="panel-collapse collapse in">
                             <div class="panel-body">
                                 <div ng-repeat="identityInfo in identityInfo.relatedApplicationIdentities" ng-include="'identityInfoTree'">
                                 </div>

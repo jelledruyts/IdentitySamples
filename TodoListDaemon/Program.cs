@@ -42,26 +42,31 @@ namespace TodoListDaemon
         private static async Task<IdentityInfo> GetIdentityInfoFromWebApiAsync()
         {
             // Get identity information from the Todo List Web API.
-            var todoListWebApiClient = await GetTodoListClient();
+            var token = await GetTokenAsync();
+            var todoListWebApiClient = GetTodoListClient(token.AccessToken);
             var todoListWebApiIdentityInfoRequest = new HttpRequestMessage(HttpMethod.Get, AppConfiguration.TodoListWebApiRootUrl + "api/identity");
             var todoListWebApiIdentityInfoResponse = await todoListWebApiClient.SendAsync(todoListWebApiIdentityInfoRequest);
             todoListWebApiIdentityInfoResponse.EnsureSuccessStatusCode();
             var todoListWebApiIdentityInfoResponseString = await todoListWebApiIdentityInfoResponse.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<IdentityInfo>(todoListWebApiIdentityInfoResponseString);
+            var todoListWebApiIdentityInfo = JsonConvert.DeserializeObject<IdentityInfo>(todoListWebApiIdentityInfoResponseString);
+            return await IdentityInfoFactory.FromJwt(token.IdToken, "ID Token", AppConfiguration.ApplicationName, new[] { todoListWebApiIdentityInfo });
         }
 
-        private static async Task<HttpClient> GetTodoListClient()
+        private static HttpClient GetTodoListClient(string accessToken)
+        {
+            var client = new HttpClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            return client;
+        }
+
+        private static async Task<AuthenticationResult> GetTokenAsync()
         {
             // [SCENARIO] OAuth 2.0 Client Credential Grant with Client Certificate
             // Get a token to authenticate against the Web API.
             var context = new AuthenticationContext(StsConfiguration.Authority, StsConfiguration.CanValidateAuthority);
             var certificate = GetCertificate(AppConfiguration.TodoListDaemonCertificateName);
             var clientCertificate = new ClientAssertionCertificate(AppConfiguration.TodoListDaemonClientId, certificate);
-            var result = await context.AcquireTokenAsync(AppConfiguration.TodoListWebApiResourceId, clientCertificate);
-
-            var client = new HttpClient();
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
-            return client;
+            return await context.AcquireTokenAsync(AppConfiguration.TodoListWebApiResourceId, clientCertificate);
         }
 
         private static X509Certificate2 GetCertificate(string certificateName)

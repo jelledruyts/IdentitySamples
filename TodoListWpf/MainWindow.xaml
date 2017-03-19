@@ -24,26 +24,30 @@
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
 
-                            <Label Grid.Row="0" Grid.Column="0" Content="Is Authenticated" FontWeight="Bold" HorizontalContentAlignment="Right" VerticalAlignment="Center" />
-                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Path=IsAuthenticated}" VerticalAlignment="Center" />
+                            <Label Grid.Row="0" Grid.Column="0" Content="Source" FontWeight="Bold" HorizontalContentAlignment="Right" VerticalAlignment="Center" />
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Path=Source}" VerticalAlignment="Center" />
 
-                            <Label Grid.Row="1" Grid.Column="0" Content="Name" FontWeight="Bold" HorizontalContentAlignment="Right" VerticalAlignment="Center" />
-                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Path=Name}" VerticalAlignment="Center" />
+                            <Label Grid.Row="1" Grid.Column="0" Content="Is Authenticated" FontWeight="Bold" HorizontalContentAlignment="Right" VerticalAlignment="Center" />
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Path=IsAuthenticated}" VerticalAlignment="Center" />
 
-                            <Label Grid.Row="2" Grid.Column="0" Content="Authentication Type" FontWeight="Bold" HorizontalContentAlignment="Right" VerticalAlignment="Center" />
-                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Path=AuthenticationType}" VerticalAlignment="Center" />
+                            <Label Grid.Row="2" Grid.Column="0" Content="Name" FontWeight="Bold" HorizontalContentAlignment="Right" VerticalAlignment="Center" />
+                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Path=Name}" VerticalAlignment="Center" />
 
-                            <Label Grid.Row="3" Grid.Column="0" Content="Application Roles" FontWeight="Bold" HorizontalContentAlignment="Right" VerticalAlignment="Center" />
-                            <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Path=RoleNames, Converter={StaticResource StringListConverter}}" VerticalAlignment="Center" />
+                            <Label Grid.Row="3" Grid.Column="0" Content="Authentication Type" FontWeight="Bold" HorizontalContentAlignment="Right" VerticalAlignment="Center" />
+                            <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Path=AuthenticationType}" VerticalAlignment="Center" />
 
-                            <Label Grid.Row="4" Grid.Column="0" Content="Groups" FontWeight="Bold" HorizontalContentAlignment="Right" VerticalAlignment="Center" />
-                            <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding Path=GroupNames, Converter={StaticResource StringListConverter}}" VerticalAlignment="Center" />
+                            <Label Grid.Row="4" Grid.Column="0" Content="Application Roles" FontWeight="Bold" HorizontalContentAlignment="Right" VerticalAlignment="Center" />
+                            <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding Path=RoleNames, Converter={StaticResource StringListConverter}}" VerticalAlignment="Center" />
+
+                            <Label Grid.Row="5" Grid.Column="0" Content="Groups" FontWeight="Bold" HorizontalContentAlignment="Right" VerticalAlignment="Center" />
+                            <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding Path=GroupNames, Converter={StaticResource StringListConverter}}" VerticalAlignment="Center" />
                         </Grid>
                     </Expander>
 
@@ -62,7 +66,7 @@
                         </DataGrid>
                     </Expander>
 
-                    <Expander Grid.Row="2" Header="Related Application Identities" IsExpanded="False" Margin="5" BorderBrush="Gray" BorderThickness="1">
+                    <Expander Grid.Row="2" Header="Related Application Identities" IsExpanded="True" Margin="5" BorderBrush="Gray" BorderThickness="1">
                         <Expander.Style>
                             <Style TargetType="Expander">
                                 <Style.Triggers>

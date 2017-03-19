@@ -34,7 +34,7 @@ angular.module('todoApp')
             $scope.loadingMessage = '';
 
             // [NOTE] Get the current user's claims from the user info profile, which is
-            // automatically populated by ADAL.JS.
+            // automatically populated by ADAL.JS from the ID token.
             var userClaims = [];
             for (var claimType in $scope.userInfo.profile) {
                 if ($scope.userInfo.profile.hasOwnProperty(claimType)) {
@@ -47,6 +47,7 @@ angular.module('todoApp')
             // Create a root identity info object for the current application, and embed the
             // retrieved Web API identity info into it.
             $scope.identityInfo = {
+                source: 'ID Token',
                 application: config.ApplicationName,
                 isAuthenticated: $scope.userInfo.isAuthenticated,
                 authenticationType: 'JWT',

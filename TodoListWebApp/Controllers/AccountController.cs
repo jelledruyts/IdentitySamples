@@ -41,7 +41,7 @@ namespace TodoListWebApp.Controllers
             {
                 graphClient = new AadGraphClient(StsConfiguration.Authority, StsConfiguration.AadTenant, SiteConfiguration.TodoListWebAppClientId, SiteConfiguration.TodoListWebAppClientSecret);
             }
-            var identityInfo = await IdentityInfoFactory.FromPrincipal(this.User, SiteConfiguration.ApplicationName, relatedApplicationIdentities, graphClient);
+            var identityInfo = await IdentityInfoFactory.FromPrincipal(this.User, "ID Token", SiteConfiguration.ApplicationName, relatedApplicationIdentities, graphClient);
 
             return View(new AccountIndexViewModel(identityInfo));
         }

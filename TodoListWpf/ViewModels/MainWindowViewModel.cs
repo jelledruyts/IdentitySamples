@@ -163,12 +163,14 @@ namespace TodoListWpf.ViewModels
         private static async Task<IdentityInfo> GetIdentityInfoAsync(bool forceLogin)
         {
             // Get identity information from the Todo List Web API.
-            var todoListWebApiClient = await GetTodoListClientAsync(forceLogin);
+            var token = await GetTokenAsync(forceLogin);
+            var todoListWebApiClient = GetTodoListClient(token.AccessToken);
             var todoListWebApiIdentityInfoRequest = new HttpRequestMessage(HttpMethod.Get, AppConfiguration.TodoListWebApiRootUrl + "api/identity");
             var todoListWebApiIdentityInfoResponse = await todoListWebApiClient.SendAsync(todoListWebApiIdentityInfoRequest);
             todoListWebApiIdentityInfoResponse.EnsureSuccessStatusCode();
             var todoListWebApiIdentityInfoResponseString = await todoListWebApiIdentityInfoResponse.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<IdentityInfo>(todoListWebApiIdentityInfoResponseString);
+            var todoListWebApiIdentityInfo = JsonConvert.DeserializeObject<IdentityInfo>(todoListWebApiIdentityInfoResponseString);
+            return await IdentityInfoFactory.FromJwt(token.IdToken, "ID Token", AppConfiguration.ApplicationName, new[] { todoListWebApiIdentityInfo });
         }
 
         private static async Task<Tuple<IList<TodoItem>, IList<Category>>> GetTodoListDataAsync()
@@ -203,15 +205,24 @@ namespace TodoListWpf.ViewModels
 
         private static async Task<HttpClient> GetTodoListClientAsync(bool forceLogin)
         {
+            var token = await GetTokenAsync(forceLogin);
+            return GetTodoListClient(token.AccessToken);
+        }
+
+        private static HttpClient GetTodoListClient(string accessToken)
+        {
+            var client = new HttpClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            return client;
+        }
+
+        private static async Task<AuthenticationResult> GetTokenAsync(bool forceLogin)
+        {
             // [SCENARIO] OAuth 2.0 Authorization Code Grant, Public Client
             // Get a token to authenticate against the Web API.
             var promptBehavior = forceLogin ? PromptBehavior.Always : PromptBehavior.Auto;
             var context = new AuthenticationContext(StsConfiguration.Authority, StsConfiguration.CanValidateAuthority);
-            var result = await context.AcquireTokenAsync(AppConfiguration.TodoListWebApiResourceId, AppConfiguration.TodoListWpfClientId, new Uri(AppConfiguration.TodoListWpfRedirectUrl), new PlatformParameters(promptBehavior));
-
-            var client = new HttpClient();
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
-            return client;
+            return await context.AcquireTokenAsync(AppConfiguration.TodoListWebApiResourceId, AppConfiguration.TodoListWpfClientId, new Uri(AppConfiguration.TodoListWpfRedirectUrl), new PlatformParameters(promptBehavior));
         }
 
         #endregion

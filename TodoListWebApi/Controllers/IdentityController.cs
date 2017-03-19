@@ -40,7 +40,7 @@ namespace TodoListWebApi.Controllers
             {
                 graphClient = new AadGraphClient(StsConfiguration.Authority, StsConfiguration.AadTenant, SiteConfiguration.TodoListWebApiClientId, SiteConfiguration.TodoListWebApiClientSecret);
             }
-            return await IdentityInfoFactory.FromPrincipal(this.User, "Todo List Web API", relatedApplicationIdentities, graphClient);
+            return await IdentityInfoFactory.FromPrincipal(this.User, "Access Token", "Todo List Web API", relatedApplicationIdentities, graphClient);
         }
 
         /// <summary>

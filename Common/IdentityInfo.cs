@@ -10,6 +10,11 @@ namespace Common
         #region Properties
 
         /// <summary>
+        /// The source of the identity information.
+        /// </summary>
+        public string Source { get; set; }
+
+        /// <summary>
         /// The application from which the identity is observed.
         /// </summary>
         public string Application { get; set; }

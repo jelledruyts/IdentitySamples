@@ -64,6 +64,7 @@ namespace Common
         private static void WriteToConsole(this IdentityInfo identity, int indentationLevel)
         {
             // Identity.
+            WritePropertyToConsole("Source\t\t", identity.Source, indentationLevel);
             WritePropertyToConsole("Application\t", identity.Application, indentationLevel);
             WritePropertyToConsole("Is Authenticated", identity.IsAuthenticated.ToString(), indentationLevel);
             WritePropertyToConsole("Name\t\t", identity.Name, indentationLevel);

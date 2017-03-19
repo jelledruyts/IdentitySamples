@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IdentityModel.Tokens;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
@@ -27,10 +28,10 @@ namespace Common
         /// <param name="principal">The principal.</param>
         /// <param name="application">The application from which the identity is observed.</param>
         /// <param name="relatedApplicationIdentities">The identities as seen from other applications related to the current application.</param>
-        /// <returns>Identity information about the current principal's identity</returns>
-        public static async Task<IdentityInfo> FromPrincipal(IPrincipal principal, string application, IList<IdentityInfo> relatedApplicationIdentities, AadGraphClient graphClient)
+        /// <returns>Identity information about the current principal's identity.</returns>
+        public static async Task<IdentityInfo> FromPrincipal(IPrincipal principal, string source, string application, IList<IdentityInfo> relatedApplicationIdentities, AadGraphClient graphClient)
         {
-            return await FromIdentity(principal.Identity as ClaimsIdentity, application, relatedApplicationIdentities, graphClient);
+            return await FromIdentity(principal.Identity as ClaimsIdentity, source, application, relatedApplicationIdentities, graphClient);
         }
 
         /// <summary>
@@ -41,14 +42,16 @@ namespace Common
         /// <param name="relatedApplicationIdentities">The identities as seen from other applications related to the current application.</param>
         /// <param name="graphClient">The graph client used to look up group claim details.</param>
         /// <returns>Identity information about the specified identity.</returns>
-        public static async Task<IdentityInfo> FromIdentity(ClaimsIdentity identity, string application, IList<IdentityInfo> relatedApplicationIdentities, AadGraphClient graphClient)
+        public static async Task<IdentityInfo> FromIdentity(ClaimsIdentity identity, string source, string application, IList<IdentityInfo> relatedApplicationIdentities, AadGraphClient graphClient)
         {
             if (identity == null)
             {
                 return new IdentityInfo
                 {
+                    Source = source,
                     Application = application,
-                    IsAuthenticated = false
+                    IsAuthenticated = false,
+                    RelatedApplicationIdentities = relatedApplicationIdentities
                 };
             }
 
@@ -66,6 +69,7 @@ namespace Common
             // [NOTE] Inspect the identity and its claims.
             return new IdentityInfo
             {
+                Source = source,
                 Application = application,
                 IsAuthenticated = identity.IsAuthenticated,
                 Name = identity.Name,
@@ -77,10 +81,52 @@ namespace Common
             };
         }
 
+        /// <summary>
+        /// Creates identity infromation about the claims represented in the specified JWT token.
+        /// </summary>
+        /// <param name="jwt">The JWT token.</param>
+        /// <param name="application">The application from which the identity is observed.</param>
+        /// <param name="relatedApplicationIdentities">The identities as seen from other applications related to the current application.</param>
+        /// <returns>Identity information about the specified JWT token.</returns>
+        public static async Task<IdentityInfo> FromJwt(string jwt, string source, string application, IList<IdentityInfo> relatedApplicationIdentities)
+        {
+            return await FromJwt(jwt, source, application, relatedApplicationIdentities, null);
+        }
+
+        /// <summary>
+        /// Creates identity infromation about the claims represented in the specified JWT token.
+        /// </summary>
+        /// <param name="jwt">The JWT token.</param>
+        /// <param name="application">The application from which the identity is observed.</param>
+        /// <param name="relatedApplicationIdentities">The identities as seen from other applications related to the current application.</param>
+        /// <param name="graphClient">The graph client used to look up group claim details.</param>
+        /// <returns>Identity information about the specified JWT token.</returns>
+        public static async Task<IdentityInfo> FromJwt(string jwt, string source, string application, IList<IdentityInfo> relatedApplicationIdentities, AadGraphClient graphClient)
+        {
+            try
+            {
+                var token = new JwtSecurityToken(jwt);
+                var identity = new ClaimsIdentity(token.Claims, "JWT", StsConfiguration.NameClaimType, StsConfiguration.RoleClaimType);
+                return await FromIdentity(identity, source, application, relatedApplicationIdentities, graphClient);
+            }
+            catch (Exception)
+            {
+                // The JWT string is not a valid token, return an unauthenticated identity.
+                return await FromIdentity(null, source, application, relatedApplicationIdentities, graphClient);
+            }
+        }
+
+        /// <summary>
+        /// Creates identity information based on an exception.
+        /// </summary>
+        /// <param name="application">The application from which the identity is observed.</param>
+        /// <param name="exc">The exception.</param>
+        /// <returns>Identity information representing the exception.</returns>
         public static IdentityInfo FromException(string application, Exception exc)
         {
             return new IdentityInfo
             {
+                Source = "Exception",
                 Application = application,
                 IsAuthenticated = false,
                 Claims = new[] {
