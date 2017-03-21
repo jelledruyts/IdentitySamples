@@ -94,7 +94,7 @@ function Get-ClientCertificate ($SubjectName)
         throw "The client certificate file ""$CertificateFileName"" was not found, please create it first and make sure it is stored in the setup script directory"
     }
     Write-Host "Reading client certificate from file ""$CertificateFileName"""
-    $SecurePfxPassword = Read-Host -AsSecureString -Prompt "Enter the password for the certificate PFX file:"
+    $SecurePfxPassword = Read-Host -AsSecureString -Prompt "Enter the password for the certificate PFX file"
     $Certificate = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2($CertificateFileName, $SecurePfxPassword)
     return $Certificate
 }
@@ -102,8 +102,9 @@ function Get-ClientCertificate ($SubjectName)
 function Initialize-ClientCertificate ($SubjectName)
 {
     Write-Host "Generating client certificate with subject name ""$SubjectName"""
+    $StartDate = (Get-Date).AddDays(-1)
     $EndDate = (Get-Date).AddYears(10)
-    $Certificate = New-SelfSignedCertificate -CertStoreLocation Cert:\CurrentUser\My -Subject $SubjectName -KeyExportPolicy Exportable -Provider "Microsoft Enhanced RSA and AES Cryptographic Provider" -NotAfter $EndDate
+    $Certificate = New-SelfSignedCertificate -CertStoreLocation Cert:\CurrentUser\My -Subject $SubjectName -KeyExportPolicy Exportable -Provider "Microsoft Enhanced RSA and AES Cryptographic Provider" -NotBefore $StartDate -NotAfter $EndDate
     $CertificateFileName = "$PSScriptRoot\$SubjectName.pfx"
     Write-Host "Exporting client certificate to file ""$CertificateFileName"""
     $SecurePfxPassword = Read-Host -AsSecureString -Prompt "Enter a password for the certificate PFX file:"
