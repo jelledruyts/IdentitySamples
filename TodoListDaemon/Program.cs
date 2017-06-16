@@ -2,6 +2,7 @@
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
@@ -19,12 +20,21 @@ namespace TodoListDaemon
             {
                 try
                 {
-                    Console.WriteLine("A - Show daemon identity information as seen by the Web API");
+                    Console.WriteLine("A - Show daemon identity information as seen by the Web API, using X509 Certificate Authentication");
+                    if (StsConfiguration.StsType == StsType.ActiveDirectoryFederationServices)
+                    {
+                        Console.WriteLine("B - Show daemon identity information as seen by the Web API, using Windows Integrated Authentication");
+                    }
                     Console.Write("Type your choice and press Enter: ");
                     var choice = Console.ReadLine();
                     if (string.Equals(choice, "A", StringComparison.InvariantCultureIgnoreCase))
                     {
-                        var identity = GetIdentityInfoFromWebApiAsync().Result;
+                        var identity = GetIdentityInfoFromWebApiAsync(false).Result;
+                        identity.WriteToConsole();
+                    }
+                    else if (string.Equals(choice, "B", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        var identity = GetIdentityInfoFromWebApiAsync(true).Result;
                         identity.WriteToConsole();
                     }
                     else
@@ -39,10 +49,10 @@ namespace TodoListDaemon
             }
         }
 
-        private static async Task<IdentityInfo> GetIdentityInfoFromWebApiAsync()
+        private static async Task<IdentityInfo> GetIdentityInfoFromWebApiAsync(bool useWindowsIntegratedAuthentication)
         {
             // Get identity information from the Todo List Web API.
-            var token = await GetTokenAsync();
+            var token = useWindowsIntegratedAuthentication ? await GetTokenUsingWiaAsync() : await GetTokenUsingClientCertificateAsync();
             var todoListWebApiClient = GetTodoListClient(token.AccessToken);
             var todoListWebApiIdentityInfoRequest = new HttpRequestMessage(HttpMethod.Get, AppConfiguration.TodoListWebApiRootUrl + "api/identity");
             var todoListWebApiIdentityInfoResponse = await todoListWebApiClient.SendAsync(todoListWebApiIdentityInfoRequest);
@@ -59,14 +69,40 @@ namespace TodoListDaemon
             return client;
         }
 
-        private static async Task<AuthenticationResult> GetTokenAsync()
+        private static async Task<TokenResult> GetTokenUsingClientCertificateAsync()
         {
             // [SCENARIO] OAuth 2.0 Client Credential Grant with Client Certificate
             // Get a token to authenticate against the Web API.
             var context = new AuthenticationContext(StsConfiguration.Authority, StsConfiguration.CanValidateAuthority);
             var certificate = GetCertificate(AppConfiguration.TodoListDaemonCertificateName);
             var clientCertificate = new ClientAssertionCertificate(AppConfiguration.TodoListDaemonClientId, certificate);
-            return await context.AcquireTokenAsync(AppConfiguration.TodoListWebApiResourceId, clientCertificate);
+            var result = await context.AcquireTokenAsync(AppConfiguration.TodoListWebApiResourceId, clientCertificate);
+            return new TokenResult(result.AccessToken, result.IdToken);
+        }
+
+        private static async Task<TokenResult> GetTokenUsingWiaAsync()
+        {
+            // [SCENARIO] OAuth 2.0 Client Credential Grant with Windows Integrated Authentication on AD FS
+            // Get a token to authenticate against the Web API.
+            // ADAL does not support this scenario so perform the client credentials token request manually.
+            using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
+            using (var client = new HttpClient(handler))
+            {
+                var parameters = new Dictionary<string, string>();
+                parameters.Add("resource", AppConfiguration.TodoListWebApiResourceId);
+                parameters.Add("client_id", AppConfiguration.TodoListDaemonClientId);
+                parameters.Add("grant_type", "client_credentials");
+                parameters.Add("use_windows_client_authentication", "true");
+                using (var content = new FormUrlEncodedContent(parameters))
+                using (var response = await client.PostAsync(StsConfiguration.Authority + "/oauth2/token", content))
+                {
+                    response.EnsureSuccessStatusCode();
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    var responseValues = JsonConvert.DeserializeObject<Dictionary<string, string>>(responseBody);
+                    var accessToken = responseValues["access_token"];
+                    return new TokenResult(accessToken, null);
+                }
+            }
         }
 
         private static X509Certificate2 GetCertificate(string certificateName)
@@ -85,6 +121,18 @@ namespace TodoListDaemon
             finally
             {
                 store.Close();
+            }
+        }
+
+        private class TokenResult
+        {
+            public string AccessToken { get; set; }
+            public string IdToken { get; set; }
+
+            public TokenResult(string accessToken, string idToken)
+            {
+                this.AccessToken = accessToken;
+                this.IdToken = idToken;
             }
         }
     }
