@@ -40,6 +40,8 @@
   </TodoListWebCoreClientSecret>
   <TodoListDaemonClientId>
   </TodoListDaemonClientId>
+  <TodoListDaemonClientSecret>
+  </TodoListDaemonClientSecret>
   <TodoListWebApiClientId>
   </TodoListWebApiClientId>
   <TodoListWebApiClientSecret>

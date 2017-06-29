@@ -77,9 +77,35 @@ function Initialize-AdfsApplicationGroup ($ConfigurationValues)
     # Register the Server application for the Daemon app.
     $DaemonClientDisplayName = "$ApplicationGroupIdentifier - Daemon Client"
     Write-Host "Creating ""$DaemonClientDisplayName"" in AD FS"
-    $DaemonClientCertificate = Get-ClientCertificate -SubjectName $ConfigurationValues["TodoListDaemonCertificateName"]
-    $DaemonClient = Add-AdfsServerApplication -ApplicationGroupIdentifier $ApplicationGroupIdentifier -Name $DaemonClientDisplayName -Identifier $(New-Guid) -JWTSigningCertificate @($DaemonClientCertificate) -PassThru
+    $DaemonClientAdUpn = Read-Host -Prompt "Optionally, enter a AD user principal name (service account) for the Daemon Client"
+    $DaemonClientCertificateSubjectName = $ConfigurationValues["TodoListDaemonCertificateName"]
+    $DaemonClientCertificateFileName = "$PSScriptRoot\$DaemonClientCertificateSubjectName.pfx"
+    if (Test-Path $DaemonClientCertificateFileName)
+    {
+        $DaemonClientCertificate = Get-ClientCertificate -CertificateFileName $DaemonClientCertificateFileName
+        if ($DaemonClientAdUpn)
+        {
+            $DaemonClient = Add-AdfsServerApplication -ApplicationGroupIdentifier $ApplicationGroupIdentifier -Name $DaemonClientDisplayName -Identifier $(New-Guid) -GenerateClientSecret -JWTSigningCertificate @($DaemonClientCertificate) -ADUserPrincipalName $DaemonClientAdUpn -PassThru
+        }
+        else
+        {
+            $DaemonClient = Add-AdfsServerApplication -ApplicationGroupIdentifier $ApplicationGroupIdentifier -Name $DaemonClientDisplayName -Identifier $(New-Guid) -GenerateClientSecret -JWTSigningCertificate @($DaemonClientCertificate) -PassThru
+        }
+    }
+    else
+    {
+        Write-Warning "The client certificate file ""$DaemonClientCertificateFileName"" was not found, the Daemon Client application will be registered without it"
+        if ($DaemonClientAdUpn)
+        {
+            $DaemonClient = Add-AdfsServerApplication -ApplicationGroupIdentifier $ApplicationGroupIdentifier -Name $DaemonClientDisplayName -Identifier $(New-Guid) -GenerateClientSecret -ADUserPrincipalName $DaemonClientAdUpn -PassThru
+        }
+        else
+        {
+            $DaemonClient = Add-AdfsServerApplication -ApplicationGroupIdentifier $ApplicationGroupIdentifier -Name $DaemonClientDisplayName -Identifier $(New-Guid) -GenerateClientSecret -PassThru
+        }
+    }
     $ConfigurationValues["TodoListDaemonClientId"] = $DaemonClient.Identifier
+    $ConfigurationValues["TodoListDaemonClientSecret"] = $DaemonClient.ClientSecret
 
     # Register the Web API application for the TodoList API.
     $TodoListApiDisplayName = "$ApplicationGroupIdentifier - TodoList API"

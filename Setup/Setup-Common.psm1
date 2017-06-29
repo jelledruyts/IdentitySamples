@@ -86,13 +86,8 @@ function Update-ConfigurationFiles ($SourceDir, $ConfigurationValues)
     $JsonConfigurationFiles | ForEach-Object { Update-ConfigurationFile -FileName $_ -ConfigurationValues $ConfigurationValues -Pattern '"?_KEY_"?: _VALUE_,?\r\n' -QuoteChar '"' -UnquotedConfigurationKeys $UnquotedConfigurationKeys }
 }
 
-function Get-ClientCertificate ($SubjectName)
+function Get-ClientCertificate ($CertificateFileName)
 {
-    $CertificateFileName = "$PSScriptRoot\$SubjectName.pfx"
-    if (!(Test-Path $CertificateFileName))
-    {
-        throw "The client certificate file ""$CertificateFileName"" was not found, please create it first and make sure it is stored in the setup script directory"
-    }
     Write-Host "Reading client certificate from file ""$CertificateFileName"""
     $SecurePfxPassword = Read-Host -AsSecureString -Prompt "Enter the password for the certificate PFX file"
     $Certificate = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2($CertificateFileName, $SecurePfxPassword)

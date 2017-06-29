@@ -273,6 +273,7 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
     
     # Register the Server application for the Daemon app.
     Write-Host "Creating ""$DaemonClientDisplayName"" in Azure AD"
+    $ConfigurationValues["TodoListDaemonClientSecret"] = New-ClientSecret
     $DaemonClientDefinition = @{
         "displayName" = $DaemonClientDisplayName
         "groupMembershipClaims" = "SecurityGroup" # Emit (security) group membership claims
@@ -301,21 +302,39 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
                 )
             }
         )
+        "passwordCredentials" = @( # Add a client secret
+            @{
+                "keyId" = New-Guid
+                "startDate" = $CredentialStartDate
+                "endDate" = $CredentialEndDate
+                "value" = $ConfigurationValues["TodoListDaemonClientSecret"]
+            }
+        )
     }
     $DaemonClient = New-AzureADApplication -TenantName $TenantName -Headers $Headers -ApplicationDefinition $DaemonClientDefinition
-    $DaemonClientCertificate = Get-ClientCertificate -SubjectName $ConfigurationValues["TodoListDaemonCertificateName"]
-    $DaemonClientCertificateData = [System.Convert]::ToBase64String($DaemonClientCertificate.GetRawCertData())
-    $DaemonClientKeyCredentials = @(
-        @{
-            "type" = "AsymmetricX509Cert" # X509 Certificate
-            "startDate" = $CredentialStartDate
-            "endDate" = $DaemonClientCertificate.NotAfter.AddDays(-1).ToString("u").Replace(" ", "T") # The credential end date must be before the certificate expiration date
-            "usage" = "Verify"
-            "value" = $DaemonClientCertificateData # Base64 encoded certificate bytes
+    $DaemonClientCertificateSubjectName = $ConfigurationValues["TodoListDaemonCertificateName"]
+    $DaemonClientCertificateFileName = "$PSScriptRoot\$DaemonClientCertificateSubjectName.pfx"
+    if (Test-Path $DaemonClientCertificateFileName)
+    {
+        $DaemonClientCertificate = Get-ClientCertificate -CertificateFileName $DaemonClientCertificateFileName
+        $DaemonClientCertificateData = [System.Convert]::ToBase64String($DaemonClientCertificate.GetRawCertData())
+        $DaemonClientKeyCredentials = @(
+            @{
+                "type" = "AsymmetricX509Cert" # X509 Certificate
+                "startDate" = $CredentialStartDate
+                "endDate" = $DaemonClientCertificate.NotAfter.AddDays(-1).ToString("u").Replace(" ", "T") # The credential end date must be before the certificate expiration date
+                "usage" = "Verify"
+                "value" = $DaemonClientCertificateData # Base64 encoded certificate bytes
 
-        }
-    )
-    $DaemonClientServicePrincipal = New-AzureADServicePrincipal -TenantName $TenantName -Headers $Headers -AppId $DaemonClient.appId -KeyCredentials $DaemonClientKeyCredentials
+            }
+        )
+        $DaemonClientServicePrincipal = New-AzureADServicePrincipal -TenantName $TenantName -Headers $Headers -AppId $DaemonClient.appId -KeyCredentials $DaemonClientKeyCredentials
+    }
+    else
+    {
+        Write-Warning "The client certificate file ""$DaemonClientCertificateFileName"" was not found, the Daemon Client application will be registered without it"
+        $DaemonClientServicePrincipal = New-AzureADServicePrincipal -TenantName $TenantName -Headers $Headers -AppId $DaemonClient.appId
+    }
     $ConfigurationValues["TodoListDaemonClientId"] = $DaemonClient.appId
 
     # Register the Server application for the TodoList Web App.

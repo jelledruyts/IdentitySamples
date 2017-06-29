@@ -20,21 +20,27 @@ namespace TodoListDaemon
             {
                 try
                 {
-                    Console.WriteLine("A - Show daemon identity information as seen by the Web API, using X509 Certificate Authentication");
+                    Console.WriteLine("A - Show daemon identity information as seen by the Web API, using a client secret");
+                    Console.WriteLine("B - Show daemon identity information as seen by the Web API, using a client certificate");
                     if (StsConfiguration.StsType == StsType.ActiveDirectoryFederationServices)
                     {
-                        Console.WriteLine("B - Show daemon identity information as seen by the Web API, using Windows Integrated Authentication");
+                        Console.WriteLine("C - Show daemon identity information as seen by the Web API, using Windows Integrated Authentication");
                     }
                     Console.Write("Type your choice and press Enter: ");
                     var choice = Console.ReadLine();
                     if (string.Equals(choice, "A", StringComparison.InvariantCultureIgnoreCase))
                     {
-                        var identity = GetIdentityInfoFromWebApiAsync(false).Result;
+                        var identity = GetIdentityInfoFromWebApiUsingClientSecretAsync().Result;
                         identity.WriteToConsole();
                     }
                     else if (string.Equals(choice, "B", StringComparison.InvariantCultureIgnoreCase))
                     {
-                        var identity = GetIdentityInfoFromWebApiAsync(true).Result;
+                        var identity = GetIdentityInfoFromWebApiUsingClientCertificateAsync().Result;
+                        identity.WriteToConsole();
+                    }
+                    else if (string.Equals(choice, "C", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        var identity = GetIdentityInfoFromWebApiUsingWiaAsync().Result;
                         identity.WriteToConsole();
                     }
                     else
@@ -49,10 +55,27 @@ namespace TodoListDaemon
             }
         }
 
-        private static async Task<IdentityInfo> GetIdentityInfoFromWebApiAsync(bool useWindowsIntegratedAuthentication)
+        private static async Task<IdentityInfo> GetIdentityInfoFromWebApiUsingClientSecretAsync()
+        {
+            var token = await GetTokenUsingClientSecretAsync();
+            return await GetIdentityInfoFromWebApiAsync(token);
+        }
+
+        private static async Task<IdentityInfo> GetIdentityInfoFromWebApiUsingClientCertificateAsync()
+        {
+            var token = await GetTokenUsingClientCertificateAsync();
+            return await GetIdentityInfoFromWebApiAsync(token);
+        }
+
+        private static async Task<IdentityInfo> GetIdentityInfoFromWebApiUsingWiaAsync()
+        {
+            var token = await GetTokenUsingWiaAsync();
+            return await GetIdentityInfoFromWebApiAsync(token);
+        }
+
+        private static async Task<IdentityInfo> GetIdentityInfoFromWebApiAsync(TokenResult token)
         {
             // Get identity information from the Todo List Web API.
-            var token = useWindowsIntegratedAuthentication ? await GetTokenUsingWiaAsync() : await GetTokenUsingClientCertificateAsync();
             var todoListWebApiClient = GetTodoListClient(token.AccessToken);
             var todoListWebApiIdentityInfoRequest = new HttpRequestMessage(HttpMethod.Get, AppConfiguration.TodoListWebApiRootUrl + "api/identity");
             var todoListWebApiIdentityInfoResponse = await todoListWebApiClient.SendAsync(todoListWebApiIdentityInfoRequest);
@@ -67,6 +90,16 @@ namespace TodoListDaemon
             var client = new HttpClient();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
             return client;
+        }
+
+        private static async Task<TokenResult> GetTokenUsingClientSecretAsync()
+        {
+            // [SCENARIO] OAuth 2.0 Client Credential Grant with Client Secret
+            // Get a token to authenticate against the Web API.
+            var context = new AuthenticationContext(StsConfiguration.Authority, StsConfiguration.CanValidateAuthority);
+            var clientCredential = new ClientCredential(AppConfiguration.TodoListDaemonClientId, AppConfiguration.TodoListDaemonClientSecret);
+            var result = await context.AcquireTokenAsync(AppConfiguration.TodoListWebApiResourceId, clientCredential);
+            return new TokenResult(result.AccessToken, result.IdToken);
         }
 
         private static async Task<TokenResult> GetTokenUsingClientCertificateAsync()

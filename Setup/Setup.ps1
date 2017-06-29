@@ -12,7 +12,7 @@ $ConfigurationValues = Get-ConfigurationValues -FileName $ConfigurationFilePath
 Write-Host ""
 Write-Host "A - Initialize daemon service client certificate"
 Write-Host "      This generates a self-signed client certificate on your machine and exports it to a PFX file."
-Write-Host "      This is required, otherwise the application registration will fail."
+Write-Host "      This is used when registering the daemon service, which can use it for authentication."
 Write-Host ""
 Write-Host "B - Register applications in AD FS"
 Write-Host "      NOTE: This must be executed on the AD FS server directly."
