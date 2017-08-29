@@ -16,7 +16,7 @@ function Get-GraphApiAccessToken ($Authority)
 function Send-GraphApiRequest ($TenantName, $Headers, $Path, $Method, $Body)
 {
     $Uri = "https://graph.windows.net/$($TenantName)/$($Path)?api-version=1.6"
-    $Result = Invoke-RestMethod -Uri $Uri -Headers $Headers -Body $BodyJson -Method $Method
+    $Result = Invoke-RestMethod -Uri $Uri -Headers $Headers -Body $Body -Method $Method
     return $Result
 }
 
@@ -69,6 +69,18 @@ function Add-AzureADRoleMember ($TenantName, $Headers, $RoleObjectId, $ServicePr
     $Result = Send-GraphApiPostRequest -TenantName $TenantName -Headers $Headers -Path $Path -Body $Body
 }
 
+function Get-AzureADRole ($TenantName, $Headers, $RoleTemplateId)
+{
+    $DirectoryRoles = Send-GraphApiRequest -TenantName $TenantName -Headers $Headers -Path "directoryRoles" -Method GET
+    $DirectoryRole = $DirectoryRoles.value | Where-Object { $_.roleTemplateId -eq $RoleTemplateId } | Select-Object -First 1
+    if (!$DirectoryRole)
+    {
+        # If the role does not exist yet, activate it first based on the requested role template.
+        $DirectoryRole = Send-GraphApiPostRequest -TenantName $TenantName -Headers $Headers -Path "directoryRoles" -Body @{ "roleTemplateId" = $RoleTemplateId }
+    }
+    return $DirectoryRole
+}
+
 function Grant-AzureADAdminConsent ($TenantName, $Headers, $ClientServicePrincipalObjectId, $ResourceServicePrincipalObjectId, $Scope)
 {
     $iOAuth2PermissionGrant = @{
@@ -95,7 +107,7 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
 {
     # Authenticate.
     $AzureADAuthority = "$AzureADInstance$TenantName"
-    Write-Warning "Authorizing access to Azure Active Directory. Please log in with an admin account of the directory!"
+    Write-Warning "Authorizing access to Azure Active Directory. Please log in with an admin account of the directory itself (not an external account)!"
     $GraphApiToken = Get-GraphApiAccessToken -Authority $AzureADAuthority
     $Headers = @{
         "Content-Type" = "application/json"
@@ -132,10 +144,9 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
         Remove-AzureADApplication -TenantName $TenantName -Headers $Headers -ObjectId $_.objectId
     }
 
-    # Look up the "Directory Readers" and "Directory Writers" roles in the directory.
-    $DirectoryRoles = Send-GraphApiRequest -TenantName $TenantName -Headers $Headers -Path "directoryRoles" -Method GET
-    $DirectoryReaderRole = $DirectoryRoles.value | Where-Object { $_.roleTemplateId -eq "88d8e3e3-8f55-4a1e-953a-9b9898b8876b" } | Select-Object -First 1
-    $DirectoryWriterRole = $DirectoryRoles.value | Where-Object { $_.roleTemplateId -eq "9360feb5-f418-4baa-8175-e2a00bac4301" } | Select-Object -First 1
+    # Activate and retrieve the "Directory Readers" and "Directory Writers" roles in the directory.
+    $DirectoryReaderRole = Get-AzureADRole -TenantName $TenantName -Headers $Headers -RoleTemplateId "88d8e3e3-8f55-4a1e-953a-9b9898b8876b"
+    $DirectoryWriterRole = Get-AzureADRole -TenantName $TenantName -Headers $Headers -RoleTemplateId "9360feb5-f418-4baa-8175-e2a00bac4301"
 
     # Register the Server application for the Taxonomy API.
     Write-Host "Creating ""$TaxonomyApiDisplayName"" in Azure AD"
@@ -392,10 +403,14 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
     # Register the Server application for the TodoList Web Core.
     Write-Host "Creating ""$WebCoreClientDisplayName"" in Azure AD"
     $ConfigurationValues["TodoListWebCoreClientSecret"] = New-ClientSecret
+	# The ASP.NET Core middleware listens for sign ins on the "/signin-oidc" endpoint.
+    $WebCoreClientRedirectUri = $ConfigurationValues["TodoListWebCoreRootUrl"]
+    $WebCoreClientRedirectUri = $WebCoreClientRedirectUri.TrimEnd('/')
+    $WebCoreClientRedirectUri = "$WebCoreClientRedirectUri/signin-oidc"
     $WebCoreClientDefinition = @{
         "displayName" = $WebCoreClientDisplayName
         "groupMembershipClaims" = "SecurityGroup" # Emit (security) group membership claims
-        "replyUrls" = @($ConfigurationValues["TodoListWebCoreRootUrl"])
+        "replyUrls" = @($WebCoreClientRedirectUri)
         "identifierUris" = @($ConfigurationValues["TodoListWebCoreResourceId"])
         "requiredResourceAccess" = @( # Define access to other applications
             @{

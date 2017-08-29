@@ -1,3 +1,5 @@
+$ErrorActionPreference = "Stop" # Break on errors
+
 # Import helper functions.
 Import-Module -Name $PSScriptRoot\Setup-Common -Force
 Import-Module -Name $PSScriptRoot\Setup-ADFS -Force
