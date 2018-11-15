@@ -8,6 +8,8 @@
   <TodoListWebCoreRootUrl>https://localhost:44309/</TodoListWebCoreRootUrl>
   <TodoListWebCoreResourceId>http://identitysamples/todolistwebcore</TodoListWebCoreResourceId>
   <TodoListWebSpaRootUrl>https://localhost:44310/</TodoListWebSpaRootUrl>
+  <TodoListWebFormsRootUrl>https://localhost:44311/</TodoListWebFormsRootUrl>
+  <TodoListWebFormsResourceId>http://identitysamples/todolistwebforms</TodoListWebFormsResourceId>
   <TodoListDaemonResourceId>http://identitysamples/todolistdaemon</TodoListDaemonResourceId>
   <TodoListDaemonCertificateName>TodoListDaemon</TodoListDaemonCertificateName>
   <TodoListWpfRedirectUrl>wpf://todolistwpf-redirect-uri</TodoListWpfRedirectUrl>
@@ -38,6 +40,10 @@
   </TodoListWebCoreClientId>
   <TodoListWebCoreClientSecret>
   </TodoListWebCoreClientSecret>
+  <TodoListWebFormsClientId>
+  </TodoListWebFormsClientId>
+  <TodoListWebFormsClientSecret>
+  </TodoListWebFormsClientSecret>
   <TodoListDaemonClientId>
   </TodoListDaemonClientId>
   <TodoListDaemonClientSecret>

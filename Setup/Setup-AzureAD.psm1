@@ -17,6 +17,7 @@ function Send-GraphApiRequest ($TenantName, $Headers, $Path, $Method, $Body)
 {
     $Uri = "https://graph.windows.net/$($TenantName)/$($Path)?api-version=1.6"
     $Result = Invoke-RestMethod -Uri $Uri -Headers $Headers -Body $Body -Method $Method
+	Start-Sleep -Seconds 5
     return $Result
 }
 
@@ -131,11 +132,12 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
     $WebSpaClientDisplayName = "TodoList Web SPA Client"
     $WebAppClientDisplayName = "TodoList Web App Client"
     $WebCoreClientDisplayName = "TodoList Web Core Client"
+    $WebFormsClientDisplayName = "TodoList WebForms Client"
     $WpfClientDisplayName = "TodoList WPF Client"
     $ConsoleClientDisplayName = "TodoList Console Client"
     $Windows10ClientDisplayName = "TodoList Windows 10 Client"
     $DaemonClientDisplayName = "TodoList Daemon Client"
-    $ApplicationDisplayNames = @($TaxonomyApiDisplayName, $TodoListApiDisplayName, $WebSpaClientDisplayName, $WebAppClientDisplayName, $WebCoreClientDisplayName, $WpfClientDisplayName, $ConsoleClientDisplayName, $Windows10ClientDisplayName, $DaemonClientDisplayName)
+    $ApplicationDisplayNames = @($TaxonomyApiDisplayName, $TodoListApiDisplayName, $WebSpaClientDisplayName, $WebAppClientDisplayName, $WebCoreClientDisplayName, $WebFormsClientDisplayName, $WpfClientDisplayName, $ConsoleClientDisplayName, $Windows10ClientDisplayName, $DaemonClientDisplayName)
 
     # Ensure we start from scratch.
     $ExistingApplications = Get-AzureADApplications -TenantName $TenantName -Headers $Headers
@@ -147,6 +149,9 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
     # Activate and retrieve the "Directory Readers" and "Directory Writers" roles in the directory.
     $DirectoryReaderRole = Get-AzureADRole -TenantName $TenantName -Headers $Headers -RoleTemplateId "88d8e3e3-8f55-4a1e-953a-9b9898b8876b"
     $DirectoryWriterRole = Get-AzureADRole -TenantName $TenantName -Headers $Headers -RoleTemplateId "9360feb5-f418-4baa-8175-e2a00bac4301"
+
+	# Wait a bit after deleting the applications before registering them again.
+	Start-Sleep -Seconds 5
 
     # Register the Server application for the Taxonomy API.
     Write-Host "Creating ""$TaxonomyApiDisplayName"" in Azure AD"
@@ -455,6 +460,58 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
     # Add the service principal to the "Directory Readers" role (which is done automatically when an admin consents to the application when it needs directory read permissions).
     Add-AzureADRoleMember -TenantName $TenantName -Headers $Headers -RoleObjectId $DirectoryReaderRole.objectId -ServicePrincipalObjectId $WebCoreClientServicePrincipal.objectId
     $ConfigurationValues["TodoListWebCoreClientId"] = $WebCoreClient.appId
+
+    # Register the Server application for the TodoList WebForms app.
+    Write-Host "Creating ""$WebFormsClientDisplayName"" in Azure AD"
+    $ConfigurationValues["TodoListWebFormsClientSecret"] = New-ClientSecret
+    $WebFormsClientDefinition = @{
+        "displayName" = $WebFormsClientDisplayName
+        "groupMembershipClaims" = "SecurityGroup" # Emit (security) group membership claims
+        "replyUrls" = @($ConfigurationValues["TodoListWebFormsRootUrl"])
+        "identifierUris" = @($ConfigurationValues["TodoListWebFormsResourceId"])
+        "requiredResourceAccess" = @( # Define access to other applications
+            @{
+                "resourceAppId" = "00000002-0000-0000-c000-000000000000" # Declare access to Azure Active Directory
+                "resourceAccess" = @(
+                    @{
+                        "id" = "5778995a-e1bf-45b8-affa-663a9f3f4d04" # "Directory.Read": Read directory data
+                        "type" = "Role" # Application Permission
+                    },
+                    @{
+                        "id" = "311a71cc-e848-46a1-bdf8-97ff7156d8e6" # "UserProfile.Read": Sign in and read user profile
+                        "type" = "Scope" # Delegated (User) Permission
+                    }
+                )
+            },
+            @{
+                "resourceAppId" = $TodoListApi.appId # Declare access to the TodoList API
+                "resourceAccess" = @(
+                    @{
+                        "id" = $TodoListApiTodoReadPermissionId # The ID for the "Todo.Read" access permission
+                        "type" = "Scope" # Delegated (User) Permission
+                    },
+                    @{
+                        "id" = $TodoListApiTodoWritePermissionId # The ID for the "Todo.Write" access permission
+                        "type" = "Scope" # Delegated (User) Permission
+                    }
+                )
+            }
+        )
+        "passwordCredentials" = @( # Add a client secret
+            @{
+                "keyId" = New-Guid
+                "startDate" = $CredentialStartDate
+                "endDate" = $CredentialEndDate
+                "value" = $ConfigurationValues["TodoListWebFormsClientSecret"]
+            }
+        )
+    }
+    $WebFormsClient = New-AzureADApplication -TenantName $TenantName -Headers $Headers -ApplicationDefinition $WebFormsClientDefinition
+    # Create the service principal representing the application instance in the directory.
+    $WebFormsClientServicePrincipal = New-AzureADServicePrincipal -TenantName $TenantName -Headers $Headers -AppId $WebFormsClient.appId
+    # Add the service principal to the "Directory Readers" role (which is done automatically when an admin consents to the application when it needs directory read permissions).
+    Add-AzureADRoleMember -TenantName $TenantName -Headers $Headers -RoleObjectId $DirectoryReaderRole.objectId -ServicePrincipalObjectId $WebFormsClientServicePrincipal.objectId
+    $ConfigurationValues["TodoListWebFormsClientId"] = $WebFormsClient.appId
 
     # Register the Native application for the Web SPA app.
     Write-Host "Creating ""$WebSpaClientDisplayName"" in Azure AD"

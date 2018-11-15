@@ -59,6 +59,7 @@ function Update-ConfigurationFiles ($SourceDir, $ConfigurationValues)
     $XmlConfigurationFiles = @(
         "$SourceDir\TodoListWebApi\Web.config"
         "$SourceDir\TodoListWebApp\Web.config"
+        "$SourceDir\TodoListWebForms\Web.config"
         "$SourceDir\TodoListConsole\App.config"
         "$SourceDir\TodoListDaemon\App.config"
         "$SourceDir\TodoListWpf\App.config"

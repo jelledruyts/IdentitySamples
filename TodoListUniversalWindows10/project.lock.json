@@ -1,7 +1,7 @@
 {
-  "version": 2,
+  "version": 3,
   "targets": {
-    "UAP,Version=v10.0": {
+    "UAP,Version=v10.0.10586": {
       "Microsoft.CSharp/4.0.1": {
         "type": "package",
         "dependencies": {
@@ -2213,7 +2213,7 @@
         }
       }
     },
-    "UAP,Version=v10.0/win10-arm": {
+    "UAP,Version=v10.0.10586/win10-arm": {
       "Microsoft.CSharp/4.0.1": {
         "type": "package",
         "dependencies": {
@@ -4508,7 +4508,7 @@
         }
       }
     },
-    "UAP,Version=v10.0/win10-arm-aot": {
+    "UAP,Version=v10.0.10586/win10-arm-aot": {
       "Microsoft.CSharp/4.0.1": {
         "type": "package",
         "dependencies": {
@@ -5129,9 +5129,6 @@
       },
       "runtime.win10-arm-aot.runtime.native.System.IO.Compression/4.0.1": {
         "type": "package",
-        "compile": {
-          "runtimes/win10-arm-aot/lib/netcore50/_._": {}
-        },
         "runtime": {
           "runtimes/win10-arm-aot/lib/netcore50/clrcompression.dll": {}
         }
@@ -6842,7 +6839,7 @@
         }
       }
     },
-    "UAP,Version=v10.0/win10-x64": {
+    "UAP,Version=v10.0.10586/win10-x64": {
       "Microsoft.CSharp/4.0.1": {
         "type": "package",
         "dependencies": {
@@ -9146,7 +9143,7 @@
         }
       }
     },
-    "UAP,Version=v10.0/win10-x64-aot": {
+    "UAP,Version=v10.0.10586/win10-x64-aot": {
       "Microsoft.CSharp/4.0.1": {
         "type": "package",
         "dependencies": {
@@ -9770,9 +9767,6 @@
       },
       "runtime.win10-x64-aot.runtime.native.System.IO.Compression/4.0.1": {
         "type": "package",
-        "compile": {
-          "runtimes/win10-x64-aot/lib/netcore50/_._": {}
-        },
         "runtime": {
           "runtimes/win10-x64-aot/lib/netcore50/clrcompression.dll": {}
         }
@@ -11489,7 +11483,7 @@
         }
       }
     },
-    "UAP,Version=v10.0/win10-x86": {
+    "UAP,Version=v10.0.10586/win10-x86": {
       "Microsoft.CSharp/4.0.1": {
         "type": "package",
         "dependencies": {
@@ -13793,7 +13787,7 @@
         }
       }
     },
-    "UAP,Version=v10.0/win10-x86-aot": {
+    "UAP,Version=v10.0.10586/win10-x86-aot": {
       "Microsoft.CSharp/4.0.1": {
         "type": "package",
         "dependencies": {
@@ -14417,9 +14411,6 @@
       },
       "runtime.win10-x86-aot.runtime.native.System.IO.Compression/4.0.1": {
         "type": "package",
-        "compile": {
-          "runtimes/win10-x86-aot/lib/netcore50/_._": {}
-        },
         "runtime": {
           "runtimes/win10-x86-aot/lib/netcore50/clrcompression.dll": {}
         }
@@ -16196,10 +16187,11 @@
       ]
     },
     "Microsoft.Net.Native.Compiler/1.6.0": {
-      "sha512": "ZWKiTdHteE3oSVoD6y2wb2k//Om2M5oMx8qIHXUbYdCCXvGL8isMnlwfIKmeft3L57imGDwd8PknuE588I4KeA==",
+      "sha512": "iN2k+MgAjqCQl9tCGmXMOWfxVvgWnyGYJ9C3X94cy0oVxzb4/VveIl8NG52EOlrEC3xsCB+QawArOw4qnBTY7A==",
       "type": "package",
       "path": "microsoft.net.native.compiler/1.6.0",
       "files": [
+        ".signature.p7s",
         "build/Microsoft.Net.Native.Compiler.props",
         "build/Microsoft.Net.Native.Compiler.targets",
         "microsoft.net.native.compiler.1.6.0.nupkg.sha512",
@@ -17091,10 +17083,11 @@
       ]
     },
     "Microsoft.Net.Native.SharedLibrary-arm/1.6.0": {
-      "sha512": "6tms4tVQoedKirFMs8q6qCLESDW3uAmFLWwUOB4lKDGtN+MHktTvA+VomsOWYtI//ByH1VSCIBvHVIqiNY8HXQ==",
+      "sha512": "84RqCsBKlrMyaZ1H7gkCjj5iREKPPITkJ9P1WcqnmvZuwKUmYapyHmz9NmbpLJ2kmoZL4HLiu2Rd0aL19+l3aA==",
       "type": "package",
       "path": "microsoft.net.native.sharedlibrary-arm/1.6.0",
       "files": [
+        ".signature.p7s",
         "build/Microsoft.Net.Native.SharedLibrary-arm.props",
         "build/Microsoft.Net.Native.SharedLibrary-arm.targets",
         "microsoft.net.native.sharedlibrary-arm.1.6.0.nupkg.sha512",
@@ -17491,10 +17484,11 @@
       ]
     },
     "Microsoft.Net.Native.SharedLibrary-x64/1.6.0": {
-      "sha512": "pLNmswGR+pzjLOgq+0oABz3e2C5XjSmTo81MFPSN9CeKyYiMb2eybU1fJRjyk86XFMfENK26gGUSVMhAo4zH/g==",
+      "sha512": "wbhN1ujyz8pDZyf8KakbS4ASzEjIGGwg8Rbt2FhDngLndY+b16g7JO/dIR8DF0NTccuG8TBiX3jcaIz5/F3llg==",
       "type": "package",
       "path": "microsoft.net.native.sharedlibrary-x64/1.6.0",
       "files": [
+        ".signature.p7s",
         "build/Microsoft.Net.Native.SharedLibrary-x64.props",
         "build/Microsoft.Net.Native.SharedLibrary-x64.targets",
         "microsoft.net.native.sharedlibrary-x64.1.6.0.nupkg.sha512",
@@ -17891,10 +17885,11 @@
       ]
     },
     "Microsoft.Net.Native.SharedLibrary-x86/1.6.0": {
-      "sha512": "AC1O3na4oqgWdvjoMjVPvt2vCO9VESTkArknbTlep5NWVRdMU2nay4XHYWBleOhweE2kw52kJHv1BGN0dcXjhQ==",
+      "sha512": "A3x8kMR+I4ZPXHwZtLroIeEhIBdGZF4HGPXT1N74J0p0u+RuhZOG1G3V/hMRLhfUkc762/ddBbBp5rXv6Q1G8Q==",
       "type": "package",
       "path": "microsoft.net.native.sharedlibrary-x86/1.6.0",
       "files": [
+        ".signature.p7s",
         "build/Microsoft.Net.Native.SharedLibrary-x86.props",
         "build/Microsoft.Net.Native.SharedLibrary-x86.targets",
         "microsoft.net.native.sharedlibrary-x86.1.6.0.nupkg.sha512",
@@ -18314,10 +18309,11 @@
       ]
     },
     "Microsoft.NETCore.Platforms/1.0.2": {
-      "sha512": "fRHBvQs9Z/ZSUAqaSotK1UPol/lwybTgdeTXR4eVw3rVDgzUnWGTUsK0A418oR7NrimNL1TQu/IM0RDa26s0qg==",
+      "sha512": "Z6nHORZtHe6t8rgnqnLKcrTp5CRB2GK46CDbMhhrnc1HHiuhIrDqKDqjJ/fgtM/f26FYk8Y8pKLTB6rzAeGNZA==",
       "type": "package",
       "path": "microsoft.netcore.platforms/1.0.2",
       "files": [
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/netstandard1.0/_._",
@@ -18434,10 +18430,11 @@
       ]
     },
     "Microsoft.NETCore.UniversalWindowsPlatform/5.3.1": {
-      "sha512": "pYCI0GC3pt29yFzhboHYnWmTIjaJ2K/L/aPNOHshrM1yQojxIp8cYdcDDd27r4GCSrSnkELVJ/x38OF06jqdmQ==",
+      "sha512": "w7JtInX2wqNViI+agVkwxsWIBTBjeUKkk3PkBPrv+hU1/t75y/sUdJt7g8IbjbTugPZFL0cV+sqgqUzz8R2pAA==",
       "type": "package",
       "path": "microsoft.netcore.universalwindowsplatform/5.3.1",
       "files": [
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "microsoft.netcore.universalwindowsplatform.5.3.1.nupkg.sha512",
@@ -21852,10 +21849,11 @@
       ]
     },
     "System.Private.ServiceModel/4.1.0": {
-      "sha512": "/QviVqIgta03ms7IDFALHCJOQCANZ1lILobf/OoLzdphHN40M3r6zqso2NsKvvSV7rJus+QLLWS/q33XGIybrQ==",
+      "sha512": "wYCHHnfDjUOJrzmNZkHxjZSkJKEvWIgEmTDkr2P9405g9BT8Qj9/sW8eR2Tf0OZPV2zRL11AuQJCCQzoRwBugA==",
       "type": "package",
       "path": "system.private.servicemodel/4.1.0",
       "files": [
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "ref/netstandard/_._",
@@ -23324,10 +23322,11 @@
       ]
     },
     "System.ServiceModel.Duplex/4.0.1": {
-      "sha512": "4I6WSQP4BiT3yG5NetAyAb626e2HlsgSzkiiqGtf4LxGpO3uFQ4eGSXsgVRnxJoDYcnDCH7q215eH/jZBMmx+w==",
+      "sha512": "BOP98l5/JVIpbiZGdV/uiuktit2hyyYwexUw5Oia9qj3p3v9kS73P4wMjTzB9DLfYxp6m/SOtIW1UEyoEuZxcg==",
       "type": "package",
       "path": "system.servicemodel.duplex/4.0.1",
       "files": [
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/net45/_._",
@@ -23365,10 +23364,11 @@
       ]
     },
     "System.ServiceModel.Http/4.1.0": {
-      "sha512": "sCIV+wrA4Antjnk0+fk6rxpzQkd2bReN4UTipGv5iyPNApVv/KtAfeDMg+YIajJ7VkQD60uVBTQmy3LZrRnNOw==",
+      "sha512": "6Hq3HKaBGxT3jy4kfUvkouweY2b92lFwd4viu5fKvPEWRI7aTFwB0qiJh8XvhPcPm/znRkpj+DegF64yjM7BBA==",
       "type": "package",
       "path": "system.servicemodel.http/4.1.0",
       "files": [
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/MonoAndroid10/_._",
@@ -23444,10 +23444,11 @@
       ]
     },
     "System.ServiceModel.NetTcp/4.1.0": {
-      "sha512": "n+Ir2B9SAd5XwAaXPIpLQsbaDcscSsyJH0ODpm5tpK8xXxmLhiPct5kujzeAiAhB37lVSetrSINdFb1Llg2ngg==",
+      "sha512": "LQs6cgd+6K7VOx+km0aTUiYzXu1PQvxZFz53aePBKXks/6ehvuGNXcre0wr6kaMHjcVbwisbVH5BKi/K+0lsiw==",
       "type": "package",
       "path": "system.servicemodel.nettcp/4.1.0",
       "files": [
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/net45/_._",
@@ -23498,10 +23499,11 @@
       ]
     },
     "System.ServiceModel.Primitives/4.1.0": {
-      "sha512": "Kd65HOn/5pL9xtCUkSL8xVqpqBUYy9tsfo0qe/MTTzApY8WQ+6i4I2ts++M+m4vbOanCoEsjjUj26P6C6ilQjQ==",
+      "sha512": "6DhBxWJT8GSpB2vjlS8APGx05R57Pj4kUKPiZcw7sRGSr9ckehjmzu8sNEmWNsUBCz9LJseG9IRN8RBZZT+grA==",
       "type": "package",
       "path": "system.servicemodel.primitives/4.1.0",
       "files": [
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/MonoAndroid10/_._",
@@ -23577,10 +23579,11 @@
       ]
     },
     "System.ServiceModel.Security/4.0.1": {
-      "sha512": "82pkDb6LMq/NHi+DVHZ7zKHMMJ7mR6rVl9TpH+p8zJhZrVYJez9vTbdMsxQhbNOngEkJKzZFveNYpaRv/3RMsg==",
+      "sha512": "fWGD0tqfGkUHY+oIqhzY9BwQVHwUgJL2ZXEZg7bzDNcAxo1bOWfo6Dk4Y9n464GMraLmmLyKggjhARZ9K9wCMg==",
       "type": "package",
       "path": "system.servicemodel.security/4.0.1",
       "files": [
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/net45/_._",
@@ -24429,7 +24432,7 @@
       "Microsoft.NETCore.UniversalWindowsPlatform >= 5.3.1",
       "Newtonsoft.Json >= 9.0.1"
     ],
-    "UAP,Version=v10.0": []
+    "UAP,Version=v10.0.10586": []
   },
   "packageFolders": {
     "C:\\Users\\jelled\\.nuget\\packages\\": {}
@@ -24440,14 +24443,24 @@
       "projectName": "TodoListUniversalWindows10",
       "projectPath": "C:\\Users\\jelled\\Desktop\\Code\\IdentitySamples\\Repo\\TodoListUniversalWindows10\\TodoListUniversalWindows10.csproj",
       "projectJsonPath": "C:\\Users\\jelled\\Desktop\\Code\\IdentitySamples\\Repo\\TodoListUniversalWindows10\\project.json",
-      "projectStyle": "ProjectJson"
+      "packagesPath": "C:\\Users\\jelled\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\jelled\\Desktop\\Code\\IdentitySamples\\Repo\\TodoListUniversalWindows10\\obj\\",
+      "projectStyle": "ProjectJson",
+      "configFilePaths": [
+        "C:\\Users\\jelled\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+      ],
+      "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "https://api.nuget.org/v3/index.json": {}
+      }
     },
     "dependencies": {
-      "Microsoft.NETCore.UniversalWindowsPlatform": "5.3.1",
-      "Newtonsoft.Json": "9.0.1"
+      "Microsoft.NETCore.UniversalWindowsPlatform": "[5.3.1, )",
+      "Newtonsoft.Json": "[9.0.1, )"
     },
     "frameworks": {
-      "uap10.0": {}
+      "uap10.0.10586": {}
     },
     "runtimes": {
       "win10-arm": {

@@ -73,6 +73,13 @@ function Initialize-AdfsApplicationGroup ($ConfigurationValues)
     $WebCoreClient = Add-AdfsServerApplication -ApplicationGroupIdentifier $ApplicationGroupIdentifier -Name $WebCoreClientDisplayName -Identifier $(New-Guid) -RedirectUri @($WebCoreClientRedirectUri) -GenerateClientSecret -PassThru
     $ConfigurationValues["TodoListWebCoreClientId"] = $WebCoreClient.Identifier
     $ConfigurationValues["TodoListWebCoreClientSecret"] = $WebCoreClient.ClientSecret
+	
+    # Register the Server application for the WebForms app.
+    $WebFormsClientDisplayName = "$ApplicationGroupIdentifier - WebForms Client"
+    Write-Host "Creating ""$WebFormsClientDisplayName"" in AD FS"
+    $WebFormsClient = Add-AdfsServerApplication -ApplicationGroupIdentifier $ApplicationGroupIdentifier -Name $WebFormsClientDisplayName -Identifier $(New-Guid) -RedirectUri @($ConfigurationValues["TodoListWebFormsRootUrl"]) -GenerateClientSecret -PassThru
+    $ConfigurationValues["TodoListWebFormsClientId"] = $WebFormsClient.Identifier
+    $ConfigurationValues["TodoListWebFormsClientSecret"] = $WebFormsClient.ClientSecret
 
     # Register the Server application for the Daemon app.
     $DaemonClientDisplayName = "$ApplicationGroupIdentifier - Daemon Client"
@@ -149,6 +156,7 @@ function Initialize-AdfsApplicationGroup ($ConfigurationValues)
     Grant-AdfsApplicationPermission -ServerRoleIdentifier $TodoListApi.Identifier[0] -ClientRoleIdentifier $WpfClientApp.Identifier -ScopeNames @("user_impersonation", "openid")
     Grant-AdfsApplicationPermission -ServerRoleIdentifier $TodoListApi.Identifier[0] -ClientRoleIdentifier $WebAppClient.Identifier -ScopeNames @("user_impersonation", "openid")
     Grant-AdfsApplicationPermission -ServerRoleIdentifier $TodoListApi.Identifier[0] -ClientRoleIdentifier $WebCoreClient.Identifier -ScopeNames @("user_impersonation", "openid")
+    Grant-AdfsApplicationPermission -ServerRoleIdentifier $TodoListApi.Identifier[0] -ClientRoleIdentifier $WebFormsClient.Identifier -ScopeNames @("user_impersonation", "openid")
     Grant-AdfsApplicationPermission -ServerRoleIdentifier $TodoListApi.Identifier[0] -ClientRoleIdentifier $DaemonClient.Identifier -ScopeNames @("user_impersonation")
 
     # Grant client applications access to the Taxonomy API.

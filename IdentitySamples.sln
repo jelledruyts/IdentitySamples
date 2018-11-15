@@ -7,36 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoListWebApp", "TodoListW
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoListWebApi", "TodoListWebApi\TodoListWebApi.csproj", "{11A10D48-8D21-47D1-B3DA-6CBA82C66789}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "00 - Solution Items", "00 - Solution Items", "{C7A4F408-7F06-46C7-8A74-A5C430894CD4}"
-	ProjectSection(SolutionItems) = preProject
-		.gitignore = .gitignore
-		LICENSE = LICENSE
-		README.md = README.md
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{5608E35F-173B-48FA-B892-91F4D7259B2E}"
-EndProject
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "TodoListWebSpa", "http://localhost:62920", "{6A6F8B90-45C0-4927-9842-A28D7AAEDDDB}"
-	ProjectSection(WebsiteProperties) = preProject
-		UseIISExpress = "true"
-		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5.1"
-		Debug.AspNetCompiler.VirtualPath = "/localhost_62920"
-		Debug.AspNetCompiler.PhysicalPath = "TodoListWebSpa\"
-		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_62920\"
-		Debug.AspNetCompiler.Updateable = "true"
-		Debug.AspNetCompiler.ForceOverwrite = "true"
-		Debug.AspNetCompiler.FixedNames = "false"
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.VirtualPath = "/localhost_62920"
-		Release.AspNetCompiler.PhysicalPath = "TodoListWebSpa\"
-		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_62920\"
-		Release.AspNetCompiler.Updateable = "true"
-		Release.AspNetCompiler.ForceOverwrite = "true"
-		Release.AspNetCompiler.FixedNames = "false"
-		Release.AspNetCompiler.Debug = "False"
-		SlnRelativePath = "TodoListWebSpa\"
-		DefaultWebSiteLanguage = "Visual C#"
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "03 - Clients", "03 - Clients", "{079BF8E4-4430-4423-B65A-FEF5676C470B}"
 EndProject
@@ -52,9 +23,49 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoListDaemon", "TodoListD
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoListUniversalWindows10", "TodoListUniversalWindows10\TodoListUniversalWindows10.csproj", "{E3F270F8-ED94-482A-BC2F-DF4574D419E9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoListWebCore", "TodoListWebCore\TodoListWebCore.csproj", "{F17AE9AC-9124-467C-9D7E-7B74A3B66D96}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TodoListWebCore", "TodoListWebCore\TodoListWebCore.csproj", "{F17AE9AC-9124-467C-9D7E-7B74A3B66D96}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaxonomyWebApi", "TaxonomyWebApi\TaxonomyWebApi.csproj", "{1B4B1FC3-DF06-4284-AE10-D7FD8D7069D3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaxonomyWebApi", "TaxonomyWebApi\TaxonomyWebApi.csproj", "{1B4B1FC3-DF06-4284-AE10-D7FD8D7069D3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoListWebForms", "TodoListWebForms\TodoListWebForms.csproj", "{5F66DF6D-872C-4612-ABE7-2E37EFAFE2FD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "00 - Setup", "00 - Setup", "{426CBDCC-81EF-4137-8B80-6075C1EB586E}"
+	ProjectSection(SolutionItems) = preProject
+		Setup\ConfigurationValues.xml = Setup\ConfigurationValues.xml
+		Setup\Setup-ADFS.psm1 = Setup\Setup-ADFS.psm1
+		Setup\Setup-AzureAD.psm1 = Setup\Setup-AzureAD.psm1
+		Setup\Setup-Common.psm1 = Setup\Setup-Common.psm1
+		Setup\Setup.ps1 = Setup\Setup.ps1
+	EndProjectSection
+EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "TodoListWebSpa", "TodoListWebSpa\", "{2AD46B03-61B8-4698-BAE6-43D70FAEC6F9}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_61578"
+		Debug.AspNetCompiler.PhysicalPath = "TodoListWebSpa\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_61578\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_61578"
+		Release.AspNetCompiler.PhysicalPath = "TodoListWebSpa\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_61578\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "61578"
+		SlnRelativePath = "TodoListWebSpa\"
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{39810FF7-0750-4AC7-85BF-B7D9290F2F2D}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		global.json = global.json
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -98,16 +109,6 @@ Global
 		{5608E35F-173B-48FA-B892-91F4D7259B2E}.Release|ARM.ActiveCfg = Release|Any CPU
 		{5608E35F-173B-48FA-B892-91F4D7259B2E}.Release|x64.ActiveCfg = Release|Any CPU
 		{5608E35F-173B-48FA-B892-91F4D7259B2E}.Release|x86.ActiveCfg = Release|Any CPU
-		{6A6F8B90-45C0-4927-9842-A28D7AAEDDDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6A6F8B90-45C0-4927-9842-A28D7AAEDDDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6A6F8B90-45C0-4927-9842-A28D7AAEDDDB}.Debug|ARM.ActiveCfg = Debug|Any CPU
-		{6A6F8B90-45C0-4927-9842-A28D7AAEDDDB}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{6A6F8B90-45C0-4927-9842-A28D7AAEDDDB}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{6A6F8B90-45C0-4927-9842-A28D7AAEDDDB}.Release|Any CPU.ActiveCfg = Debug|Any CPU
-		{6A6F8B90-45C0-4927-9842-A28D7AAEDDDB}.Release|Any CPU.Build.0 = Debug|Any CPU
-		{6A6F8B90-45C0-4927-9842-A28D7AAEDDDB}.Release|ARM.ActiveCfg = Debug|Any CPU
-		{6A6F8B90-45C0-4927-9842-A28D7AAEDDDB}.Release|x64.ActiveCfg = Debug|Any CPU
-		{6A6F8B90-45C0-4927-9842-A28D7AAEDDDB}.Release|x86.ActiveCfg = Debug|Any CPU
 		{8703CD35-26F9-4579-A6C3-303F2C7D85A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8703CD35-26F9-4579-A6C3-303F2C7D85A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8703CD35-26F9-4579-A6C3-303F2C7D85A1}.Debug|ARM.ActiveCfg = Debug|Any CPU
@@ -192,6 +193,38 @@ Global
 		{1B4B1FC3-DF06-4284-AE10-D7FD8D7069D3}.Release|x64.Build.0 = Release|Any CPU
 		{1B4B1FC3-DF06-4284-AE10-D7FD8D7069D3}.Release|x86.ActiveCfg = Release|Any CPU
 		{1B4B1FC3-DF06-4284-AE10-D7FD8D7069D3}.Release|x86.Build.0 = Release|Any CPU
+		{5F66DF6D-872C-4612-ABE7-2E37EFAFE2FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F66DF6D-872C-4612-ABE7-2E37EFAFE2FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F66DF6D-872C-4612-ABE7-2E37EFAFE2FD}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{5F66DF6D-872C-4612-ABE7-2E37EFAFE2FD}.Debug|ARM.Build.0 = Debug|Any CPU
+		{5F66DF6D-872C-4612-ABE7-2E37EFAFE2FD}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5F66DF6D-872C-4612-ABE7-2E37EFAFE2FD}.Debug|x64.Build.0 = Debug|Any CPU
+		{5F66DF6D-872C-4612-ABE7-2E37EFAFE2FD}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5F66DF6D-872C-4612-ABE7-2E37EFAFE2FD}.Debug|x86.Build.0 = Debug|Any CPU
+		{5F66DF6D-872C-4612-ABE7-2E37EFAFE2FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F66DF6D-872C-4612-ABE7-2E37EFAFE2FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F66DF6D-872C-4612-ABE7-2E37EFAFE2FD}.Release|ARM.ActiveCfg = Release|Any CPU
+		{5F66DF6D-872C-4612-ABE7-2E37EFAFE2FD}.Release|ARM.Build.0 = Release|Any CPU
+		{5F66DF6D-872C-4612-ABE7-2E37EFAFE2FD}.Release|x64.ActiveCfg = Release|Any CPU
+		{5F66DF6D-872C-4612-ABE7-2E37EFAFE2FD}.Release|x64.Build.0 = Release|Any CPU
+		{5F66DF6D-872C-4612-ABE7-2E37EFAFE2FD}.Release|x86.ActiveCfg = Release|Any CPU
+		{5F66DF6D-872C-4612-ABE7-2E37EFAFE2FD}.Release|x86.Build.0 = Release|Any CPU
+		{2AD46B03-61B8-4698-BAE6-43D70FAEC6F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2AD46B03-61B8-4698-BAE6-43D70FAEC6F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2AD46B03-61B8-4698-BAE6-43D70FAEC6F9}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{2AD46B03-61B8-4698-BAE6-43D70FAEC6F9}.Debug|ARM.Build.0 = Debug|Any CPU
+		{2AD46B03-61B8-4698-BAE6-43D70FAEC6F9}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2AD46B03-61B8-4698-BAE6-43D70FAEC6F9}.Debug|x64.Build.0 = Debug|Any CPU
+		{2AD46B03-61B8-4698-BAE6-43D70FAEC6F9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2AD46B03-61B8-4698-BAE6-43D70FAEC6F9}.Debug|x86.Build.0 = Debug|Any CPU
+		{2AD46B03-61B8-4698-BAE6-43D70FAEC6F9}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{2AD46B03-61B8-4698-BAE6-43D70FAEC6F9}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{2AD46B03-61B8-4698-BAE6-43D70FAEC6F9}.Release|ARM.ActiveCfg = Debug|Any CPU
+		{2AD46B03-61B8-4698-BAE6-43D70FAEC6F9}.Release|ARM.Build.0 = Debug|Any CPU
+		{2AD46B03-61B8-4698-BAE6-43D70FAEC6F9}.Release|x64.ActiveCfg = Debug|Any CPU
+		{2AD46B03-61B8-4698-BAE6-43D70FAEC6F9}.Release|x64.Build.0 = Debug|Any CPU
+		{2AD46B03-61B8-4698-BAE6-43D70FAEC6F9}.Release|x86.ActiveCfg = Debug|Any CPU
+		{2AD46B03-61B8-4698-BAE6-43D70FAEC6F9}.Release|x86.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -200,12 +233,16 @@ Global
 		{5FAB39E1-07CF-414C-9290-2A70E2B36F53} = {079BF8E4-4430-4423-B65A-FEF5676C470B}
 		{11A10D48-8D21-47D1-B3DA-6CBA82C66789} = {5CF11F85-59C5-497C-AF7E-19FA22B9C91A}
 		{5608E35F-173B-48FA-B892-91F4D7259B2E} = {7F4559E7-1102-427E-9A0C-06AB57831794}
-		{6A6F8B90-45C0-4927-9842-A28D7AAEDDDB} = {079BF8E4-4430-4423-B65A-FEF5676C470B}
 		{8703CD35-26F9-4579-A6C3-303F2C7D85A1} = {079BF8E4-4430-4423-B65A-FEF5676C470B}
 		{D59C9BC8-7423-4615-A224-F0F49CD5A0B6} = {079BF8E4-4430-4423-B65A-FEF5676C470B}
 		{B18FEF85-88F6-469C-A126-012D810CFE86} = {079BF8E4-4430-4423-B65A-FEF5676C470B}
 		{E3F270F8-ED94-482A-BC2F-DF4574D419E9} = {079BF8E4-4430-4423-B65A-FEF5676C470B}
 		{F17AE9AC-9124-467C-9D7E-7B74A3B66D96} = {079BF8E4-4430-4423-B65A-FEF5676C470B}
 		{1B4B1FC3-DF06-4284-AE10-D7FD8D7069D3} = {5CF11F85-59C5-497C-AF7E-19FA22B9C91A}
+		{5F66DF6D-872C-4612-ABE7-2E37EFAFE2FD} = {079BF8E4-4430-4423-B65A-FEF5676C470B}
+		{2AD46B03-61B8-4698-BAE6-43D70FAEC6F9} = {079BF8E4-4430-4423-B65A-FEF5676C470B}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {32340980-87F0-4E0E-A595-9837E0736DD8}
 	EndGlobalSection
 EndGlobal
