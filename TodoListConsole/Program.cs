@@ -18,12 +18,20 @@ namespace TodoListConsole
             {
                 try
                 {
-                    Console.WriteLine("A - Sign in and show identity information as seen by the Web API");
+                    Console.WriteLine("A - Sign in and show identity information as seen by the Web API - using web browser");
+                    Console.WriteLine("B - Sign in and show identity information as seen by the Web API - using device code");
                     Console.Write("Type your choice and press Enter: ");
                     var choice = Console.ReadLine();
                     if (string.Equals(choice, "A", StringComparison.InvariantCultureIgnoreCase))
                     {
-                        var identity = GetIdentityInfoFromWebApiAsync().Result;
+                        var token = GetTokenAsync(true).Result;
+                        var identity = GetIdentityInfoFromWebApiAsync(token).Result;
+                        identity.WriteToConsole();
+                    }
+                    else if (string.Equals(choice, "B", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        var token = GetTokenFromDeviceCodeAsync().Result;
+                        var identity = GetIdentityInfoFromWebApiAsync(token).Result;
                         identity.WriteToConsole();
                     }
                     else
@@ -38,10 +46,9 @@ namespace TodoListConsole
             }
         }
 
-        private static async Task<IdentityInfo> GetIdentityInfoFromWebApiAsync()
+        private static async Task<IdentityInfo> GetIdentityInfoFromWebApiAsync(AuthenticationResult token)
         {
             // Get identity information from the Todo List Web API.
-            var token = await GetTokenAsync(true);
             var todoListWebApiClient = GetTodoListClient(token.AccessToken);
             var todoListWebApiIdentityInfoRequest = new HttpRequestMessage(HttpMethod.Get, AppConfiguration.TodoListWebApiRootUrl + "api/identity");
             var todoListWebApiIdentityInfoResponse = await todoListWebApiClient.SendAsync(todoListWebApiIdentityInfoRequest);
@@ -65,6 +72,16 @@ namespace TodoListConsole
             var promptBehavior = forceLogin ? PromptBehavior.Always : PromptBehavior.Auto;
             var context = new AuthenticationContext(StsConfiguration.Authority, StsConfiguration.CanValidateAuthority);
             return await context.AcquireTokenAsync(AppConfiguration.TodoListWebApiResourceId, AppConfiguration.TodoListConsoleClientId, new Uri(AppConfiguration.TodoListConsoleRedirectUrl), new PlatformParameters(promptBehavior));
+        }
+
+        private static async Task<AuthenticationResult> GetTokenFromDeviceCodeAsync()
+        {
+            // [SCENARIO] OAuth 2.0 Device Code Flow
+            // Get a token to authenticate against the Web API.
+            var context = new AuthenticationContext(StsConfiguration.Authority, StsConfiguration.CanValidateAuthority);
+            var deviceCode = await context.AcquireDeviceCodeAsync(AppConfiguration.TodoListWebApiResourceId, AppConfiguration.TodoListConsoleClientId);
+            Console.WriteLine(deviceCode.Message);
+            return await context.AcquireTokenByDeviceCodeAsync(deviceCode);
         }
     }
 }
