@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace TodoListWebCore
@@ -110,7 +111,7 @@ namespace TodoListWebCore
                     {
                         // Handle sign-in errors differently than generic errors.
                         context.HandleResponse();
-                        context.Response.Redirect("/Home/Error?message=" + context.Failure.Message);
+                        context.Response.Redirect("/Home/Error?message=" + WebUtility.UrlEncode(context.Failure.Message));
                         return Task.FromResult(0);
                     }
                 }

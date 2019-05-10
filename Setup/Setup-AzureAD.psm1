@@ -82,16 +82,26 @@ function Get-AzureADRole ($TenantName, $Headers, $RoleTemplateId)
     return $DirectoryRole
 }
 
-function Grant-AzureADAdminConsent ($TenantName, $Headers, $ClientServicePrincipalObjectId, $ResourceServicePrincipalObjectId, $Scope)
+function Grant-AzureADAdminConsentOnOAuth2Permission ($TenantName, $Headers, $ClientServicePrincipalObjectId, $ResourceServicePrincipalObjectId, $Scope)
 {
-    $iOAuth2PermissionGrant = @{
+    $oauth2PermissionGrant = @{
         "clientId" = $ClientServicePrincipalObjectId # The service principal Object ID of the application
         "consentType" = "AllPrincipals" # Grant admin consent for all principals
         "expiryTime" = (Get-Date).AddYears(10).ToString("u").Replace(" ", "T")
         "resourceId" = $ResourceServicePrincipalObjectId # The service principal Object ID representing the resource
         "scope" = $Scope # The required scope(s)
     }
-    $Result = Send-GraphApiPostRequest -TenantName $TenantName -Headers $Headers -Path "oauth2PermissionGrants" -Body $iOAuth2PermissionGrant
+    $Result = Send-GraphApiPostRequest -TenantName $TenantName -Headers $Headers -Path "oauth2PermissionGrants" -Body $oauth2PermissionGrant
+}
+
+function Grant-AzureADAdminConsentOnAppRole ($TenantName, $Headers, $ClientServicePrincipalObjectId, $ResourceServicePrincipalObjectId, $AppRoleId)
+{
+    $appRoleAssignment = @{
+       "id" = $AppRoleId # The ID of the App Role being granted
+       "principalId" = $ClientServicePrincipalObjectId # The service principal Object ID of the application
+       "resourceId" = $ResourceServicePrincipalObjectId # The service principal Object ID representing the resource
+     }
+    $Result = Send-GraphApiPostRequest -TenantName $TenantName -Headers $Headers -Path "servicePrincipals/$ClientServicePrincipalObjectId/appRoleAssignments" -Body $appRoleAssignment
 }
 
 function Get-AzureADOAuth2PermissionId ($AzureADApplication, $PermissionValue)
@@ -102,6 +112,16 @@ function Get-AzureADOAuth2PermissionId ($AzureADApplication, $PermissionValue)
         throw "The OAuth 2.0 permission ""$PermissionValue"" was not found in the application object"
     }
     return $Permission.id
+}
+
+function Get-AzureADAppRoleId ($AzureADApplication, $RoleValue)
+{
+    $AppRole = $AzureADApplication.appRoles | Where { $_.value -eq $RoleValue }
+    if (!$AppRole)
+    {
+        throw "The App Role ""$RoleValue"" was not found in the application object"
+    }
+    return $AppRole.id
 }
 
 function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName)
@@ -166,11 +186,7 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
                 "resourceAppId" = "00000002-0000-0000-c000-000000000000" # Azure Active Directory
                 "resourceAccess" = @(
                     @{
-                        "id" = "5778995a-e1bf-45b8-affa-663a9f3f4d04" # "Directory.Read": Read directory data
-                        "type" = "Role" # Application Permission
-                    },
-                    @{
-                        "id" = "311a71cc-e848-46a1-bdf8-97ff7156d8e6" # "UserProfile.Read": Sign in and read user profile
+                        "id" = "311a71cc-e848-46a1-bdf8-97ff7156d8e6" # "User.Read": Sign in and read user profile
                         "type" = "Scope" # Delegated (User) Permission
                     }
                 )
@@ -207,15 +223,7 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
                 "resourceAppId" = "00000002-0000-0000-c000-000000000000" # Declare access to Azure Active Directory
                 "resourceAccess" = @(
                     @{
-                        "id" = "5778995a-e1bf-45b8-affa-663a9f3f4d04" # "Directory.Read": Read directory data
-                        "type" = "Role" # Application Permission
-                    },
-                    @{
-                        "id" = "78c8a3c8-a07e-4b9e-af1b-b5ccab50a175" # "Directory.Write": Read and write directory data
-                        "type" = "Role" # Application Permission
-                    },
-                    @{
-                        "id" = "311a71cc-e848-46a1-bdf8-97ff7156d8e6" # "UserProfile.Read": Sign in and read user profile
+                        "id" = "311a71cc-e848-46a1-bdf8-97ff7156d8e6" # "User.Read": Sign in and read user profile
                         "type" = "Scope" # Delegated (User) Permission
                     }
                 )
@@ -230,7 +238,7 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
                 )
             }
         )
-        "oauth2Permissions" = @( # Define app-specific permissions
+        "oauth2Permissions" = @( # Define app-specific delegated (user) permissions
             @{
                 "id" = New-Guid
                 "value" = "Todo.Read"
@@ -242,12 +250,21 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
             },
             @{
                 "id" = New-Guid
-                "value" = "Todo.Write"
+                "value" = "Todo.ReadWrite"
                 "type" = "User" # User consent is allowed (otherwise use "Admin" for admin-only consent)
                 "adminConsentDescription" = "Allow the application to write todo's on behalf of the signed-in user."
                 "adminConsentDisplayName" = "Write todo's"
                 "userConsentDescription" = "Allow the application to write todo's on your behalf."
                 "userConsentDisplayName" = "Write todo's"
+            },
+            @{
+                "id" = New-Guid
+                "value" = "Todo.Read.All"
+                "type" = "Admin" # Admin consent is required to have read permissions on todo's of all users
+                "adminConsentDescription" = "Allow the application to read todo's of all users."
+                "adminConsentDisplayName" = "Read all todo's"
+                "userConsentDescription" = "Allow the application to write todo's of all users."
+                "userConsentDisplayName" = "Read all todo's"
             }
         )
         "appRoles" =  @( # Define app-specific roles
@@ -256,14 +273,21 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
                 "value" = "administrator"
                 "displayName" = "Administrator"
                 "description" = "Administrators can manage the application"
-                "allowedMemberTypes" = @("User")
+                "allowedMemberTypes" = @("User") # Only users can get this role
             },
             @{
                 "id" = New-Guid
                 "value" = "contributor"
                 "displayName" = "Contributor"
                 "description" = "Contributors can manage their own todo lists"
-                "allowedMemberTypes" = @("User")
+                "allowedMemberTypes" = @("User") # Only users can get this role
+            },
+            @{
+                "id" = New-Guid
+                "value" = "Todo.ReadWrite.All"
+                "displayName" = "Read and write all todo's"
+                "description" = "Application is allowed to read and write todo's for all users"
+                "allowedMemberTypes" = @("Application") # Only applications can get this role
             }
         )
         "passwordCredentials" = @( # Add a client secret
@@ -283,9 +307,11 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
     $ConfigurationValues["TodoListWebApiClientId"] = $TodoListApi.appId
     # Note that the "user_impersonation" permission is automatically added.
     $TodoListApiTodoReadPermissionId = Get-AzureADOAuth2PermissionId -AzureADApplication $TodoListApi -PermissionValue "Todo.Read"
-    $TodoListApiTodoWritePermissionId = Get-AzureADOAuth2PermissionId -AzureADApplication $TodoListApi -PermissionValue "Todo.Write"
+    $TodoListApiTodoReadWritePermissionId = Get-AzureADOAuth2PermissionId -AzureADApplication $TodoListApi -PermissionValue "Todo.ReadWrite"
+    $TodoListApiTodoReadAllPermissionId = Get-AzureADOAuth2PermissionId -AzureADApplication $TodoListApi -PermissionValue "Todo.Read.All"
+	$TodoListApiTodoReadWriteAllAppRoleId = Get-AzureADAppRoleId -AzureADApplication $TodoListApi -RoleValue "Todo.ReadWrite.All"
     # Grant admin consent for the TodoList API to access the Taxonomy API.
-    Grant-AzureADAdminConsent -TenantName $TenantName -Headers $Headers -ClientServicePrincipalObjectId $TodoListApiServicePrincipal.objectId -ResourceServicePrincipalObjectId $TaxonomyApiServicePrincipal.objectId -Scope "user_impersonation"
+    Grant-AzureADAdminConsentOnOAuth2Permission -TenantName $TenantName -Headers $Headers -ClientServicePrincipalObjectId $TodoListApiServicePrincipal.objectId -ResourceServicePrincipalObjectId $TaxonomyApiServicePrincipal.objectId -Scope "user_impersonation"
     
     # Register the Server application for the Daemon app.
     Write-Host "Creating ""$DaemonClientDisplayName"" in Azure AD"
@@ -299,7 +325,7 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
                 "resourceAppId" = "00000002-0000-0000-c000-000000000000" # Declare access to Azure Active Directory
                 "resourceAccess" = @(
                     @{
-                        "id" = "311a71cc-e848-46a1-bdf8-97ff7156d8e6" # "UserProfile.Read": Sign in and read user profile
+                        "id" = "311a71cc-e848-46a1-bdf8-97ff7156d8e6" # "User.Read": Sign in and read user profile
                         "type" = "Scope" # Delegated (User) Permission
                     }
                 )
@@ -312,8 +338,12 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
                         "type" = "Scope" # Delegated (User) Permission
                     },
                     @{
-                        "id" = $TodoListApiTodoWritePermissionId # The ID for the "Todo.Write" access permission
+                        "id" = $TodoListApiTodoReadWritePermissionId # The ID for the "Todo.ReadWrite" access permission
                         "type" = "Scope" # Delegated (User) Permission
+                    },
+                    @{
+                        "id" = $TodoListApiTodoReadWriteAllAppRoleId # The ID for the "Todo.ReadWrite.All" app role
+                        "type" = "Role" # Application Permission
                     }
                 )
             }
@@ -351,6 +381,8 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
         Write-Warning "The client certificate file ""$DaemonClientCertificateFileName"" was not found, the Daemon Client application will be registered without it"
         $DaemonClientServicePrincipal = New-AzureADServicePrincipal -TenantName $TenantName -Headers $Headers -AppId $DaemonClient.appId
     }
+	# Grant admin consent on the Daemon Client to access the TodoList API through the "Todo.ReadWrite.All" App Role
+    Grant-AzureADAdminConsentOnAppRole -TenantName $TenantName -Headers $Headers -ClientServicePrincipalObjectId $DaemonClientServicePrincipal.objectId -ResourceServicePrincipalObjectId $TodoListApiServicePrincipal.objectId -AppRoleId $TodoListApiTodoReadWriteAllAppRoleId
     $ConfigurationValues["TodoListDaemonClientId"] = $DaemonClient.appId
 
     # Register the Server application for the TodoList Web App.
@@ -366,11 +398,7 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
                 "resourceAppId" = "00000002-0000-0000-c000-000000000000" # Declare access to Azure Active Directory
                 "resourceAccess" = @(
                     @{
-                        "id" = "5778995a-e1bf-45b8-affa-663a9f3f4d04" # "Directory.Read": Read directory data
-                        "type" = "Role" # Application Permission
-                    },
-                    @{
-                        "id" = "311a71cc-e848-46a1-bdf8-97ff7156d8e6" # "UserProfile.Read": Sign in and read user profile
+                        "id" = "311a71cc-e848-46a1-bdf8-97ff7156d8e6" # "User.Read": Sign in and read user profile
                         "type" = "Scope" # Delegated (User) Permission
                     }
                 )
@@ -383,7 +411,7 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
                         "type" = "Scope" # Delegated (User) Permission
                     },
                     @{
-                        "id" = $TodoListApiTodoWritePermissionId # The ID for the "Todo.Write" access permission
+                        "id" = $TodoListApiTodoReadWritePermissionId # The ID for the "Todo.ReadWrite" access permission
                         "type" = "Scope" # Delegated (User) Permission
                     }
                 )
@@ -422,11 +450,7 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
                 "resourceAppId" = "00000002-0000-0000-c000-000000000000" # Declare access to Azure Active Directory
                 "resourceAccess" = @(
                     @{
-                        "id" = "5778995a-e1bf-45b8-affa-663a9f3f4d04" # "Directory.Read": Read directory data
-                        "type" = "Role" # Application Permission
-                    },
-                    @{
-                        "id" = "311a71cc-e848-46a1-bdf8-97ff7156d8e6" # "UserProfile.Read": Sign in and read user profile
+                        "id" = "311a71cc-e848-46a1-bdf8-97ff7156d8e6" # "User.Read": Sign in and read user profile
                         "type" = "Scope" # Delegated (User) Permission
                     }
                 )
@@ -439,7 +463,7 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
                         "type" = "Scope" # Delegated (User) Permission
                     },
                     @{
-                        "id" = $TodoListApiTodoWritePermissionId # The ID for the "Todo.Write" access permission
+                        "id" = $TodoListApiTodoReadWritePermissionId # The ID for the "Todo.ReadWrite" access permission
                         "type" = "Scope" # Delegated (User) Permission
                     }
                 )
@@ -474,11 +498,7 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
                 "resourceAppId" = "00000002-0000-0000-c000-000000000000" # Declare access to Azure Active Directory
                 "resourceAccess" = @(
                     @{
-                        "id" = "5778995a-e1bf-45b8-affa-663a9f3f4d04" # "Directory.Read": Read directory data
-                        "type" = "Role" # Application Permission
-                    },
-                    @{
-                        "id" = "311a71cc-e848-46a1-bdf8-97ff7156d8e6" # "UserProfile.Read": Sign in and read user profile
+                        "id" = "311a71cc-e848-46a1-bdf8-97ff7156d8e6" # "User.Read": Sign in and read user profile
                         "type" = "Scope" # Delegated (User) Permission
                     }
                 )
@@ -491,7 +511,7 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
                         "type" = "Scope" # Delegated (User) Permission
                     },
                     @{
-                        "id" = $TodoListApiTodoWritePermissionId # The ID for the "Todo.Write" access permission
+                        "id" = $TodoListApiTodoReadWritePermissionId # The ID for the "Todo.ReadWrite" access permission
                         "type" = "Scope" # Delegated (User) Permission
                     }
                 )
@@ -526,7 +546,7 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
                 "resourceAppId" = "00000002-0000-0000-c000-000000000000" # Declare access to Azure Active Directory
                 "resourceAccess" = @(
                     @{
-                        "id" = "311a71cc-e848-46a1-bdf8-97ff7156d8e6" # "UserProfile.Read": Sign in and read user profile
+                        "id" = "311a71cc-e848-46a1-bdf8-97ff7156d8e6" # "User.Read": Sign in and read user profile
                         "type" = "Scope" # Delegated (User) Permission
                     }
                 )
@@ -539,7 +559,7 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
                         "type" = "Scope" # Delegated (User) Permission
                     },
                     @{
-                        "id" = $TodoListApiTodoWritePermissionId # The ID for the "Todo.Write" access permission
+                        "id" = $TodoListApiTodoReadWritePermissionId # The ID for the "Todo.ReadWrite" access permission
                         "type" = "Scope" # Delegated (User) Permission
                     }
                 )
@@ -550,7 +570,7 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
     $WebSpaClientServicePrincipal = New-AzureADServicePrincipal -TenantName $TenantName -Headers $Headers -AppId $WebSpaClient.appId
     $ConfigurationValues["TodoListWebSpaClientId"] = $WebSpaClient.appId
     # Grant admin consent for the TodoList Web SPA application to access the TodoList API (this cannot be done during an OAuth 2.0 Implicit Grant).
-    Grant-AzureADAdminConsent -TenantName $TenantName -Headers $Headers -ClientServicePrincipalObjectId $WebSpaClientServicePrincipal.objectId -ResourceServicePrincipalObjectId $TodoListApiServicePrincipal.objectId -Scope "user_impersonation"
+    Grant-AzureADAdminConsentOnOAuth2Permission -TenantName $TenantName -Headers $Headers -ClientServicePrincipalObjectId $WebSpaClientServicePrincipal.objectId -ResourceServicePrincipalObjectId $TodoListApiServicePrincipal.objectId -Scope "user_impersonation"
 
     # Register the Native application for the WPF app.
     Write-Host "Creating ""$WpfClientDisplayName"" in Azure AD"
@@ -564,7 +584,7 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
                 "resourceAppId" = "00000002-0000-0000-c000-000000000000" # Declare access to Azure Active Directory
                 "resourceAccess" = @(
                     @{
-                        "id" = "311a71cc-e848-46a1-bdf8-97ff7156d8e6" # "UserProfile.Read": Sign in and read user profile
+                        "id" = "311a71cc-e848-46a1-bdf8-97ff7156d8e6" # "User.Read": Sign in and read user profile
                         "type" = "Scope" # Delegated (User) Permission
                     }
                 )
@@ -577,7 +597,7 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
                         "type" = "Scope" # Delegated (User) Permission
                     },
                     @{
-                        "id" = $TodoListApiTodoWritePermissionId # The ID for the "Todo.Write" access permission
+                        "id" = $TodoListApiTodoReadWritePermissionId # The ID for the "Todo.ReadWrite" access permission
                         "type" = "Scope" # Delegated (User) Permission
                     }
                 )
@@ -600,7 +620,7 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
                 "resourceAppId" = "00000002-0000-0000-c000-000000000000" # Declare access to Azure Active Directory
                 "resourceAccess" = @(
                     @{
-                        "id" = "311a71cc-e848-46a1-bdf8-97ff7156d8e6" # "UserProfile.Read": Sign in and read user profile
+                        "id" = "311a71cc-e848-46a1-bdf8-97ff7156d8e6" # "User.Read": Sign in and read user profile
                         "type" = "Scope" # Delegated (User) Permission
                     }
                 )
@@ -613,7 +633,7 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
                         "type" = "Scope" # Delegated (User) Permission
                     },
                     @{
-                        "id" = $TodoListApiTodoWritePermissionId # The ID for the "Todo.Write" access permission
+                        "id" = $TodoListApiTodoReadWritePermissionId # The ID for the "Todo.ReadWrite" access permission
                         "type" = "Scope" # Delegated (User) Permission
                     }
                 )
@@ -636,7 +656,7 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
                 "resourceAppId" = "00000002-0000-0000-c000-000000000000" # Declare access to Azure Active Directory
                 "resourceAccess" = @(
                     @{
-                        "id" = "311a71cc-e848-46a1-bdf8-97ff7156d8e6" # "UserProfile.Read": Sign in and read user profile
+                        "id" = "311a71cc-e848-46a1-bdf8-97ff7156d8e6" # "User.Read": Sign in and read user profile
                         "type" = "Scope" # Delegated (User) Permission
                     }
                 )
@@ -649,7 +669,7 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
                         "type" = "Scope" # Delegated (User) Permission
                     },
                     @{
-                        "id" = $TodoListApiTodoWritePermissionId # The ID for the "Todo.Write" access permission
+                        "id" = $TodoListApiTodoReadWritePermissionId # The ID for the "Todo.ReadWrite" access permission
                         "type" = "Scope" # Delegated (User) Permission
                     }
                 )
