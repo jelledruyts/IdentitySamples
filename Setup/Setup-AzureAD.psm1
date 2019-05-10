@@ -311,6 +311,7 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
     $TodoListApiTodoReadAllPermissionId = Get-AzureADOAuth2PermissionId -AzureADApplication $TodoListApi -PermissionValue "Todo.Read.All"
 	$TodoListApiTodoReadWriteAllAppRoleId = Get-AzureADAppRoleId -AzureADApplication $TodoListApi -RoleValue "Todo.ReadWrite.All"
     # Grant admin consent for the TodoList API to access the Taxonomy API.
+	# The alternative is to use "knownClientApplications" to pre-identify the API's that client applications need, and that users can consent to from the beginning.
     Grant-AzureADAdminConsentOnOAuth2Permission -TenantName $TenantName -Headers $Headers -ClientServicePrincipalObjectId $TodoListApiServicePrincipal.objectId -ResourceServicePrincipalObjectId $TaxonomyApiServicePrincipal.objectId -Scope "user_impersonation"
     
     # Register the Server application for the Daemon app.
@@ -381,7 +382,7 @@ function Initialize-AzureAD ($ConfigurationValues, $AzureADInstance, $TenantName
         Write-Warning "The client certificate file ""$DaemonClientCertificateFileName"" was not found, the Daemon Client application will be registered without it"
         $DaemonClientServicePrincipal = New-AzureADServicePrincipal -TenantName $TenantName -Headers $Headers -AppId $DaemonClient.appId
     }
-	# Grant admin consent on the Daemon Client to access the TodoList API through the "Todo.ReadWrite.All" App Role
+	# Grant admin consent on the Daemon Client to access the TodoList API through the "Todo.ReadWrite.All" App Role.
     Grant-AzureADAdminConsentOnAppRole -TenantName $TenantName -Headers $Headers -ClientServicePrincipalObjectId $DaemonClientServicePrincipal.objectId -ResourceServicePrincipalObjectId $TodoListApiServicePrincipal.objectId -AppRoleId $TodoListApiTodoReadWriteAllAppRoleId
     $ConfigurationValues["TodoListDaemonClientId"] = $DaemonClient.appId
 
